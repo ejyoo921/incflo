@@ -25,16 +25,16 @@ incflo.gravity          =   0.  0.      # Gravitational force (3D)
 incflo.ro_0             =   1000.       # Reference density 
 
 incflo.fluid_model      =   "hb" # Fluid model (rheology)
-incflo.mu               =   1000.       # Dynamic viscosity coefficient
+incflo.mu               =   10.       # Dynamic viscosity coefficient
 incflo.tau_0            =   1.          # Yield stresst
-incflo.papa_reg         =   1.0e-3      # Papanastasiou regularisation parameter (epsilon)
-incflo.n                =   0.5          # flow type
+incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter (epsilon)
+incflo.n                =   1.5          # flow type
 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   32  32      # Grid cells at coarsest AMRlevel
+amr.n_cell              =   128  128    # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#

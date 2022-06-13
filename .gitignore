@@ -52,6 +52,8 @@ exec/movie.visit
 exec/*.vtp
 exec/*.pvtp
 test/*.ex
+test_2d/*.ex
+test_3d/*.ex
 test/tmp_build_dir/
 test/Backtrace.*
 test/*plt*/
