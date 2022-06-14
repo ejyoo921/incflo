@@ -21,6 +21,8 @@ TAGS
 
 # OS Lint
 .DS_Store
+._.DS_Store
+src/._.DS_Store
 .dirstamp
 
 Makefile
