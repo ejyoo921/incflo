@@ -59,4 +59,8 @@ test_3d/*.ex
 test/tmp_build_dir/
 test/Backtrace.*
 test/*plt*/
+test_2d/*plt*/
+test_3d/*plt*/
 test/chk*/
+test_2d/chk*/
+test_3d/chk*/

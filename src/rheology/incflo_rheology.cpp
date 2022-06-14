@@ -21,6 +21,10 @@ struct NonNewtonianViscosity
     amrex::Real operator() (amrex::Real sr) const noexcept {
         switch (fluid_model)
         {
+        // case incflo::FluidModel::simple:
+        // {
+        //     return mu;
+        // }
         case incflo::FluidModel::powerlaw:
         {
             return mu * std::pow(sr,n_flow-1.0);
@@ -31,10 +35,10 @@ struct NonNewtonianViscosity
             // return (sr * mu + tau_0) * expterm(sr/papa_reg) / papa_reg; 
 
             // EY: This is test for the new eta values with pressure 
-            return (sr/2.0) * (mu_1 + A_1* expterm(sr/papa_reg * alpha_1) / papa_reg);
+            // return (sr/2.0) * (mu_1 + A_1* expterm(sr/papa_reg * alpha_1) / papa_reg);
 
             //Original code:
-            // return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
+            return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
             // expterm(sr/papa_reg)/papa_reg = (1-exp(-sr/papa_reg))/sr
         }
         case incflo::FluidModel::HerschelBulkley:
