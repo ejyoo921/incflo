@@ -37,8 +37,24 @@ void incflo::ReadRheologyParameters()
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg > 0.0,
                     "Papanastasiou regularisation parameter must be positive");
 
+         pp.query("mu_1", m_mu_1);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_1 > 0.0,
+                    "Fitting parameter mu1 must be positive");
+
+         pp.query("A_1", m_A_1);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_1 > 0.0,
+                    "Fitting parameter must be positive");
+
+         pp.query("alpha_1", m_alpha_1);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 > 0.0,
+                    "Fitting parameter must be positive");
+
+
          amrex::Print() << "Bingham fluid with"
                         << " mu = " << m_mu
+                        << " mu_1 = " << m_mu_1
+                        << " A_1 = " << m_A_1
+                        << " alpha_1 = " << m_alpha_1
                         << ", tau_0 = " << m_tau_0
                         << ", papa_reg = " << m_papa_reg << std::endl;
      }

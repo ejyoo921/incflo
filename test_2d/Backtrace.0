@@ -1,0 +1,43 @@
+=== If no file names and line numbers are shown below, one can run
+            addr2line -Cpfie my_exefile my_line_address
+    to convert `my_line_address` (e.g., 0x4a6b) into file name and line number.
+    Or one can use amrex/Tools/Backtrace/parse_bt.py.
+
+=== Please note that the line number reported by addr2line may not be accurate.
+    One can use
+            readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+
+ 0: ./incflo2d.gnu.MPI.EB.ex(+0x305475) [0x556c95b1f475]
+    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
+
+ 1: ./incflo2d.gnu.MPI.EB.ex(+0x30790a) [0x556c95b2190a]
+    amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
+
+ 2: ./incflo2d.gnu.MPI.EB.ex(+0x200c34) [0x556c95a1ac34]
+    bool amrex::(anonymous namespace)::(anonymous namespace)::squeryval<int>(std::__cxx11::list<amrex::ParmParse::PP_entry, std::allocator<amrex::ParmParse::PP_entry> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int&, int, int) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:777
+
+ 3: ./incflo2d.gnu.MPI.EB.ex(+0x201079) [0x556c95a1b079]
+    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const at /usr/include/c++/10/bits/basic_string.h:187 (discriminator 4)
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_is_local() const at /usr/include/c++/10/bits/basic_string.h:222 (discriminator 4)
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() at /usr/include/c++/10/bits/basic_string.h:231 (discriminator 4)
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() at /usr/include/c++/10/bits/basic_string.h:658 (discriminator 4)
+ (inlined by) amrex::ParmParse::query(char const*, int&, int) const at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:1345 (discriminator 4)
+
+ 4: ./incflo2d.gnu.MPI.EB.ex(+0xf5687) [0x556c9590f687]
+    incflo::ReadIOParameters() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/setup/init.cpp:212
+
+ 5: ./incflo2d.gnu.MPI.EB.ex(+0xf5e05) [0x556c9590fe05]
+    incflo::ReadParameters() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/setup/init.cpp:21
+
+ 6: ./incflo2d.gnu.MPI.EB.ex(+0x470db) [0x556c958610db]
+    incflo::incflo() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/incflo.cpp:21
+
+ 7: ./incflo2d.gnu.MPI.EB.ex(+0x38fb9) [0x556c95852fb9]
+    main at /home/eyoo/CCSE_packages/incflo/test_2d/../src/main.cpp:48 (discriminator 8)
+
+ 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f226767b083]
+
+ 9: ./incflo2d.gnu.MPI.EB.ex(+0x40cfe) [0x556c9585acfe]
+    ?? ??:0
+

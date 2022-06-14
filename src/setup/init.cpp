@@ -231,11 +231,11 @@ void incflo::ReadIOParameters()
         m_plt_gpy        = 1;
         m_plt_gpz        = 1;
         m_plt_rho        = 1;
-        m_plt_tracer     = 1;
-        m_plt_p_nd       = 0;
-        m_plt_p_cc       = 0;
+        m_plt_tracer     = 0;
+        m_plt_p_nd       = 1;
+        m_plt_p_cc       = 1;
         m_plt_macphi     = 0;
-        m_plt_eta        = 0;
+        m_plt_eta        = 1;
         m_plt_vort       = 0;
         m_plt_strainrate = 0;
         m_plt_divu       = 0;

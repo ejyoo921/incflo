@@ -15,7 +15,7 @@ amrex::Real expterm (amrex::Real nu) noexcept
 struct NonNewtonianViscosity
 {
     incflo::FluidModel fluid_model;
-    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg;
+    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, mu_1, A_1, alpha_1;
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real operator() (amrex::Real sr) const noexcept {
@@ -28,8 +28,13 @@ struct NonNewtonianViscosity
         case incflo::FluidModel::Bingham:
         {
             // EY: I think this is incorrect: (sr * mu + tau)
-            // return (sr * mu + tau) * expterm(sr/papa_reg) / papa_reg; 
-            return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
+            // return (sr * mu + tau_0) * expterm(sr/papa_reg) / papa_reg; 
+
+            // EY: This is test for the new eta values with pressure 
+            return (sr/2.0) * (mu_1 + A_1* expterm(sr/papa_reg * alpha_1) / papa_reg);
+
+            //Original code:
+            // return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
             // expterm(sr/papa_reg)/papa_reg = (1-exp(-sr/papa_reg))/sr
         }
         case incflo::FluidModel::HerschelBulkley:
@@ -40,6 +45,10 @@ struct NonNewtonianViscosity
         {
             return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr*(eta_0/tau_0))*(eta_0/tau_0);
         }
+        // case incflo::FluidModel::NonIsotropic1:
+        // {
+        //     return (sr/2.0)*(p_nd)*(mu_1 + A_1 * std::pow(sr*dia/pow(p_nd/ro_0,0.5), alpha_1));
+        // }
         default:
         {
             return mu;
@@ -81,6 +90,10 @@ void incflo::compute_viscosity_at_level (int lev,
         non_newtonian_viscosity.tau_0 = m_tau_0;
         non_newtonian_viscosity.eta_0 = m_eta_0;
         non_newtonian_viscosity.papa_reg = m_papa_reg;
+
+        non_newtonian_viscosity.mu_1 = m_mu_1;
+        non_newtonian_viscosity.A_1 = m_A_1;
+        non_newtonian_viscosity.alpha_1 = m_alpha_1;
 
 #ifdef AMREX_USE_EB
         auto const& fact = EBFactory(lev);

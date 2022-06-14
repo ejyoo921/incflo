@@ -30,6 +30,12 @@ incflo.tau_0            =   1.          # Yield stresst
 incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter (epsilon)
 incflo.n                =   1.5          # flow type
 
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#             NonIsotropic              #
+#.......................................#
+incflo.mu_1             =   0.1
+incflo.A_1              =   0.526
+incflo.alpha_1          =   0.5
 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#

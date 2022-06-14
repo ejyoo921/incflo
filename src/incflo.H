@@ -472,6 +472,9 @@ private:
     amrex::Real m_tau_0 = 0.0;
     amrex::Real m_papa_reg = 0.0;
     amrex::Real m_eta_0 = 0.0;
+    amrex::Real m_mu_1 = 0.0;
+    amrex::Real m_A_1 = 0.0;
+    amrex::Real m_alpha_1 = 1.0;
 
     int m_plot_int = -1;
 
@@ -504,16 +507,16 @@ private:
     int m_plt_gpy         = 1;
     int m_plt_gpz         = 1;
     int m_plt_rho         = 1;
-    int m_plt_tracer      = 1;
-    int m_plt_p_nd        = 0;
-    int m_plt_p_cc        = 0;
+    int m_plt_tracer      = 0;
+    int m_plt_p_nd        = 1;
+    int m_plt_p_cc        = 1;
     int m_plt_macphi      = 0;
-    int m_plt_eta         = 0;
-    int m_plt_vort        = 1;
+    int m_plt_eta         = 1;
+    int m_plt_vort        = 0;
     int m_plt_forcing     = 0;
     int m_plt_strainrate  = 0;
     int m_plt_divu        = 0;
-    int m_plt_vfrac       = 1;
+    int m_plt_vfrac       = 0;
     int m_plt_error_u     = 0;
     int m_plt_error_v     = 0;
     int m_plt_error_w     = 0;
