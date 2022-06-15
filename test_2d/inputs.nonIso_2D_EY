@@ -22,21 +22,14 @@ amr.restart             =   ""          # Checkpoint to restart from
 #               PHYSICS                 #
 #.......................................#
 incflo.gravity          =   0.  0.      # Gravitational force (3D)
-incflo.ro_0             =   1000.       # Reference density 
+incflo.ro_0             =   1.          # Reference density 
+incflo.diam             =   0.1         # Particle (mean) diameter
 
-incflo.fluid_model      =   "bingham"   # Fluid model (rheology)
-incflo.mu               =   10.         # Dynamic viscosity coefficient
-incflo.tau_0            =   1.          # Yield stresst
-incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter (epsilon)
-incflo.n                =   1.5          # flow type
-
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
-#             NonIsotropic              #
-#.......................................#
+incflo.fluid_model      =  "NonIso"     # Fluid model (rheology)
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.526
 incflo.alpha_1          =   0.5
-
+incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter (epsilon)
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
@@ -49,14 +42,21 @@ amr.max_level           =   0           # Max AMR level in hierarchy
 #.......................................#
 geometry.prob_lo        =   0.  0.      # Lo corner coordinates
 geometry.prob_hi        =   1.  1.      # Hi corner coordinates
-geometry.is_periodic    =   0   0       # Periodicity x y z (0/1)
+geometry.is_periodic    =   1   0       # Periodicity x y z (0/1)
 
 # Boundary conditions
-xlo.type                =   "nsw"
-xhi.type                =   "nsw"
+#xlo.type                =   "nsw"
+#xhi.type                =   "nsw"
+
 ylo.type                =   "nsw"
 yhi.type                =   "nsw"
 yhi.velocity            =   1.  0.  
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#          INITIAL CONDITIONS           #
+#.......................................#
+#incflo.probtype         =   666         # Granular flow model
+#incflo.ic_p         #    =   0.000     # Initial pressure
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #

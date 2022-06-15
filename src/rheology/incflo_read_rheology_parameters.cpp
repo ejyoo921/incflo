@@ -37,24 +37,9 @@ void incflo::ReadRheologyParameters()
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg > 0.0,
                     "Papanastasiou regularisation parameter must be positive");
 
-         pp.query("mu_1", m_mu_1);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_1 > 0.0,
-                    "Fitting parameter mu1 must be positive");
-
-         pp.query("A_1", m_A_1);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_1 > 0.0,
-                    "Fitting parameter must be positive");
-
-         pp.query("alpha_1", m_alpha_1);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 > 0.0,
-                    "Fitting parameter must be positive");
-
 
          amrex::Print() << "Bingham fluid with"
                         << " mu = " << m_mu
-                        << " mu_1 = " << m_mu_1
-                        << " A_1 = " << m_A_1
-                        << " alpha_1 = " << m_alpha_1
                         << ", tau_0 = " << m_tau_0
                         << ", papa_reg = " << m_papa_reg << std::endl;
      }
@@ -98,6 +83,40 @@ void incflo::ReadRheologyParameters()
                         << ", n = " << m_n_0
                         << ", tau_0 = " << m_tau_0
                         << ", eta_0 = " << m_eta_0 << std::endl;
+     }
+     else if(fluid_model_s == "NonIso")
+     {
+         m_fluid_model = FluidModel::NonIsotropic;
+         pp.query("diam", m_diam);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_diam > 0.0,
+                    "Particle diameter must be positive");
+
+         pp.query("ro_0", m_ro_0);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_ro_0 > 0.0,
+                    "Reference density must be positive");
+
+         pp.query("papa_reg", m_papa_reg);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg > 0.0,
+                    "Papanastasiou regularisation parameter must be positive");
+
+         pp.query("mu_1", m_mu_1);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_1 > 0.0,
+                    "Fitting parameter mu1 must be positive");
+
+         pp.query("A_1", m_A_1);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_1 > 0.0,
+                    "Fitting parameter must be positive");
+
+         pp.query("alpha_1", m_alpha_1);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 > 0.0,
+                    "Fitting parameter must be positive");
+
+
+         amrex::Print() << "NonIsotropic stress with"
+                        << " mu_1 = " << m_mu_1
+                        << " A_1 = " << m_A_1
+                        << " alpha_1 = " << m_alpha_1
+                        << ", papa_reg = " << m_papa_reg << std::endl;
      }
      else
      {
