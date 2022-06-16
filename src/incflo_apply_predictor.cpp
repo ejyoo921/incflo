@@ -130,7 +130,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // Compute viscosity / diffusive coefficients
     // *************************************************************************************
     compute_viscosity(GetVecOfPtrs(vel_eta),
-                      get_density_old(), get_velocity_old(),
+                      get_density_old(), get_velocity_old(), get_mac_phi(),
                       m_cur_time, 1);
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
 

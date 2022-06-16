@@ -250,11 +250,13 @@ public: // for cuda
     virtual void compute_viscosity (amrex::Vector<amrex::MultiFab*> const& eta,
                                     amrex::Vector<amrex::MultiFab*> const& rho,
                                     amrex::Vector<amrex::MultiFab*> const& vel,
+                                    amrex::Vector<amrex::MultiFab*> const& p_nd,
                                     amrex::Real time, int nghost);
     virtual void compute_viscosity_at_level (int lev,
                                              amrex::MultiFab* eta,
                                              amrex::MultiFab* rho,
                                              amrex::MultiFab* vel,
+                                             amrex::MultiFab* p_nd,
                                              amrex::Geometry& lev_geom,
                                              amrex::Real time, int nghost);
     virtual void compute_tracer_diff_coeff (amrex::Vector<amrex::MultiFab*> const& tra_eta,

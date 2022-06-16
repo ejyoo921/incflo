@@ -581,6 +581,7 @@ void incflo::WritePlotFile()
                                        &vel_eta,
                                        &m_leveldata[lev]->density,
                                        &m_leveldata[lev]->velocity,
+                                       &m_leveldata[lev]->p_nd,
                                        Geom(lev),
                                        m_cur_time, 0);
         }
