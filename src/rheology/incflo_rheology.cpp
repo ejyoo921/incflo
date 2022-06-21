@@ -29,10 +29,10 @@ struct NonNewtonianViscosity
         case incflo::FluidModel::Bingham:
         {
             // EY: I think this is incorrect: (sr * mu + tau)
-            // return (sr * mu + tau_0) * expterm(sr/papa_reg) / papa_reg; 
+            return (sr * mu + tau_0) * expterm(sr/papa_reg) / papa_reg; 
 
             //Original code:
-            return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
+            // return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
             // expterm(sr/papa_reg)/papa_reg = (1-exp(-sr/papa_reg))/sr
         }
         case incflo::FluidModel::HerschelBulkley:
@@ -45,7 +45,6 @@ struct NonNewtonianViscosity
         }
         case incflo::FluidModel::NonIsotropic:
         {
-            // return (sr/2.0)*(p_nd)*(mu_1 + A_1 * std::pow(sr*diam_0/pow(p_nd/ro_0,0.5), alpha_1));
             return (sr/2.0)*(pressure)*(mu_1 + A_1 * std::pow(sr*diam/pow(pressure/ro_0,0.5), alpha_1));
         }
         default:
@@ -61,12 +60,12 @@ struct NonNewtonianViscosity
 void incflo::compute_viscosity (Vector<MultiFab*> const& vel_eta,
                                 Vector<MultiFab*> const& rho,
                                 Vector<MultiFab*> const& vel,
-                                Vector<MultiFab*> const& p_nd,
+                                Vector<MultiFab*> const& p_lev,
                                 Real time, int nghost)
 {
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        compute_viscosity_at_level(lev, vel_eta[lev], rho[lev], vel[lev], p_nd[lev], geom[lev], time, nghost);
+        compute_viscosity_at_level(lev, vel_eta[lev], rho[lev], vel[lev], p_lev[lev], geom[lev], time, nghost);
     }
 }
 
@@ -74,7 +73,7 @@ void incflo::compute_viscosity_at_level (int lev,
                                          MultiFab* vel_eta,
                                          MultiFab* /*rho*/,
                                          MultiFab* vel,
-                                         MultiFab* p_nd,
+                                         MultiFab* p_lev,
                                          Geometry& lev_geom,
                                          Real /*time*/, int nghost)
 {
@@ -117,7 +116,7 @@ void incflo::compute_viscosity_at_level (int lev,
                 Box const& bx = mfi.growntilebox(nghost);
                 Array4<Real> const& eta_arr = vel_eta->array(mfi);
                 Array4<Real const> const& vel_arr = vel->const_array(mfi);
-                Array4<Real const> const& p_arr = p_nd->const_array(mfi);
+                Array4<Real const> const& p_arr = p_lev->const_array(mfi);
 #ifdef AMREX_USE_EB
                 auto const& flag_fab = flags[mfi];
                 auto typ = flag_fab.getType(bx);
@@ -145,6 +144,7 @@ void incflo::compute_viscosity_at_level (int lev,
                     {
                         Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);
                         Real pressure = p_arr(i,j,k);
+                        amrex::Print() << "Pressure = " << pressure << "\n";
 
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, pressure);
                     });

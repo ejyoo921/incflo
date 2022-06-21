@@ -297,6 +297,8 @@ void incflo::InitialIterations ()
     for (int lev = 0; lev <= finest_level; ++lev) m_t_old[lev] = m_t_new[lev];
     for (int lev = 0; lev <= finest_level; ++lev) mac_phi[lev]->setVal(0.);
 
+    
+
     int ng = nghost_state();
     for (int lev = 0; lev <= finest_level; ++lev) {
             fillpatch_velocity(lev, m_t_old[lev], m_leveldata[lev]->velocity_o, ng);

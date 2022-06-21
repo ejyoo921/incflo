@@ -1,0 +1,64 @@
+=== If no file names and line numbers are shown below, one can run
+            addr2line -Cpfie my_exefile my_line_address
+    to convert `my_line_address` (e.g., 0x4a6b) into file name and line number.
+    Or one can use amrex/Tools/Backtrace/parse_bt.py.
+
+=== Please note that the line number reported by addr2line may not be accurate.
+    One can use
+            readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x45ca75) [0x5650a3597a75]
+    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
+
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x45ef0a) [0x5650a3599f0a]
+    amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
+
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f63e033c090]
+
+ 3: /lib/x86_64-linux-gnu/libc.so.6(__write+0x4d) [0x7f63e04070ad]
+
+ 4: /lib/x86_64-linux-gnu/libc.so.6(_IO_file_write+0x2d) [0x7f63e0387e8d]
+
+ 5: /lib/x86_64-linux-gnu/libc.so.6(_IO_do_write+0xb1) [0x7f63e0389951]
+
+ 6: /lib/x86_64-linux-gnu/libc.so.6(_IO_file_xsputn+0xe5) [0x7f63e03886b5]
+
+ 7: /lib/x86_64-linux-gnu/libc.so.6(fwrite+0xc1) [0x7f63e037c3c1]
+
+ 8: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l+0x194) [0x7f63e07ab824]
+    ?? ??:0
+
+ 9: ./incflo3d.gnu.MPI.EB.ex(+0x10db67) [0x5650a3248b67]
+    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const at /usr/include/c++/10/bits/basic_string.h:187
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_is_local() const at /usr/include/c++/10/bits/basic_string.h:222
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() at /usr/include/c++/10/bits/basic_string.h:231
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() at /usr/include/c++/10/bits/basic_string.h:658
+ (inlined by) amrex::Print::~Print() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Print.H:79
+ (inlined by) operator() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/rheology/incflo_rheology.cpp:147
+ (inlined by) call_f<incflo::compute_viscosity_at_level(int, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::Geometry&, amrex::Real, int)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:29
+ (inlined by) ParallelFor<incflo::compute_viscosity_at_level(int, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::Geometry&, amrex::Real, int)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:119
+ (inlined by) incflo::compute_viscosity_at_level(int, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::Geometry&, double, int) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/rheology/incflo_rheology.cpp:143
+
+10: ./incflo3d.gnu.MPI.EB.ex(+0x10c990) [0x5650a3247990]
+    incflo::compute_viscosity(amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, double, int) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/rheology/incflo_rheology.cpp:66 (discriminator 2)
+
+11: ./incflo3d.gnu.MPI.EB.ex(+0x4cd76) [0x5650a3187d76]
+    std::vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
+ (inlined by) amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
+ (inlined by) incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:132
+
+12: ./incflo3d.gnu.MPI.EB.ex(+0x4acf7) [0x5650a3185cf7]
+    incflo::Advance() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_advance.cpp:57
+
+13: ./incflo3d.gnu.MPI.EB.ex(+0x42b58) [0x5650a317db58]
+    incflo::Evolve() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:136
+
+14: ./incflo3d.gnu.MPI.EB.ex(+0x3a23e) [0x5650a317523e]
+    main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:57
+
+15: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f63e031d083]
+
+16: ./incflo3d.gnu.MPI.EB.ex(+0x421ce) [0x5650a317d1ce]
+    ?? ??:0
+

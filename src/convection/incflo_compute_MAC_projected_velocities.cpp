@@ -154,7 +154,7 @@ incflo::compute_MAC_projected_velocities (
         macproj->project(mac_phi,m_mac_mg_rtol,m_mac_mg_atol);
 
         for (int lev=0; lev <= finest_level; ++lev)
-            mac_phi[lev]->mult(2.0,0,1,1);
+            mac_phi[lev]->mult(2.0, 0, 1, 1);
     } else {
         macproj->project(m_mac_mg_rtol,m_mac_mg_atol);
     }
