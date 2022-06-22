@@ -23,9 +23,10 @@ amr.restart             =   ""          # Checkpoint to restart from
 #.......................................#
 incflo.gravity          =   0.  0.      # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
-incflo.diam             =   0.1         # Particle (mean) diameter
 
 incflo.fluid_model      =  "NonIso"     # Fluid model (rheology)
+
+incflo.diam             =   0.1         # Particle (mean) diameter
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.526
 incflo.alpha_1          =   0.5
@@ -34,14 +35,14 @@ incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   128  128    # Grid cells at coarsest AMRlevel
+amr.n_cell              =   32  32    # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
 geometry.prob_lo        =   0.  0.      # Lo corner coordinates
-geometry.prob_hi        =   1.  1.      # Hi corner coordinates
+geometry.prob_hi        =   2.  2.      # Hi corner coordinates
 geometry.is_periodic    =   1   0       # Periodicity x y z (0/1)
 
 # Boundary conditions
@@ -56,7 +57,7 @@ yhi.velocity            =   1.  0.
 #          INITIAL CONDITIONS           #
 #.......................................#
 #incflo.probtype         =   666         # Granular flow model
-incflo.ic_p              =   0.1        # Initial pressure
+#incflo.ic_p              =   0.1        # Initial pressure
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #

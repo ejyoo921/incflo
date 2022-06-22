@@ -28,7 +28,7 @@ incflo.mu               =   1.          # Dynamic viscosity coefficient
 incflo.tau_0            =   1.          # Dynamic viscosity coefficient
 incflo.papa_reg         =   1.0e-3      # Dynamic viscosity coefficient
 
-incflo.diam             =   0.1         # Particle (mean) diameter
+incflo.diam             =   0.01         # Particle (mean) diameter
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.526
 incflo.alpha_1          =   0.5
@@ -45,13 +45,13 @@ amr.max_level           =   0           # Max AMR level in hierarchy
 #.......................................#
 geometry.prob_lo        =   0.  0.      # Lo corner coordinates
 geometry.prob_hi        =   2.  2.      # Hi corner coordinates
-geometry.is_periodic    =   0   1       # Periodicity x y z (0/1)
+geometry.is_periodic    =   1   0       # Periodicity x y z (0/1)
 
 incflo.delp             =   0.  2.      # Prescribed (cyclic) pressure gradient
 
 # Boundary conditions
-xlo.type                =   "nsw"
-xhi.type                =   "nsw"
+ylo.type                =   "nsw"
+yhi.type                =   "nsw"
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #

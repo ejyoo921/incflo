@@ -546,6 +546,17 @@ Vector<MultiFab const*> incflo::get_tracer_new_const () const noexcept
     return r;
 }
 
+//EY: Added to get pressure
+Vector<MultiFab*> incflo::get_p_nd () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->p_nd));
+    }
+    return r;
+}
+
 void incflo::copy_from_new_to_old_velocity (IntVect const& ng)
 {
     for (int lev = 0; lev <= finest_level; ++lev) {
