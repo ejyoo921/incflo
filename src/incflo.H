@@ -250,13 +250,13 @@ public: // for cuda
     virtual void compute_viscosity (amrex::Vector<amrex::MultiFab*> const& eta,
                                     amrex::Vector<amrex::MultiFab*> const& rho,
                                     amrex::Vector<amrex::MultiFab*> const& vel,
-                                    amrex::Vector<amrex::MultiFab*> const& p_lev,
+                                    amrex::Vector<amrex::MultiFab*> const& p_nd,
                                     amrex::Real time, int nghost);
     virtual void compute_viscosity_at_level (int lev,
                                              amrex::MultiFab* eta,
                                              amrex::MultiFab* rho,
                                              amrex::MultiFab* vel,
-                                             amrex::MultiFab* p_lev,
+                                             amrex::MultiFab* p_nd,
                                              amrex::Geometry& lev_geom,
                                              amrex::Real time, int nghost);
     virtual void compute_tracer_diff_coeff (amrex::Vector<amrex::MultiFab*> const& tra_eta,
@@ -719,6 +719,10 @@ private:
     amrex::Vector<amrex::MultiFab const*> get_tracer_new_const () const noexcept;
     amrex::Vector<amrex::MultiFab const*> get_vel_forces_const () const noexcept;
     amrex::Vector<amrex::MultiFab const*> get_tra_forces_const () const noexcept;
+
+    //EY: for granular rheology
+    amrex::Vector<amrex::MultiFab*> get_p_nd () noexcept;
+    amrex::Vector<amrex::MultiFab const*> get_p_nd_const () const noexcept;
 
     amrex::Vector<int> const& get_velocity_iconserv () const noexcept { return m_iconserv_velocity; }
     amrex::Vector<int> const& get_density_iconserv () const noexcept { return m_iconserv_density; }

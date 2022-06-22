@@ -367,7 +367,7 @@ void incflo::InitialProjection()
     for (int lev = 0; lev <= finest_level; lev++)
     {
         m_leveldata[lev]->p_nd.setVal(1.0);
-        m_leveldata[lev]->p_cc.setVal(1.0);
+        m_leveldata[lev]->p_cc.setVal(0.0);
         m_leveldata[lev]->gp.setVal(0.0);
     }
 

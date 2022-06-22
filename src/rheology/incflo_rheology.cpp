@@ -68,12 +68,12 @@ struct NonNewtonianViscosity
 void incflo::compute_viscosity (Vector<MultiFab*> const& vel_eta,
                                 Vector<MultiFab*> const& rho,
                                 Vector<MultiFab*> const& vel,
-                                Vector<MultiFab*> const& p_lev,
+                                Vector<MultiFab*> const& p_nd,
                                 Real time, int nghost)
 {
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        compute_viscosity_at_level(lev, vel_eta[lev], rho[lev], vel[lev], p_lev[lev], geom[lev], time, nghost);
+        compute_viscosity_at_level(lev, vel_eta[lev], rho[lev], vel[lev], p_nd[lev], geom[lev], time, nghost);
     }
 }
 
@@ -81,7 +81,7 @@ void incflo::compute_viscosity_at_level (int lev,
                                          MultiFab* vel_eta,
                                          MultiFab* /*rho*/,
                                          MultiFab* vel,
-                                         MultiFab* p_lev,
+                                         MultiFab* p_nd,
                                          Geometry& lev_geom,
                                          Real /*time*/, int nghost)
 {
@@ -103,7 +103,6 @@ void incflo::compute_viscosity_at_level (int lev,
         non_newtonian_viscosity.diam = m_diam;
         non_newtonian_viscosity.mu_1 = m_mu_1;
         non_newtonian_viscosity.A_1 = m_A_1;
-        // non_newtonian_viscosity.alpha_1 = m_alpha_1;
 
 #ifdef AMREX_USE_EB
         auto const& fact = EBFactory(lev);
@@ -124,7 +123,7 @@ void incflo::compute_viscosity_at_level (int lev,
                 Box const& bx = mfi.growntilebox(nghost);
                 Array4<Real> const& eta_arr = vel_eta->array(mfi);
                 Array4<Real const> const& vel_arr = vel->const_array(mfi);
-                Array4<Real const> const& p_arr = p_lev->const_array(mfi);
+                Array4<Real const> const& p_arr = p_nd->const_array(mfi);
 #ifdef AMREX_USE_EB
                 auto const& flag_fab = flags[mfi];
                 auto typ = flag_fab.getType(bx);
