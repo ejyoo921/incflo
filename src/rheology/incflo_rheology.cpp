@@ -12,6 +12,13 @@ amrex::Real expterm (amrex::Real nu) noexcept
                         : -std::expm1(-nu)/nu; 
 }
 
+// Compute the I term, where I is the inertial number, in mu(I) relation
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+amrex::Real inertialNum (amrex::Real sr, amrex::Real pressure, amrex::Real diam, amrex::Real ro_0, amrex::Real alpha_1) noexcept
+{
+    return std::pow(sr*diam/std::pow(pressure/ro_0,0.5), alpha_1);
+}
+
 struct NonNewtonianViscosity
 {
     incflo::FluidModel fluid_model;
@@ -29,7 +36,7 @@ struct NonNewtonianViscosity
         case incflo::FluidModel::Bingham:
         {
             // EY: I think this is incorrect: (sr * mu + tau)
-            return (sr * mu + tau_0) * expterm(sr/papa_reg) / papa_reg; 
+            return (mu*std::pow(sr,1)+tau_0)*expterm(sr/papa_reg)/papa_reg;
 
             //Original code:
             // return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
@@ -45,7 +52,8 @@ struct NonNewtonianViscosity
         }
         case incflo::FluidModel::NonIsotropic:
         {
-            return (sr/2.0)*(pressure)*(mu_1 + A_1 * std::pow(sr*diam/pow(pressure/ro_0,0.5), alpha_1));
+            amrex::Print() << "Pressure = " << pressure << "\n";
+            return (expterm(sr/papa_reg) / papa_reg)*(pressure)*(mu_1 + A_1 * inertialNum(sr, pressure, diam, ro_0, alpha_1));
         }
         default:
         {
@@ -132,7 +140,7 @@ void incflo::compute_viscosity_at_level (int lev,
                     auto const& flag_arr = flag_fab.const_array();
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
-                        Real sr = incflo_strainrate_eb(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr,flag_arr(i,j,k));\
+                        Real sr = incflo_strainrate_eb(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr,flag_arr(i,j,k));
                         Real pressure = p_arr(i,j,k);
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, pressure);
                     });
@@ -144,7 +152,6 @@ void incflo::compute_viscosity_at_level (int lev,
                     {
                         Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);
                         Real pressure = p_arr(i,j,k);
-                        amrex::Print() << "Pressure = " << pressure << "\n";
 
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, pressure);
                     });

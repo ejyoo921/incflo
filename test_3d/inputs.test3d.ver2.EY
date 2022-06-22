@@ -24,42 +24,34 @@ incflo.gravity          =   0.  0.  0.  # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
 
 incflo.fluid_model      =   "NonIso"   # Fluid model (rheology)
+incflo.mu               =   1.          # Dynamic viscosity coefficient
+incflo.tau_0            =   1.          # Dynamic viscosity coefficient
+incflo.papa_reg         =   1.0e-3      # Dynamic viscosity coefficient
 
 incflo.diam             =   0.1         # Particle (mean) diameter
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.526
 incflo.alpha_1          =   1.
 
-incflo.mu               =   1.          # Dynamic viscosity coefficient
-incflo.tau_0            =   1.          # Yield stress
-incflo.papa_reg         =   0.001      # Papanastasiou regularisation parameter
-
-incflo.ic_p             =   1.         # Initial pressure at node (0,0,0)
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   32  32  32  # Grid cells at coarsest AMRlevel
+amr.n_cell              =   32  32  16  # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
 geometry.prob_lo        =   0.  0.  0.  # Lo corner coordinates
-geometry.prob_hi        =   2.  2.  2.  # Hi corner coordinates
+geometry.prob_hi        =   2.  2.  1.  # Hi corner coordinates
 geometry.is_periodic    =   1   0   1   # Periodicity x y z (0/1)
 
-incflo.delp             =   0.  0.  0.  # Prescribed (cyclic) pressure gradient
+incflo.delp             =   0.  0.  2.  # Prescribed (cyclic) pressure gradient
 
 # Boundary conditions
-#xlo.type                =   "nsw"
-#xhi.type                =   "nsw"
 ylo.type                =   "nsw"
 yhi.type                =   "nsw"
-#zlo.type                =   "nsw"
-#zhi.type                =   "nsw"
-
-yhi.velocity            =   0.  1.  0.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
