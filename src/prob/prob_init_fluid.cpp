@@ -11,7 +11,7 @@ void incflo::prob_init_fluid (int lev)
     auto const& probhi = geom[lev].ProbHiArray();
 
     // EY:  Manually add constant background density. 
-    ld.p_nd.setVal(1.0); 
+    ld.p_nd.setVal(0.0); 
     ld.p_cc.setVal(0.0);
     ld.gp.setVal(0.0);
 

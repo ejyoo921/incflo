@@ -22,7 +22,7 @@ amrex::Real inertialNum (amrex::Real sr, amrex::Real pressure, amrex::Real diam,
 struct NonNewtonianViscosity
 {
     incflo::FluidModel fluid_model;
-    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, ro_0, diam, mu_1, A_1, alpha_1;
+    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, ro_0, p_bg, diam, mu_1, A_1, alpha_1;
     
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -52,8 +52,8 @@ struct NonNewtonianViscosity
         }
         case incflo::FluidModel::NonIsotropic:
         {
-            amrex::Print() << "Pressure = " << pressure << "\n";
-            return (expterm(sr/papa_reg) / papa_reg)*(pressure)*(mu_1 + A_1 * inertialNum(sr, pressure, diam, ro_0, alpha_1));
+            amrex::Print() << "p_bg = " << p_bg << "\n";
+            return (expterm(sr/papa_reg) / papa_reg)*(p_bg)*(mu_1 + A_1 * inertialNum(sr, p_bg, diam, ro_0, alpha_1));
         }
         default:
         {
@@ -99,10 +99,13 @@ void incflo::compute_viscosity_at_level (int lev,
         non_newtonian_viscosity.eta_0 = m_eta_0;
         non_newtonian_viscosity.papa_reg = m_papa_reg;
 
+        //EY: for granular rheology
         non_newtonian_viscosity.ro_0 = m_ro_0;
         non_newtonian_viscosity.diam = m_diam;
         non_newtonian_viscosity.mu_1 = m_mu_1;
         non_newtonian_viscosity.A_1 = m_A_1;
+        non_newtonian_viscosity.p_bg =m_p_bg;
+
 
 #ifdef AMREX_USE_EB
         auto const& fact = EBFactory(lev);

@@ -1,21 +1,20 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-stop_time               =   0.5          # Max (simulated) time to evolve
+stop_time               =   0.5         # Max (simulated) time to evolve
 max_step                =   -1          # Max number of time steps
 steady_state            =   0           # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   0.01          # Use this constant dt if > 0
-incflo.cfl              =   0.45        # CFL factor
+incflo.fixed_dt         =   0.001       # Use this constant dt if > 0
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   0.1         # Steps between plot files
-amr.check_int           =   -1        # Steps between checkpoint files
+amr.plot_per_exact      =   0.1         # Steps between plot files
+amr.check_int           =   -1          # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -24,18 +23,21 @@ amr.restart             =   ""          # Checkpoint to restart from
 incflo.gravity          =   0.  0.      # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
 
-incflo.fluid_model      =  "NonIso"     # Fluid model (rheology)
+incflo.fluid_model      =   "NonIso"    # Fluid model (rheology)
+incflo.mu               =   1.          # Dynamic viscosity coefficient
+incflo.tau_0            =   1.          # Dynamic viscosity coefficient
+incflo.papa_reg         =   1.0e-5      # Dynamic viscosity coefficient
 
-incflo.diam             =   0.1         # Particle (mean) diameter
+incflo.diam             =   0.01        # Particle (mean) diameter
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.526
-incflo.alpha_1          =   0.5
-incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter (epsilon)
+incflo.alpha_1          =   1.
+incflo.p_bg             =   1.          # Background pressure (time independant)
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   32  32    # Grid cells at coarsest AMRlevel
+amr.n_cell              =   32  32      # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -45,19 +47,16 @@ geometry.prob_lo        =   0.  0.      # Lo corner coordinates
 geometry.prob_hi        =   2.  2.      # Hi corner coordinates
 geometry.is_periodic    =   1   0       # Periodicity x y z (0/1)
 
-# Boundary conditions
-#xlo.type                =   "nsw"
-#xhi.type                =   "nsw"
+incflo.delp             =   0.  0.      # Prescribed (cyclic) pressure gradient
 
+# Boundary conditions
 ylo.type                =   "nsw"
 yhi.type                =   "nsw"
-yhi.velocity            =   1.  0.  
 
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
-#          INITIAL CONDITIONS           #
-#.......................................#
-#incflo.probtype         =   666         # Granular flow model
-#incflo.ic_p              =   0.1        # Initial pressure
+
+#Initial values
+yhi.velocity            =   1.  0.
+incflo.ic_p             =   1.0         # Initial pressure
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
@@ -67,8 +66,17 @@ incflo.steady_state_tol   = 1.e-5       # Tolerance for steady-state
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
 #.......................................#
-incflo.verbose          =   2           # incflo_level
-mac_proj.verbose        =   0           # MAC Projector
-nodal_proj.verbose      =   0           # Nodal Projector
+incflo.verbose              =  2        # incflo_level
+mac_proj.verbose            =  0        # MAC Projector
+nodal_proj.verbose          =  0        # Nodal Projector
+
+scalar_diffusion.verbose    =  0        # Scalar Diffusion
+scalar_diffusion.mg_verbose =  0        # Scalar Diffusion
+
+tensor_diffusion.verbose    =  0        # Tensor Diffusion
+tensor_diffusion.mg_verbose =  1        # Tensor Diffusion
+
+tensor_diffusion.num_pre_smooth  = 2    # How many relaxations going down the V-cycle
+tensor_diffusion.num_post_smooth = 2    # How many relaxations going   up the V-cycle
 
 amr.plt_ccse_regtest    =   1

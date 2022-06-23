@@ -95,6 +95,10 @@ void incflo::ReadRheologyParameters()
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_ro_0 > 0.0,
                     "Reference density must be positive");
 
+         pp.query("p_bg", m_p_bg);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_p_bg > 0.0,
+                    "Background pressure must be positive");
+
          pp.query("papa_reg", m_papa_reg);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg > 0.0,
                     "Papanastasiou regularisation parameter must be positive");
@@ -114,8 +118,9 @@ void incflo::ReadRheologyParameters()
 
          amrex::Print() << "NonIsotropic stress with"
                         << " mu_1 = " << m_mu_1
-                        << " A_1 = " << m_A_1
-                        << " alpha_1 = " << m_alpha_1
+                        << ", A_1 = " << m_A_1
+                        << ", alpha_1 = " << m_alpha_1
+                        << ", p_bg = " << m_p_bg
                         << ", papa_reg = " << m_papa_reg << std::endl;
      }
      else

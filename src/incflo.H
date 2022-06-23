@@ -479,7 +479,8 @@ private:
     amrex::Real m_diam = 0.0;
     amrex::Real m_mu_1 = 0.0;
     amrex::Real m_A_1 = 0.0;
-    amrex::Real m_alpha_1 = 1.0;
+    amrex::Real m_alpha_1 = 0.0;
+    amrex::Real m_p_bg = 0.0;
 
     int m_plot_int = -1;
 
