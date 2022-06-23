@@ -52,8 +52,8 @@ struct NonNewtonianViscosity
         }
         case incflo::FluidModel::NonIsotropic:
         {
-            amrex::Print() << "p_bg = " << p_bg << "\n";
-            return (expterm(sr/papa_reg) / papa_reg)*(p_bg)*(mu_1 + A_1 * inertialNum(sr, p_bg, diam, ro_0, alpha_1));
+            //amrex::Print() << "p_bg = " << p_bg << "\n";
+            return (expterm(sr/papa_reg) / papa_reg)*(pressure + p_bg)*(mu_1 + A_1 * inertialNum(sr, pressure + p_bg, diam, ro_0, alpha_1));
         }
         default:
         {

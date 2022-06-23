@@ -8,58 +8,37 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo2d.gnu.MPI.EB.ex(+0x306ac5) [0x557e50d53ac5]
+ 0: ./incflo2d.gnu.MPI.EB.ex(+0x306a45) [0x55d4a9a3fa45]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo2d.gnu.MPI.EB.ex(+0x308f5a) [0x557e50d55f5a]
+ 1: ./incflo2d.gnu.MPI.EB.ex(+0x308eda) [0x55d4a9a41eda]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7fae726eb090]
-
- 3: /lib/x86_64-linux-gnu/libc.so.6(__write+0x4d) [0x7fae727b60ad]
-
- 4: /lib/x86_64-linux-gnu/libc.so.6(_IO_file_write+0x2d) [0x7fae72736e8d]
-
- 5: /lib/x86_64-linux-gnu/libc.so.6(_IO_do_write+0xb1) [0x7fae72738951]
-
- 6: /lib/x86_64-linux-gnu/libc.so.6(_IO_file_xsputn+0xe5) [0x7fae727376b5]
-
- 7: /lib/x86_64-linux-gnu/libc.so.6(fwrite+0xc1) [0x7fae7272b3c1]
-
- 8: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l+0x194) [0x7fae72b5a824]
-    ?? ??:0
-
- 9: ./incflo2d.gnu.MPI.EB.ex(+0xf0767) [0x557e50b3d767]
+ 2: ./incflo2d.gnu.MPI.EB.ex(+0x22bad3) [0x55d4a9964ad3]
     std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const at /usr/include/c++/10/bits/basic_string.h:187
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_is_local() const at /usr/include/c++/10/bits/basic_string.h:222
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() at /usr/include/c++/10/bits/basic_string.h:231
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() at /usr/include/c++/10/bits/basic_string.h:658
- (inlined by) amrex::Print::~Print() at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_Print.H:79
- (inlined by) operator() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/rheology/incflo_rheology.cpp:55
- (inlined by) operator() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/rheology/incflo_rheology.cpp:155
- (inlined by) call_f<incflo::compute_viscosity_at_level(int, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::Geometry&, amrex::Real, int)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:29
- (inlined by) ParallelFor<incflo::compute_viscosity_at_level(int, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::Geometry&, amrex::Real, int)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:119
- (inlined by) incflo::compute_viscosity_at_level(int, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::MultiFab*, amrex::Geometry&, double, int) at /home/eyoo/CCSE_packages/incflo/test_2d/../src/rheology/incflo_rheology.cpp:150
+ (inlined by) amrex::FileOpenFailed(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_Utility.cpp:167
 
-10: ./incflo2d.gnu.MPI.EB.ex(+0xefa5d) [0x557e50b3ca5d]
-    incflo::compute_viscosity(amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, double, int) at /home/eyoo/CCSE_packages/incflo/test_2d/../src/rheology/incflo_rheology.cpp:74 (discriminator 2)
+ 3: ./incflo2d.gnu.MPI.EB.ex(+0x256520) [0x55d4a998f520]
+    amrex::ParallelDescriptor::ReadAndBcastFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, amrex::Vector<char, std::allocator<char> >&, bool, ompi_communicator_t* const&) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParallelDescriptor.cpp:1415
 
-11: ./incflo2d.gnu.MPI.EB.ex(+0x4b40d) [0x557e50a9840d]
-    std::vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
- (inlined by) amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_Vector.H:25
- (inlined by) incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_2d/../src/incflo_apply_predictor.cpp:132
+ 4: ./incflo2d.gnu.MPI.EB.ex(+0x21364a) [0x55d4a994c64a]
+    amrex::(anonymous namespace)::read_file(char const*, std::__cxx11::list<amrex::ParmParse::PP_entry, std::allocator<amrex::ParmParse::PP_entry> >&) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:496 (discriminator 2)
 
-12: ./incflo2d.gnu.MPI.EB.ex(+0x49577) [0x557e50a96577]
-    incflo::Advance() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/incflo_advance.cpp:57
+ 5: ./incflo2d.gnu.MPI.EB.ex(+0x2159ab) [0x55d4a994e9ab]
+    amrex::ParmParse::Initialize(int, char**, char const*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:954
+ (inlined by) amrex::ParmParse::Initialize(int, char**, char const*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:1153
 
-13: ./incflo2d.gnu.MPI.EB.ex(+0x419d8) [0x557e50a8e9d8]
-    incflo::Evolve() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/incflo.cpp:136
+ 6: ./incflo2d.gnu.MPI.EB.ex(+0x1fd1bb) [0x55d4a99361bb]
+    amrex::Initialize(int&, char**&, bool, ompi_communicator_t*, std::function<void ()> const&, std::ostream&, std::ostream&, void (*)(char const*)) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX.cpp:406
 
-14: ./incflo2d.gnu.MPI.EB.ex(+0x391de) [0x557e50a861de]
-    main at /home/eyoo/CCSE_packages/incflo/test_2d/../src/main.cpp:57
+ 7: ./incflo2d.gnu.MPI.EB.ex(+0x39124) [0x55d4a9772124]
+    main at /home/eyoo/CCSE_packages/incflo/test_2d/../src/main.cpp:28
 
-15: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fae726cc083]
+ 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fb4f890c083]
 
-16: ./incflo2d.gnu.MPI.EB.ex(+0x40efe) [0x557e50a8defe]
+ 9: ./incflo2d.gnu.MPI.EB.ex(+0x40efe) [0x55d4a9779efe]
     ?? ??:0
 
