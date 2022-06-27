@@ -8,37 +8,32 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo3d.gnu.MPI.EB.ex(+0x45cbc5) [0x563a681b5bc5]
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x45d1c5) [0x56001a3fc1c5]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo3d.gnu.MPI.EB.ex(+0x45f05a) [0x563a681b805a]
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x45f65a) [0x56001a3fe65a]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: ./incflo3d.gnu.MPI.EB.ex(+0x102e9c) [0x563a67e5be9c]
-    amrex::Abort(char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.H:155
- (inlined by) incflo::get_nodal_projection_bc(amrex::Orientation::Side) const at /home/eyoo/CCSE_packages/incflo/test_3d/../src/projection/incflo_projection_bc.cpp:34
+ 2: ./incflo3d.gnu.MPI.EB.ex(+0x33909e) [0x56001a2d809e]
+    amrex::Assert_host(char const*, char const*, int, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.cpp:274
 
- 3: ./incflo3d.gnu.MPI.EB.ex(+0x1091aa) [0x563a67e621aa]
-    incflo::ApplyNodalProjection(amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >, double, double, bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/projection/incflo_apply_nodal_projection.cpp:105
+ 3: ./incflo3d.gnu.MPI.EB.ex(+0x110f2b) [0x56001a0aff2b]
+    amrex::Assert(char const*, char const*, int, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.H:185
+ (inlined by) incflo::ReadRheologyParameters() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/rheology/incflo_read_rheology_parameters.cpp:33
 
- 4: ./incflo3d.gnu.MPI.EB.ex(+0x42487) [0x563a67d9b487]
-    std::vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
- (inlined by) amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
- (inlined by) incflo::ApplyProjection(amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, double, double, bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:186
+ 4: ./incflo3d.gnu.MPI.EB.ex(+0x1143cd) [0x56001a0b33cd]
+    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Alloc_hider::_Alloc_hider(char*, std::allocator<char> const&) at /usr/include/c++/10/bits/basic_string.h:157
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) at /usr/include/c++/10/bits/basic_string.h:526
+ (inlined by) incflo::ReadParameters() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/setup/init.cpp:24
 
- 5: ./incflo3d.gnu.MPI.EB.ex(+0x117648) [0x563a67e70648]
-    std::vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
- (inlined by) amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
- (inlined by) incflo::InitialProjection() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/setup/init.cpp:362
+ 5: ./incflo3d.gnu.MPI.EB.ex(+0x48b62) [0x560019fe7b62]
+    incflo::incflo() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:21
 
- 6: ./incflo3d.gnu.MPI.EB.ex(+0x43e0a) [0x563a67d9ce0a]
-    incflo::InitData() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:60
+ 6: ./incflo3d.gnu.MPI.EB.ex(+0x3a289) [0x560019fd9289]
+    main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:48 (discriminator 8)
 
- 7: ./incflo3d.gnu.MPI.EB.ex(+0x3a221) [0x563a67d93221]
-    main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:51
+ 7: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fbb09096083]
 
- 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7ff6b8b17083]
-
- 9: ./incflo3d.gnu.MPI.EB.ex(+0x421ce) [0x563a67d9b1ce]
+ 8: ./incflo3d.gnu.MPI.EB.ex(+0x4223e) [0x560019fe123e]
     ?? ??:0
 

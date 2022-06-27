@@ -24,17 +24,17 @@ amr.restart             =   ""          # Checkpoint to restart from
 incflo.gravity          =   0.  0.      # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
 
-incflo.fluid_model      =   "NonIso"    # Fluid model (rheology)
+incflo.fluid_model      =   "bingham"  # Fluid model (rheology)
 incflo.mu               =   1.          # Dynamic viscosity coefficient
 
 incflo.tau_0            =   1.          # Dynamic viscosity coefficient
 incflo.papa_reg         =   1.0e-5      # Dynamic viscosity coefficient
 
-incflo.diam             =   0.01        # Particle (mean) diameter
-incflo.mu_1             =   0.1
-incflo.A_1              =   0.5
-incflo.alpha_1          =   0.
-incflo.p_bg             =   1.          # Background pressure (time independant)
+#incflo.diam             =   0.01        # Particle (mean) diameter
+#incflo.mu_1             =   0.1
+#incflo.A_1              =   0.5
+#incflo.alpha_1          =   0.
+#incflo.p_bg             =   1.          # Background pressure (time independant)
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #

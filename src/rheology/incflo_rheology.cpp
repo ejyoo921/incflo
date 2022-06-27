@@ -14,9 +14,9 @@ amrex::Real expterm (amrex::Real nu) noexcept
 
 // Compute the I term, where I is the inertial number, in mu(I) relation
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-amrex::Real inertialNum (amrex::Real sr, amrex::Real pressure, amrex::Real diam, amrex::Real ro_0, amrex::Real alpha_1) noexcept
+amrex::Real inertialNum (amrex::Real sr, amrex::Real pressure, amrex::Real ro_0, amrex::Real diam, amrex::Real mu_1, amrex::Real A_1, amrex::Real alpha_1) noexcept
 {
-    return std::pow(sr*diam/std::pow(pressure/ro_0,0.5), alpha_1);
+    return mu_1 + A_1*std::pow((sr/2)*diam/std::pow(pressure/ro_0, 0.5), alpha_1);
 }
 
 struct NonNewtonianViscosity
@@ -35,12 +35,8 @@ struct NonNewtonianViscosity
         }
         case incflo::FluidModel::Bingham:
         {
-            // EY: I think this is incorrect: (sr * mu + tau)
-            return (mu*std::pow(sr,1)+tau_0)*expterm(sr/papa_reg)/papa_reg;
-
-            //Original code:
-            // return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
-            // expterm(sr/papa_reg)/papa_reg = (1-exp(-sr/papa_reg))/sr
+            return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
+            // expterm(sr/papa_reg)/papa_reg = (1-exp(-sr/papa_reg))/sr --> 2 dot(gamma)'s papa ver.
         }
         case incflo::FluidModel::HerschelBulkley:
         {
@@ -52,8 +48,8 @@ struct NonNewtonianViscosity
         }
         case incflo::FluidModel::NonIsotropic:
         {
-            //amrex::Print() << "p_bg = " << p_bg << "\n";
-            return (expterm(sr/papa_reg) / papa_reg)*(pressure + p_bg)*(mu_1 + A_1 * inertialNum(sr, pressure + p_bg, diam, ro_0, alpha_1));
+            //amrex::Print() << "mu1 = " << sr/2 << "\n";
+            return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
         }
         default:
         {
