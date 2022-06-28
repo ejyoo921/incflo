@@ -482,6 +482,11 @@ private:
     amrex::Real m_alpha_1 = 0.0;
     amrex::Real m_p_bg = 0.0;
 
+    amrex::Real m_vert_hi = 0.0;
+    amrex::Real m_vert_lo = 0.0;
+    amrex::Real m_vert_n = 0.0;
+
+
     int m_plot_int = -1;
 
     // Dump plotfiles at as close as possible to the designated period *without* changing dt

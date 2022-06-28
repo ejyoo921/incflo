@@ -117,6 +117,11 @@ void incflo::ReadRheologyParameters()
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 >= 0.0,
                     "Fitting parameter must be positive");
 
+         pp.query("vert_hi", m_vert_hi);
+         pp.query("vert_lo", m_vert_lo);
+         pp.query("vert_n", m_vert_n);
+
+
 
          amrex::Print() << "NonIsotropic stress with"
                         << " mu_1 = " << m_mu_1

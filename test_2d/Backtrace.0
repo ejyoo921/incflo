@@ -8,37 +8,40 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo2d.gnu.MPI.EB.ex(+0x306c25) [0x55555ae87c25]
+ 0: ./incflo2d.gnu.MPI.EB.ex(+0x306245) [0x55da318d4245]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo2d.gnu.MPI.EB.ex(+0x3090ba) [0x55555ae8a0ba]
+ 1: ./incflo2d.gnu.MPI.EB.ex(+0x3086da) [0x55da318d66da]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: ./incflo2d.gnu.MPI.EB.ex(+0x22bcb3) [0x55555adaccb3]
+ 2: ./incflo2d.gnu.MPI.EB.ex(+0x20abd8) [0x55da317d8bd8]
+    bool amrex::(anonymous namespace)::(anonymous namespace)::squeryarr<double>(std::__cxx11::list<amrex::ParmParse::PP_entry, std::allocator<amrex::ParmParse::PP_entry> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::vector<double, std::allocator<double> >&, int, int, int) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:854
+
+ 3: ./incflo2d.gnu.MPI.EB.ex(+0x20b0d1) [0x55da317d90d1]
+    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const at /usr/include/c++/10/bits/basic_string.h:187 (discriminator 4)
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_is_local() const at /usr/include/c++/10/bits/basic_string.h:222 (discriminator 4)
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() at /usr/include/c++/10/bits/basic_string.h:231 (discriminator 4)
+ (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() at /usr/include/c++/10/bits/basic_string.h:658 (discriminator 4)
+ (inlined by) amrex::ParmParse::queryarr(char const*, std::vector<double, std::allocator<double> >&, int, int) const at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:1741 (discriminator 4)
+
+ 4: ./incflo2d.gnu.MPI.EB.ex(+0x63371) [0x55da31631371]
+    incflo::init_bcs()::{lambda(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, amrex::Orientation)#1}::operator()(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, amrex::Orientation) const at /home/eyoo/CCSE_packages/incflo/test_2d/../src/boundary_conditions/boundary_conditions.cpp:11
+
+ 5: ./incflo2d.gnu.MPI.EB.ex(+0x63ae6) [0x55da31631ae6]
     std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const at /usr/include/c++/10/bits/basic_string.h:187
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_is_local() const at /usr/include/c++/10/bits/basic_string.h:222
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() at /usr/include/c++/10/bits/basic_string.h:231
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() at /usr/include/c++/10/bits/basic_string.h:658
- (inlined by) amrex::FileOpenFailed(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_Utility.cpp:167
+ (inlined by) incflo::init_bcs() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/boundary_conditions/boundary_conditions.cpp:111
 
- 3: ./incflo2d.gnu.MPI.EB.ex(+0x256700) [0x55555add7700]
-    amrex::ParallelDescriptor::ReadAndBcastFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, amrex::Vector<char, std::allocator<char> >&, bool, ompi_communicator_t* const&) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParallelDescriptor.cpp:1415
+ 6: ./incflo2d.gnu.MPI.EB.ex(+0x473b7) [0x55da316153b7]
+    incflo::incflo() at /home/eyoo/CCSE_packages/incflo/test_2d/../src/incflo.cpp:29
 
- 4: ./incflo2d.gnu.MPI.EB.ex(+0x21382a) [0x55555ad9482a]
-    amrex::(anonymous namespace)::read_file(char const*, std::__cxx11::list<amrex::ParmParse::PP_entry, std::allocator<amrex::ParmParse::PP_entry> >&) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:496 (discriminator 2)
+ 7: ./incflo2d.gnu.MPI.EB.ex(+0x39089) [0x55da31607089]
+    main at /home/eyoo/CCSE_packages/incflo/test_2d/../src/main.cpp:48 (discriminator 8)
 
- 5: ./incflo2d.gnu.MPI.EB.ex(+0x215b8b) [0x55555ad96b8b]
-    amrex::ParmParse::Initialize(int, char**, char const*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:954
- (inlined by) amrex::ParmParse::Initialize(int, char**, char const*) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX_ParmParse.cpp:1153
+ 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fe73a0cd083]
 
- 6: ./incflo2d.gnu.MPI.EB.ex(+0x1fd39b) [0x55555ad7e39b]
-    amrex::Initialize(int&, char**&, bool, ompi_communicator_t*, std::function<void ()> const&, std::ostream&, std::ostream&, void (*)(char const*)) at /home/eyoo/CCSE_packages/incflo/test_2d/../../amrex/Src/Base/AMReX.cpp:406
-
- 7: ./incflo2d.gnu.MPI.EB.ex(+0x39124) [0x55555abba124]
-    main at /home/eyoo/CCSE_packages/incflo/test_2d/../src/main.cpp:28
-
- 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fe5344ec083]
-
- 9: ./incflo2d.gnu.MPI.EB.ex(+0x40efe) [0x55555abc1efe]
+ 9: ./incflo2d.gnu.MPI.EB.ex(+0x40dce) [0x55da3160edce]
     ?? ??:0
 

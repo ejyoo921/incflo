@@ -31,8 +31,13 @@ incflo.papa_reg         =   1.0e-3      # Dynamic viscosity coefficient
 incflo.diam             =   0.01        # Particle (mean) diameter
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.5
-incflo.alpha_1          =   0.
-incflo.p_bg             =   1.          # Background pressure (time independant)
+incflo.alpha_1          =   0.5
+incflo.p_bg             =   0.5          # Background pressure (time independant)
+
+# Make sure these are the same as the following geometry
+incflo.vert_lo          =   0.          # Lo vertical coordinates
+incflo.vert_hi          =   2.          # Hi vertical coordinates
+incflo.vert_n           =   32          # Grid cells at coarsest AMRlevel
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
@@ -45,13 +50,17 @@ amr.max_level           =   0           # Max AMR level in hierarchy
 #.......................................#
 geometry.prob_lo        =   0.  0.      # Lo corner coordinates
 geometry.prob_hi        =   2.  2.      # Hi corner coordinates
-geometry.is_periodic    =   0   1       # Periodicity x y z (0/1)
+geometry.is_periodic    =   1   0       # Periodicity x y z (0/1)
 
 incflo.delp             =   0.  2      # Prescribed (cyclic) pressure gradient
 
 # Boundary conditions
-xlo.type                =   "nsw"
-xhi.type                =   "nsw"
+#xlo.type                =   "nsw"
+#xhi.type                =   "nsw"
+ylo.type                =   "nsw"
+yhi.type                =   "nsw"
+
+yhi.velocity            =   1.  0. 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
