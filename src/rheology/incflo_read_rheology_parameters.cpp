@@ -99,6 +99,8 @@ void incflo::ReadRheologyParameters()
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_p_bg > 0.0,
                     "Background pressure must be positive");
 
+         pp.queryarr("delp", m_delp);
+
          pp.query("papa_reg", m_papa_reg);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg > 0.0,
                     "Papanastasiou regularisation parameter must be positive");
