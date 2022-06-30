@@ -19,7 +19,7 @@ amrex::Real inertialNum (amrex::Real sr, amrex::Real p_ext, amrex::Real ro_0, am
     return mu_1 + A_1*std::pow((sr/2)*diam/std::pow(p_ext/ro_0, 0.5), alpha_1);
 }
 
-struct NonNewtonianViscosity
+struct NonNewtonianViscosity //Apparent viscosity
 {
     incflo::FluidModel fluid_model;
     amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, ro_0, p_bg, diam, mu_1, A_1, alpha_1;
