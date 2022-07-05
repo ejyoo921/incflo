@@ -49,6 +49,8 @@ struct NonNewtonianViscosity //Apparent viscosity
         case incflo::FluidModel::NonIsotropic:
         {
             //amrex::Print() << "pr = " << p_ext << "\n";
+            // If you want pressure gradient
+            // add p_ext to p_bg
             return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_1, A_1, alpha_1);
         }
         default:
@@ -123,7 +125,7 @@ void incflo::compute_viscosity_at_level (int lev,
                 Array4<Real> const& eta_arr = vel_eta->array(mfi);
                 Array4<Real const> const& vel_arr = vel->const_array(mfi);
                 //EY: p_nd later if we need to add to pressure term for Granular rheology
-                //Array4<Real const> const& p_arr = p_nd->const_array(mfi);
+                Array4<Real const> const& p_arr = p_nd->const_array(mfi);
 #ifdef AMREX_USE_EB
                 auto const& flag_fab = flags[mfi];
                 auto typ = flag_fab.getType(bx);
@@ -140,7 +142,10 @@ void incflo::compute_viscosity_at_level (int lev,
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
                         Real sr = incflo_strainrate_eb(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr,flag_arr(i,j,k));
-                        Real p_ext = m_delp[1]*(j/32);
+                        //Real p_ext = m_p_nd(i,j,k);
+                        Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
+                        Real p_ext = m_gp0[1]*(j*nn);
+                        //Real p_ext = m_delp[1]*(j*nn);
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);
                     });
                 }
@@ -150,10 +155,11 @@ void incflo::compute_viscosity_at_level (int lev,
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
                         Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);
+                        //Real p_ext = m_p_nd(i,j,k);
 
                         Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
-                        //Real p_ext = m_gp0[1]*m_ro_0*(j*nn);
-                        Real p_ext = m_delp[1]*(j*nn);
+                        Real p_ext = m_gp0[1]*m_gravity[1]*(j*nn);
+                        //Real p_ext = m_delp[1]*(j*nn);
 
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);
                     });

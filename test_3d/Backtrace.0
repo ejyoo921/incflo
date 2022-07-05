@@ -8,32 +8,24 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo3d.gnu.MPI.EB.ex(+0x45d1c5) [0x56001a3fc1c5]
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x45cd45) [0x55bbef8c6d45]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo3d.gnu.MPI.EB.ex(+0x45f65a) [0x56001a3fe65a]
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x45f1da) [0x55bbef8c91da]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: ./incflo3d.gnu.MPI.EB.ex(+0x33909e) [0x56001a2d809e]
-    amrex::Assert_host(char const*, char const*, int, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.cpp:274
+ 2: ./incflo3d.gnu.MPI.EB.ex(+0x11a5eb) [0x55bbef5845eb]
+    amrex::Abort(char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.H:155
+ (inlined by) incflo::set_background_pressure() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/setup/set_background_pressure.cpp:56
 
- 3: ./incflo3d.gnu.MPI.EB.ex(+0x110f2b) [0x56001a0aff2b]
-    amrex::Assert(char const*, char const*, int, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.H:185
- (inlined by) incflo::ReadRheologyParameters() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/rheology/incflo_read_rheology_parameters.cpp:33
+ 3: ./incflo3d.gnu.MPI.EB.ex(+0x48a5c) [0x55bbef4b2a5c]
+    incflo::incflo() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:32
 
- 4: ./incflo3d.gnu.MPI.EB.ex(+0x1143cd) [0x56001a0b33cd]
-    std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Alloc_hider::_Alloc_hider(char*, std::allocator<char> const&) at /usr/include/c++/10/bits/basic_string.h:157
- (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&) at /usr/include/c++/10/bits/basic_string.h:526
- (inlined by) incflo::ReadParameters() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/setup/init.cpp:24
-
- 5: ./incflo3d.gnu.MPI.EB.ex(+0x48b62) [0x560019fe7b62]
-    incflo::incflo() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:21
-
- 6: ./incflo3d.gnu.MPI.EB.ex(+0x3a289) [0x560019fd9289]
+ 4: ./incflo3d.gnu.MPI.EB.ex(+0x3a149) [0x55bbef4a4149]
     main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:48 (discriminator 8)
 
- 7: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fbb09096083]
+ 5: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f1903cbf083]
 
- 8: ./incflo3d.gnu.MPI.EB.ex(+0x4223e) [0x560019fe123e]
+ 6: ./incflo3d.gnu.MPI.EB.ex(+0x420fe) [0x55bbef4ac0fe]
     ?? ??:0
 
