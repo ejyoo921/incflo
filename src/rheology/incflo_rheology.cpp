@@ -158,7 +158,7 @@ void incflo::compute_viscosity_at_level (int lev,
                         //Real p_ext = m_p_nd(i,j,k);
 
                         Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
-                        Real p_ext = m_gp0[1]*m_gravity[1]*(j*nn);
+                        Real p_ext = m_gp0[1]*(j*nn);
                         //Real p_ext = m_delp[1]*(j*nn);
 
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);

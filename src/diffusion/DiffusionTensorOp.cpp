@@ -275,7 +275,8 @@ void DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
     {
         // We want to return div (mu grad)) phi
         m_reg_apply_op->setScalars(0.0, -1.0);
-        for (int lev = 0; lev <= finest_level; ++lev) {
+        for (int lev = 0; lev <= finest_level; ++lev) 
+        {
             m_reg_apply_op->setACoeffs(lev, *a_density[lev]);
             Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *a_eta[lev]);
             m_reg_apply_op->setShearViscosity(lev, GetArrOfConstPtrs(b));

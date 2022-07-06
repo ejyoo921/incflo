@@ -95,13 +95,23 @@ void incflo::compute_vel_forces_on_level (int lev,
 
                     if (include_pressure_gradient)
                     {
-                        AMREX_D_TERM(vel_f(i,j,k,0) = -(gradp(i,j,k,0)+l_gp0[0])*rhoinv + l_gravity[0];,
-                                     vel_f(i,j,k,1) = -(gradp(i,j,k,1)+l_gp0[1])*rhoinv + l_gravity[1];,
-                                     vel_f(i,j,k,2) = -(gradp(i,j,k,2)+l_gp0[2])*rhoinv + l_gravity[2];);
+                        // AMREX_D_TERM(vel_f(i,j,k,0) = -(gradp(i,j,k,0)+l_gp0[0])*rhoinv + l_gravity[0];,
+                        //              vel_f(i,j,k,1) = -(gradp(i,j,k,1)+l_gp0[1])*rhoinv + l_gravity[1];,
+                        //              vel_f(i,j,k,2) = -(gradp(i,j,k,2)+l_gp0[2])*rhoinv + l_gravity[2];);
+                        //EY
+                        AMREX_D_TERM(vel_f(i,j,k,0) = -(gradp(i,j,k,0) + l_gp0[0] + l_gravity[0])*rhoinv;,
+                                     vel_f(i,j,k,1) = -(gradp(i,j,k,1) + l_gp0[1] + l_gravity[1])*rhoinv;,
+                                     vel_f(i,j,k,2) = -(gradp(i,j,k,2) + l_gp0[2] + l_gravity[2])*rhoinv;);
+                        //amrex::Print() << "velf(1) = " <<  l_gp0[1] + l_gravity[1] << "\n";
                     } else {
-                        AMREX_D_TERM(vel_f(i,j,k,0) = -(               l_gp0[0])*rhoinv + l_gravity[0];,
-                                     vel_f(i,j,k,1) = -(               l_gp0[1])*rhoinv + l_gravity[1];,
-                                     vel_f(i,j,k,2) = -(               l_gp0[2])*rhoinv + l_gravity[2];);
+                        // AMREX_D_TERM(vel_f(i,j,k,0) = -(               l_gp0[0])*rhoinv + l_gravity[0];,
+                        //              vel_f(i,j,k,1) = -(               l_gp0[1])*rhoinv + l_gravity[1];,
+                        //              vel_f(i,j,k,2) = -(               l_gp0[2])*rhoinv + l_gravity[2];);
+                        AMREX_D_TERM(vel_f(i,j,k,0) = -(                   l_gp0[0] + l_gravity[0])*rhoinv;,
+                                     vel_f(i,j,k,1) = -(                   l_gp0[1] + l_gravity[1])*rhoinv ;,
+                                     vel_f(i,j,k,2) = -(                   l_gp0[2] + l_gravity[2])*rhoinv ;);
+                    
+                        //amrex::Print() << "velf(1) = " <<  vel_f(i,j,k,1) << "\n";
                     }
                 });
             }
