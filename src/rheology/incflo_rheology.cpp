@@ -17,6 +17,7 @@ AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 amrex::Real inertialNum (amrex::Real sr, amrex::Real p_ext, amrex::Real ro_0, amrex::Real diam, amrex::Real mu_1, amrex::Real A_1, amrex::Real alpha_1) noexcept
 {
     return mu_1 + A_1*std::pow((sr/2)*diam/std::pow(p_ext/ro_0, 0.5), alpha_1);
+    // return mu_1 + A_1*std::pow((sr/2)*diam/std::pow(p_ext/ro_0, 0.5), 2*alpha_1);
 }
 
 struct NonNewtonianViscosity //Apparent viscosity
@@ -51,7 +52,8 @@ struct NonNewtonianViscosity //Apparent viscosity
             //amrex::Print() << "pr = " << p_ext << "\n";
             // If you want pressure gradient
             // add p_ext to p_bg
-            return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_1, A_1, alpha_1);
+            return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+            //return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_1, A_1, alpha_1);
         }
         default:
         {
@@ -143,9 +145,9 @@ void incflo::compute_viscosity_at_level (int lev,
                     {
                         Real sr = incflo_strainrate_eb(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr,flag_arr(i,j,k));
                         //Real p_ext = m_p_nd(i,j,k);
+
                         Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
                         Real p_ext = m_gp0[1]*(j*nn);
-                        //Real p_ext = m_delp[1]*(j*nn);
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);
                     });
                 }
@@ -159,7 +161,6 @@ void incflo::compute_viscosity_at_level (int lev,
 
                         Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
                         Real p_ext = m_gp0[1]*(j*nn);
-                        //Real p_ext = m_delp[1]*(j*nn);
 
                         eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);
                     });

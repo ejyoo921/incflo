@@ -33,6 +33,12 @@ public:
                          amrex::Vector<amrex::MultiFab const*> const& density,
                          amrex::Vector<amrex::MultiFab const*> const& eta);
 
+    //EY: Granular rheology
+    void compute_divtau_sq (amrex::Vector<amrex::MultiFab*> const& divtau_sq,
+                         amrex::Vector<amrex::MultiFab const*> const& velocity,
+                         amrex::Vector<amrex::MultiFab const*> const& density,
+                         amrex::Vector<amrex::MultiFab const*> const& eta);
+
 private:
 
     void readParameters ();

@@ -1,14 +1,14 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-stop_time               =   0.5         # Max (simulated) time to evolve
+stop_time               =   1.0         # Max (simulated) time to evolve
 max_step                =   -1          # Max number of time steps
 steady_state            =   0           # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   0.01       # Use this constant dt if > 0
+incflo.fixed_dt         =   0.001       # Use this constant dt if > 0
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
@@ -20,7 +20,7 @@ amr.restart             =   ""          # Checkpoint to restart from
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
-incflo.gravity          =   0.  1.      # Gravitational force (3D)
+incflo.gravity          =   0.  0.      # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
 
 incflo.fluid_model      =   "bingham"   # Fluid model (rheology)
@@ -31,18 +31,18 @@ incflo.papa_reg         =   1.0e-3      # Dynamic viscosity coefficient
 incflo.diam             =   0.01        # Particle (mean) diameter
 incflo.mu_1             =   0.1
 incflo.A_1              =   0.526
-incflo.alpha_1          =   0.4
+incflo.alpha_1          =   0.0
 incflo.p_bg             =   1.0          # Background pressure (time independant)
 
 # Make sure these are the same as the following geometry
 incflo.vert_lo          =   0.          # Lo vertical coordinates
 incflo.vert_hi          =   2.          # Hi vertical coordinates
-incflo.vert_n           =  16          # Grid cells at coarsest AMRlevel
+incflo.vert_n           =  128          # Grid cells at coarsest AMRlevel
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   16  16       # Grid cells at coarsest AMRlevel
+amr.n_cell              =   128  128       # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -50,14 +50,15 @@ amr.max_level           =   0           # Max AMR level in hierarchy
 #.......................................#
 geometry.prob_lo        =   0.  0.      # Lo corner coordinates
 geometry.prob_hi        =   2.  2.      # Hi corner coordinates
-geometry.is_periodic    =   0   1       # Periodicity x y z (0/1)
+geometry.is_periodic    =   1   0       # Periodicity x y z (0/1)
 
 #incflo.delp             =   0.0  0.0       # Prescribed (cyclic) pressure gradient
 
 # Boundary conditions
-xlo.type                =   "nsw"
-xhi.type                =   "nsw"
+ylo.type                =   "nsw"
+yhi.type                =   "nsw"
 
+yhi.velocity            =  1.  0.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #

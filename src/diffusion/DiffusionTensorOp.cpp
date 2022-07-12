@@ -306,3 +306,101 @@ void DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
         }
     }
 }
+
+//EY : Granular rheology
+void DiffusionTensorOp::compute_divtau_sq (Vector<MultiFab*> const& a_divtau_sq,
+                                        Vector<MultiFab const*> const& a_velocity,
+                                        Vector<MultiFab const*> const& a_density,
+                                        Vector<MultiFab const*> const& a_eta)
+{
+    BL_PROFILE("DiffusionTensorOp::compute_divtau_sq");
+
+    int finest_level = m_incflo->finestLevel();
+
+    Vector<MultiFab> velocity(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        velocity[lev].define(a_velocity[lev]->boxArray(),
+                             a_velocity[lev]->DistributionMap(),
+                             AMREX_SPACEDIM, 1, MFInfo(),
+                             a_velocity[lev]->Factory());
+        MultiFab::Copy(velocity[lev], *a_velocity[lev], 0, 0, AMREX_SPACEDIM, 1);
+    }
+
+#ifdef AMREX_USE_EB
+    if (m_eb_apply_op)
+    {
+        Vector<MultiFab> divtau_tmp(finest_level+1);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            divtau_tmp[lev].define(a_divtau_sq[lev]->boxArray(),
+                                   a_divtau_sq[lev]->DistributionMap(),
+                                   AMREX_SPACEDIM, 2, MFInfo(),
+                                   a_divtau_sq[lev]->Factory());
+            divtau_tmp[lev].setVal(0.0);
+        }
+
+        // We want to return div (mu grad)) phi
+        m_eb_apply_op->setScalars(0.0, -1.0);
+
+        // For when we use the stencil for centroid values
+        // m_eb_apply_op->setPhiOnCentroid();
+
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            m_eb_apply_op->setACoeffs(lev, *a_density[lev]);
+
+            Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *a_eta[lev]);
+
+            m_eb_apply_op->setShearViscosity(lev, GetArrOfConstPtrs(b), MLMG::Location::FaceCentroid);
+
+            if (m_incflo->hasEBFlow()) {
+               m_eb_apply_op->setEBShearViscosityWithInflow(lev, *a_eta[lev], *(m_incflo->get_velocity_eb()[lev]));
+            } else {
+               m_eb_apply_op->setEBShearViscosity(lev, *a_eta[lev]);
+            }
+            m_eb_apply_op->setLevelBC(lev, &velocity[lev]);
+        }
+
+        MLMG mlmg(*m_eb_apply_op);
+        mlmg.apply(GetVecOfPtrs(divtau_tmp), GetVecOfPtrs(velocity));
+
+        for(int lev = 0; lev <= finest_level; lev++)
+        {
+            amrex::single_level_redistribute( divtau_tmp[lev], *a_divtau_sq[lev], 0, AMREX_SPACEDIM, m_incflo->Geom(lev));
+        }
+    }
+    else
+#endif
+    {
+        // We want to return div (mu grad)) phi
+        // m_reg_apply_op->setScalars(0.0, -1.0);
+        m_reg_apply_op->setScalars(0.0, -0.0);
+        for (int lev = 0; lev <= finest_level; ++lev) 
+        {
+            m_reg_apply_op->setACoeffs(lev, *a_density[lev]);
+            Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *a_eta[lev]);
+            m_reg_apply_op->setShearViscosity(lev, GetArrOfConstPtrs(b));
+            m_reg_apply_op->setLevelBC(lev, &velocity[lev]);
+        }
+
+        MLMG mlmg(*m_reg_apply_op);
+        mlmg.apply(a_divtau_sq, GetVecOfPtrs(velocity));
+    }
+
+#ifdef _OPENMP
+#pragma omp parallel if (Gpu::notInLaunchRegion())
+#endif
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        for (MFIter mfi(*a_divtau_sq[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+            Box const& bx = mfi.tilebox();
+            Array4<Real> const& divtau_arr = a_divtau_sq[lev]->array(mfi);
+            Array4<Real const> const& rho_arr = a_density[lev]->const_array(mfi);
+            amrex::ParallelFor(bx,
+            [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+            {
+                Real rhoinv = 1.0/rho_arr(i,j,k);
+                AMREX_D_TERM(divtau_arr(i,j,k,0) *= rhoinv;,
+                             divtau_arr(i,j,k,1) *= rhoinv;,
+                             divtau_arr(i,j,k,2) *= rhoinv;);
+            });
+        }
+    }
+}
