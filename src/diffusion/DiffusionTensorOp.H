@@ -34,7 +34,7 @@ public:
                          amrex::Vector<amrex::MultiFab const*> const& eta);
 
     //EY: Granular rheology
-    void compute_divtau_sq (amrex::Vector<amrex::MultiFab*> const& divtau_sq,
+    void compute_divtau2 (amrex::Vector<amrex::MultiFab*> const& divtau2,
                          amrex::Vector<amrex::MultiFab const*> const& velocity,
                          amrex::Vector<amrex::MultiFab const*> const& density,
                          amrex::Vector<amrex::MultiFab const*> const& eta);
@@ -51,6 +51,13 @@ private:
 #endif
     std::unique_ptr<amrex::MLTensorOp> m_reg_solve_op;
     std::unique_ptr<amrex::MLTensorOp> m_reg_apply_op;
+    
+    //EY: Granular rheology 
+    std::unique_ptr<amrex::MLTensorOp> m_reg_apply_op2;
+    std::unique_ptr<amrex::MLTensorOp> m_reg_apply_op3;
+
+    int m_higher_tensor = 1;
+
 
     // DiffusionOp verbosity
     int m_verbose = 0;

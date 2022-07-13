@@ -491,6 +491,8 @@ private:
     amrex::Real m_vert_hi = 0.0;
     amrex::Real m_vert_lo = 0.0;
     amrex::Real m_vert_n = 0.0;
+    
+    int m_higher_tensor = 1;
 
 
     int m_plot_int = -1;
@@ -680,6 +682,11 @@ private:
         return ( m_godunov_include_diff_in_forcing || DiffusionType::Implicit != m_diff_type );
     }
 
+    //EY: Granular rheology 
+    bool useHigherTensor () const {
+        return m_higher_tensor;
+    }
+
     bool useTensorSolve () const {
         return use_tensor_solve;
     }
@@ -695,6 +702,8 @@ private:
 #endif
 
     DiffusionTensorOp* get_diffusion_tensor_op ();
+    //EY: Granular rheology
+    DiffusionTensorOp* get_diffusion_tensor2_op ();
     DiffusionScalarOp* get_diffusion_scalar_op ();
 
     amrex::Vector<amrex::MultiFab*> get_velocity_old () noexcept;
