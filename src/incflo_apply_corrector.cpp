@@ -146,7 +146,7 @@ void incflo::ApplyCorrector()
     // Compute viscosity / diffusive coefficients
     // *************************************************************************************
     compute_viscosity(GetVecOfPtrs(vel_eta),
-                      get_density_new(), get_velocity_new(), get_p_nd(),
+                      get_density_new(), get_velocity_new(), 
                       new_time, 1);
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
 

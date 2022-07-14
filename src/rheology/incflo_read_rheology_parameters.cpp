@@ -84,9 +84,9 @@ void incflo::ReadRheologyParameters()
                         << ", tau_0 = " << m_tau_0
                         << ", eta_0 = " << m_eta_0 << std::endl;
      }
-     else if(fluid_model_s == "NonIso")
+     else if(fluid_model_s == "Granular")
      {
-         m_fluid_model = FluidModel::NonIsotropic;
+         m_fluid_model = FluidModel::Granular;
          pp.query("diam", m_diam);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_diam > 0.0,
                     "Particle diameter must be positive");
@@ -116,6 +116,18 @@ void incflo::ReadRheologyParameters()
          pp.query("alpha_1", m_alpha_1);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 >= 0.0,
                     "Fitting parameter must be positive");
+        
+         pp.query("mu_1", m_mu_2);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 > 0.0,
+                    "Fitting parameter mu1 must be positive");
+
+         pp.query("A_1", m_A_2);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_2 > 0.0,
+                    "Fitting parameter must be positive");
+
+         pp.query("alpha_1", m_alpha_2);
+            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_2 >= 0.0,
+                    "Fitting parameter must be positive");
 
          pp.query("vert_hi", m_vert_hi);
          pp.query("vert_lo", m_vert_lo);
@@ -123,7 +135,7 @@ void incflo::ReadRheologyParameters()
 
 
 
-         amrex::Print() << "NonIsotropic stress with"
+         amrex::Print() << "Granular stress with"
                         << " mu_1 = " << m_mu_1
                         << ", A_1 = " << m_A_1
                         << ", alpha_1 = " << m_alpha_1

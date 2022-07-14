@@ -466,6 +466,28 @@ Vector<MultiFab*> incflo::get_divtau_new () noexcept
     return r;
 }
 
+//EY: Granular rheology
+Vector<MultiFab*> incflo::get_divtau2_old () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->divtau2_o));
+    }
+    return r;
+}
+
+Vector<MultiFab*> incflo::get_divtau2_new () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->divtau));
+    }
+    return r;
+}
+
+
 Vector<MultiFab*> incflo::get_laps_old () noexcept
 {
     Vector<MultiFab*> r;
@@ -542,17 +564,6 @@ Vector<MultiFab const*> incflo::get_tracer_new_const () const noexcept
     r.reserve(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         r.push_back(&(m_leveldata[lev]->tracer));
-    }
-    return r;
-}
-
-//EY: Added to get pressure
-Vector<MultiFab*> incflo::get_p_nd () noexcept
-{
-    Vector<MultiFab*> r;
-    r.reserve(finest_level+1);
-    for (int lev = 0; lev <= finest_level; ++lev) {
-        r.push_back(&(m_leveldata[lev]->p_nd));
     }
     return r;
 }

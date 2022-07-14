@@ -103,7 +103,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // Forcing terms
     Vector<MultiFab> vel_forces, tra_forces;
 
-    Vector<MultiFab> vel_eta, tra_eta;
+    Vector<MultiFab> vel_eta, vel_eta2, vel_eta3, tra_eta;
 
     // *************************************************************************************
     // Allocate space for the forcing terms
@@ -116,10 +116,13 @@ void incflo::ApplyPredictor (bool incremental_projection)
             tra_forces.emplace_back(grids[lev], dmap[lev], m_ntrac, nghost_force(),
                                     MFInfo(), Factory(lev));
         }
-        vel_eta.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
+        vel_eta.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
+        
         if (m_advect_tracer) {
             tra_eta.emplace_back(grids[lev], dmap[lev], m_ntrac, 1, MFInfo(), Factory(lev));
         }
+        vel_eta2.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
+        vel_eta3.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
     }
 
     // *************************************************************************************
@@ -130,8 +133,22 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // Compute viscosity / diffusive coefficients
     // *************************************************************************************
     compute_viscosity(GetVecOfPtrs(vel_eta),
-                      get_density_old(), get_velocity_old(), get_p_nd(),
+                      get_density_old(), get_velocity_old(),
                       m_cur_time, 1);
+
+    if (m_fluid_model == FluidModel::Granular)
+    {
+
+        m_fluid_model = FluidModel::Granular2;
+        compute_viscosity(GetVecOfPtrs(vel_eta2),
+                      get_density_old(), get_velocity_old(),
+                      m_cur_time, 1);
+                    
+        // Go back to the first one - for eta1
+        m_fluid_model = FluidModel::Granular;
+    }
+
+
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
 
     // *************************************************************************************
@@ -141,6 +158,21 @@ void incflo::ApplyPredictor (bool incremental_projection)
     {
         compute_divtau(get_divtau_old(),get_velocity_old_const(),
                        get_density_old_const(),GetVecOfConstPtrs(vel_eta));
+
+        if (m_fluid_model == FluidModel::Granular)
+        {
+            compute_divtau2(get_divtau2_old(),get_velocity_old_const(),
+                       get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
+
+            //Need to combine with divtau
+            for (int lev = 0; lev <= finest_level; ++lev)
+            {
+                auto& ld = *m_leveldata[lev];
+                MultiFab::Add(ld.divtau_o[lev], ld.divtau2_o[lev], 0, 0, AMREX_SPACEDIM, 0);
+            }
+
+        }
+                    
     }
 
     // *************************************************************************************

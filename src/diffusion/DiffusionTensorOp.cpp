@@ -295,7 +295,7 @@ DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
 #endif
     {
         // We want to return div (mu grad)) phi
-        m_reg_apply_op->setScalars(0.0, -1.0);
+        m_reg_apply_op->setScalars(0.0, 0.0);
         for (int lev = 0; lev <= finest_level; ++lev) 
         {
             m_reg_apply_op->setACoeffs(lev, *a_density[lev]);
@@ -307,22 +307,40 @@ DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
         MLMG mlmg(*m_reg_apply_op);
         mlmg.apply(a_divtau, GetVecOfPtrs(velocity));
 
+        //EY: Granular rheology.
+        // if (m_higher_tensor == 1) //Should be either 0 (no), 1(second order), 2(vorticity)
+        // {   
+        //     amrex::Print() << "got in" << "\n";
+ 
+        //     Vector<MultiFab> a_divtau2;
+        //     for (int lev = 0; lev <= finest_level; ++lev) {
+        //         a_divtau2[lev].define(a_divtau[lev]->boxArray(),
+        //                                  a_divtau[lev]->DistributionMap(),
+        //                                  AMREX_SPACEDIM, 0, MFInfo(),
+        //                                  a_divtau[lev]->Factory());
 
-        //EY
-        if (m_higher_tensor == 1) //Should be either 0 (no), 1(second order), 2(vorticity)
-        {
-            amrex::Vector<MultiFab> a_divtau2 ;
-            m_reg_apply_op->setScalars(0.0, 0.0);
-            mlmg.apply_sq(a_divtau2, GetVecOfPtrs(velocity));
-            amrex::Print() << "here = "<< "\n";
+        //         a_divtau2[lev].setVal(0.0);
 
-            for (int lev = 0; lev <= finest_level; ++lev) {
-            amrex::Multifab::Add(a_divtau[lev], a_divtau2[lev], 0, 0, a_divtau[0]->nComp());
+        //         MultiFab::Copy(a_divtau2[lev], *a_divtau[lev], 0, 0, AMREX_SPACEDIM, 0);
 
-            }
-        }
+
+        //         m_reg_apply_op->setScalars(0.0, 0.0);
+        //         // This a_eta value should be different than the first one. This is eta2
+        //         Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *a_eta[lev]);
+        //         m_reg_apply_op->setShearViscosity(lev, GetArrOfConstPtrs(b));
+
+        //         MLMG mlmg(*m_reg_apply_op);
+        //         mlmg.apply_sq(a_divtau, GetVecOfPtrs(velocity));
+
+        //         MultiFab::Add(a_divtau2[lev], *a_divtau[lev], 0, 0, AMREX_SPACEDIM, 0);
+
+        //     }
+
+        // }
 
     }
+
+    
 
 #ifdef _OPENMP
 #pragma omp parallel if (Gpu::notInLaunchRegion())
@@ -331,6 +349,60 @@ DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
         for (MFIter mfi(*a_divtau[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             Box const& bx = mfi.tilebox();
             Array4<Real> const& divtau_arr = a_divtau[lev]->array(mfi);
+            Array4<Real const> const& rho_arr = a_density[lev]->const_array(mfi);
+            amrex::ParallelFor(bx,
+            [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+            {
+                Real rhoinv = 1.0/rho_arr(i,j,k);
+                AMREX_D_TERM(divtau_arr(i,j,k,0) *= rhoinv;,
+                             divtau_arr(i,j,k,1) *= rhoinv;,
+                             divtau_arr(i,j,k,2) *= rhoinv;);
+            });
+        }
+    }
+}
+
+// EY: We might need to do this like separately. 
+void 
+DiffusionTensorOp::compute_divtau2 (Vector<MultiFab*> const& a_divtau2,
+                                        Vector<MultiFab const*> const& a_velocity,
+                                        Vector<MultiFab const*> const& a_density,
+                                        Vector<MultiFab const*> const& a_eta2)
+{
+    BL_PROFILE("DiffusionTensorOp::compute_divtau2");
+
+    int finest_level = m_incflo->finestLevel();
+
+    Vector<MultiFab> velocity(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        velocity[lev].define(a_velocity[lev]->boxArray(),
+                             a_velocity[lev]->DistributionMap(),
+                             AMREX_SPACEDIM, 1, MFInfo(),
+                             a_velocity[lev]->Factory());
+        MultiFab::Copy(velocity[lev], *a_velocity[lev], 0, 0, AMREX_SPACEDIM, 1);
+
+        // We want to return div (mu grad)) phi
+        m_reg_apply_op->setScalars(0.0, 0.0);
+        for (int lev = 0; lev <= finest_level; ++lev) 
+        {
+            m_reg_apply_op->setACoeffs(lev, *a_density[lev]);
+            Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *a_eta2[lev]);
+            m_reg_apply_op->setShearViscosity(lev, GetArrOfConstPtrs(b));
+            m_reg_apply_op->setLevelBC(lev, &velocity[lev]);
+        }
+
+        MLMG mlmg(*m_reg_apply_op);
+        mlmg.apply_sq(a_divtau2, GetVecOfPtrs(velocity));
+
+    }
+
+#ifdef _OPENMP
+#pragma omp parallel if (Gpu::notInLaunchRegion())
+#endif
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        for (MFIter mfi(*a_divtau2[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+            Box const& bx = mfi.tilebox();
+            Array4<Real> const& divtau_arr = a_divtau2[lev]->array(mfi);
             Array4<Real const> const& rho_arr = a_density[lev]->const_array(mfi);
             amrex::ParallelFor(bx,
             [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept

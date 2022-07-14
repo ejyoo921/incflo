@@ -24,7 +24,7 @@ public:
     friend DiffusionScalarOp;
 
     enum struct FluidModel {
-        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, NonIsotropic
+        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular, Granular2, Granular3
     };
 
     incflo ();
@@ -187,7 +187,7 @@ public: // for cuda
                           amrex::Vector<amrex::MultiFab const*> const& eta);
 
     //EY : Granular rheology
-    void compute_divtau_sq  (amrex::Vector<amrex::MultiFab      *> const& divtau_sq,
+    void compute_divtau2  (amrex::Vector<amrex::MultiFab      *> const& divtau_sq,
                           amrex::Vector<amrex::MultiFab const*> const& velocity,
                           amrex::Vector<amrex::MultiFab const*> const& density,
                           amrex::Vector<amrex::MultiFab const*> const& eta);
@@ -256,13 +256,11 @@ public: // for cuda
     virtual void compute_viscosity (amrex::Vector<amrex::MultiFab*> const& eta,
                                     amrex::Vector<amrex::MultiFab*> const& rho,
                                     amrex::Vector<amrex::MultiFab*> const& vel,
-                                    amrex::Vector<amrex::MultiFab*> const& p_nd,
                                     amrex::Real time, int nghost);
     virtual void compute_viscosity_at_level (int lev,
                                              amrex::MultiFab* eta,
                                              amrex::MultiFab* rho,
                                              amrex::MultiFab* vel,
-                                             amrex::MultiFab* p_nd,
                                              amrex::Geometry& lev_geom,
                                              amrex::Real time, int nghost);
     virtual void compute_tracer_diff_coeff (amrex::Vector<amrex::MultiFab*> const& tra_eta,
@@ -486,6 +484,11 @@ private:
     amrex::Real m_mu_1 = 0.0;
     amrex::Real m_A_1 = 0.0;
     amrex::Real m_alpha_1 = 0.0;
+    
+    amrex::Real m_mu_2 = 0.0;
+    amrex::Real m_A_2 = 0.0;
+    amrex::Real m_alpha_2 = 0.0;
+
     amrex::Real m_p_bg = 0.0;
 
     amrex::Real m_vert_hi = 0.0;
@@ -577,6 +580,10 @@ private:
         //
         amrex::MultiFab divtau;
         amrex::MultiFab divtau_o;
+        // EY: Granular rheology
+        amrex::MultiFab divtau2;
+        amrex::MultiFab divtau2_o;
+
         amrex::MultiFab laps;
         amrex::MultiFab laps_o;
     };
@@ -726,6 +733,11 @@ private:
     amrex::Vector<amrex::MultiFab*> get_conv_tracer_new () noexcept;
     amrex::Vector<amrex::MultiFab*> get_divtau_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_divtau_new () noexcept;
+
+    //EY: Granular rheology
+    amrex::Vector<amrex::MultiFab*> get_divtau2_old () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_divtau2_new () noexcept;
+
     amrex::Vector<amrex::MultiFab*> get_laps_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_laps_new () noexcept;
     //
@@ -740,10 +752,6 @@ private:
     amrex::Vector<amrex::MultiFab const*> get_tracer_new_const () const noexcept;
     amrex::Vector<amrex::MultiFab const*> get_vel_forces_const () const noexcept;
     amrex::Vector<amrex::MultiFab const*> get_tra_forces_const () const noexcept;
-
-    //EY: for granular rheology
-    amrex::Vector<amrex::MultiFab*> get_p_nd () noexcept;
-    amrex::Vector<amrex::MultiFab const*> get_p_nd_const () const noexcept;
 
     amrex::Vector<int> const& get_velocity_iconserv () const noexcept { return m_iconserv_velocity; }
     amrex::Vector<int> const& get_density_iconserv () const noexcept { return m_iconserv_density; }

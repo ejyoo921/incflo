@@ -3,7 +3,7 @@ namespace amrex {
 
 const char* buildInfoGetBuildDate() {
 
-  static const char BUILD_DATE[] = "2022-07-13 11:11:13.185310";
+  static const char BUILD_DATE[] = "2022-07-14 16:46:29.218373";
   return BUILD_DATE;
 }
 
@@ -136,7 +136,7 @@ const char* buildInfoGetModuleVal(int i) {
 const char* buildInfoGetGitHash(int i) {
 
   //static const char HASH1[] = "${GIT[1]}";
-  static const char HASH1[] = "20.08-247-gf3d03c1-dirty";
+  static const char HASH1[] = "20.08-248-g9f7ea58-dirty";
   static const char HASH2[] = "22.07-11-g9bb896f2d-dirty";
 
   static const char EMPT[] = "";

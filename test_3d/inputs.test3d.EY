@@ -23,7 +23,7 @@ amr.restart             =   ""          # Checkpoint to restart from
 incflo.gravity          =   0.  0.  0.  # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
 
-incflo.fluid_model      =   "NonIso"    # Fluid model (rheology)
+incflo.fluid_model      =   "Granular"    # Fluid model (rheology)
 
 incflo.diam             =   0.1        # Particle (mean) diameter
 incflo.mu_1             =   0.1
@@ -34,12 +34,12 @@ incflo.mu               =   1.          # Dynamic viscosity coefficient
 incflo.tau_0            =   1.          # Yield stress
 incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter
 
-incflo.p_bg             =   0.1          # Initial pressure at node (0,0,0)
+incflo.p_bg             =   0.1         # Initial pressure at node (0,0,0)
 
 # Make sure these are the same as the following geometry
 incflo.vert_lo          =   0.          # Lo vertical coordinates
 incflo.vert_hi          =   3.          # Hi vertical coordinates
-incflo.vert_n           =   64          # Grid cells at coarsest AMRlevel
+incflo.vert_n           =   32          # Grid cells at coarsest AMRlevel
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #

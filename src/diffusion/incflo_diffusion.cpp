@@ -52,6 +52,42 @@ incflo::compute_divtau(Vector<MultiFab      *> const& divtau,
     }
 }
 
+//EY: Granular rheology
+void
+incflo::compute_divtau2(Vector<MultiFab      *> const& divtau,
+                       Vector<MultiFab const*> const& vel,
+                       Vector<MultiFab const*> const& density,
+                       Vector<MultiFab const*> const& eta)
+{
+    if (use_tensor_correction) {
+
+        get_diffusion_tensor_op()->compute_divtau2(divtau, vel, density, eta);
+#ifdef AMREX_USE_EB
+        EB_set_covered(*divtau[0]     , 0.0);
+#endif
+
+        Vector<MultiFab*> divtau_scal;
+        divtau_scal.push_back(new MultiFab(grids[0], dmap[0], divtau[0]->nComp(),
+                                           divtau[0]->nGrow(),MFInfo(),*m_factory[0]));
+        divtau_scal[0]->setVal(0.);
+
+        get_diffusion_scalar_op()->compute_divtau({divtau_scal}, vel, density, eta);
+#ifdef AMREX_USE_EB
+        EB_set_covered(*divtau_scal[0], 0.0);
+#endif
+
+        // Define divtau to be (divtau_full - divtau_separate)
+        if (m_verbose > 0)
+            amrex::Print() << " ... Defining divtau as the difference between tensor and scalar versions" << std::endl;
+
+        divtau[0]->Saxpy(*divtau[0], -1.0, *divtau_scal[0], 0, 0, AMREX_SPACEDIM, 0);
+
+    } else if (use_tensor_solve) {
+        get_diffusion_tensor_op()->compute_divtau2(divtau, vel, density, eta);
+    } else {
+        get_diffusion_scalar_op()->compute_divtau(divtau, vel, density, eta);
+    }
+}
 
 void
 incflo::compute_laps(Vector<MultiFab      *> const& laps,
