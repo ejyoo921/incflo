@@ -117,15 +117,15 @@ void incflo::ReadRheologyParameters()
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 >= 0.0,
                     "Fitting parameter must be positive");
         
-         pp.query("mu_1", m_mu_2);
+         pp.query("mu_2", m_mu_2);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 > 0.0,
                     "Fitting parameter mu1 must be positive");
 
-         pp.query("A_1", m_A_2);
+         pp.query("A_2", m_A_2);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_2 > 0.0,
                     "Fitting parameter must be positive");
 
-         pp.query("alpha_1", m_alpha_2);
+         pp.query("alpha_2", m_alpha_2);
             AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_2 >= 0.0,
                     "Fitting parameter must be positive");
 
@@ -136,9 +136,9 @@ void incflo::ReadRheologyParameters()
 
 
          amrex::Print() << "Granular stress with"
-                        << " mu_1 = " << m_mu_1
-                        << ", A_1 = " << m_A_1
-                        << ", alpha_1 = " << m_alpha_1
+                        << " mu_2 = " << m_mu_2
+                        << ", A_2 = " << m_A_2
+                        << ", alpha_2 = " << m_alpha_2
                         << ", p_bg = " << m_p_bg
                         << ", papa_reg = " << m_papa_reg << std::endl;
      }

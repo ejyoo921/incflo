@@ -28,6 +28,8 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
 {
     if (advection_type != "MOL") {
         divtau_o.define(ba, dm, AMREX_SPACEDIM, 0, MFInfo(), fact);
+        //EY: Granular rheology
+        divtau2_o.define(ba, dm, AMREX_SPACEDIM, 0, MFInfo(), fact);
         if (advect_tracer) {
             laps_o.define(ba, dm, ntrac, 0, MFInfo(), fact);
         }
@@ -40,6 +42,9 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
         {
             divtau.define  (ba, dm, AMREX_SPACEDIM, 0, MFInfo(), fact);
             divtau_o.define(ba, dm, AMREX_SPACEDIM, 0, MFInfo(), fact);
+            //EY: Granular rheology
+            divtau2.define  (ba, dm, AMREX_SPACEDIM, 0, MFInfo(), fact);
+            divtau2_o.define(ba, dm, AMREX_SPACEDIM, 0, MFInfo(), fact);
         }
         if (!implicit_diffusion && advect_tracer)
         {

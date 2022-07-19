@@ -49,13 +49,14 @@ struct NonNewtonianViscosity //Apparent viscosity
         }
         case incflo::FluidModel::Granular:
         {
-            //amrex::Print() << "pr = " << p_ext << "\n";
+            // amrex::Print() << "mu_1 = " << mu_1 << "\n";
             // If you want pressure gradient add p_ext to p_bg
             return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_1, A_1, alpha_1);
             //return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_2, A_2, 2*alpha_2);
         }
         case incflo::FluidModel::Granular2:
         {
+            // amrex::Print() << "mu_2 = "<< mu_2 <<"\n";
             return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_2, A_2, 2*alpha_2);
         }
         default:
@@ -90,7 +91,7 @@ void incflo::compute_viscosity_at_level (int lev,
     {
         vel_eta->setVal(m_mu, 0, 1, nghost);
     }
-    else if (m_fluid_model == FluidModel::Granular)
+    else if (m_fluid_model == FluidModel::Granular || m_fluid_model == FluidModel::Granular2)
     {
         /* code */
         NonNewtonianViscosity non_newtonian_viscosity;
@@ -107,11 +108,11 @@ void incflo::compute_viscosity_at_level (int lev,
 
         non_newtonian_viscosity.mu_1 = m_mu_1;
         non_newtonian_viscosity.A_1 = m_A_1;
-        non_newtonian_viscosity.p_bg =m_alpha_1;
+        non_newtonian_viscosity.alpha_1 =m_alpha_1;
 
-        non_newtonian_viscosity.mu_1 = m_mu_2;
-        non_newtonian_viscosity.A_1 = m_A_2;
-        non_newtonian_viscosity.p_bg =m_alpha_2;
+        non_newtonian_viscosity.mu_2 = m_mu_2;
+        non_newtonian_viscosity.A_2 = m_A_2;
+        non_newtonian_viscosity.alpha_2 =m_alpha_2;
 
         non_newtonian_viscosity.p_bg =m_p_bg;
 

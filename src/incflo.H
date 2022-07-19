@@ -187,7 +187,7 @@ public: // for cuda
                           amrex::Vector<amrex::MultiFab const*> const& eta);
 
     //EY : Granular rheology
-    void compute_divtau2  (amrex::Vector<amrex::MultiFab      *> const& divtau_sq,
+    void compute_divtau2  (amrex::Vector<amrex::MultiFab      *> const& divtau2,
                           amrex::Vector<amrex::MultiFab const*> const& velocity,
                           amrex::Vector<amrex::MultiFab const*> const& density,
                           amrex::Vector<amrex::MultiFab const*> const& eta);
