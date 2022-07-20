@@ -117,12 +117,12 @@ void incflo::ApplyPredictor (bool incremental_projection)
                                     MFInfo(), Factory(lev));
         }
         vel_eta.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
+        vel_eta2.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
+        vel_eta3.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
         
         if (m_advect_tracer) {
             tra_eta.emplace_back(grids[lev], dmap[lev], m_ntrac, 1, MFInfo(), Factory(lev));
         }
-        vel_eta2.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
-        vel_eta3.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
     }
 
     // *************************************************************************************
@@ -140,10 +140,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
     if (m_fluid_model == FluidModel::Granular)
     {
 
-        m_fluid_model = FluidModel::Granular2;
-        compute_viscosity(GetVecOfPtrs(vel_eta2),
-                      get_density_old(), get_velocity_old(),
-                      m_cur_time, 1);
+        // m_fluid_model = FluidModel::Granular2;
+        // compute_viscosity(GetVecOfPtrs(vel_eta2),
+        //               get_density_old(), get_velocity_old(),
+        //               m_cur_time, 1);
                     
         // Go back to the first one - for eta1
         m_fluid_model = FluidModel::Granular;
@@ -161,12 +161,12 @@ void incflo::ApplyPredictor (bool incremental_projection)
                        get_density_old_const(),GetVecOfConstPtrs(vel_eta));
 
         //EY: Granular rheology
-        if (m_fluid_model == FluidModel::Granular)
-        {
-            compute_divtau2(get_divtau2_old(),get_velocity_old_const(),
-                       get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
+        // if (m_fluid_model == FluidModel::Granular)
+        // {
+        //     compute_divtau2(get_divtau2_old(),get_velocity_old_const(),
+        //                get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
 
-        }
+        // }
                     
     }
 
@@ -381,6 +381,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
             Array4<Real const> const& vel_f = vel_forces[lev].const_array(mfi);
 
             if (m_diff_type == DiffusionType::Implicit) {
+                if (m_fluid_model == FluidModel::Granular)
+                {
+                    // amrex::Abort("Granular rheology requires Explicit method (pr-Im) ");
+                }
 
                 if (use_tensor_correction)
                 {
@@ -403,6 +407,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)
             {
+                if (m_fluid_model == FluidModel::Granular)
+                {
+                    // amrex::Abort("Granular rheology requires Explicit method (pr-CN)");
+                }
 
                 Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
@@ -431,7 +439,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 else
                 {
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
+                    {   
                         AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o(i,j,k,0));,
                                     vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o(i,j,k,1));,
                                     vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)););

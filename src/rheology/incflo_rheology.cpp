@@ -16,13 +16,13 @@ amrex::Real expterm (amrex::Real nu) noexcept
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 amrex::Real inertialNum (amrex::Real sr, amrex::Real p_ext, amrex::Real ro_0, amrex::Real diam, amrex::Real mu_1, amrex::Real A_1, amrex::Real alpha_1) noexcept
 {
-    return mu_1 + A_1*std::pow((sr/2)*diam/std::pow(p_ext/ro_0, 0.5), alpha_1);
+    return mu_1 + A_1*std::pow((sr/2)*diam/(std::pow(p_ext/ro_0, 0.5)), alpha_1);
 }
 
 struct NonNewtonianViscosity //Apparent viscosity
 {
     incflo::FluidModel fluid_model;
-    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, ro_0, p_bg, diam, mu_1, A_1, alpha_1, mu_2, A_2, alpha_2;
+    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, ro_0, p_bg, diam, mu_1, A_1, alpha_1, mu_2, A_2, alpha_2, A_3, alpha_3;
     
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -35,7 +35,7 @@ struct NonNewtonianViscosity //Apparent viscosity
         }
         case incflo::FluidModel::Bingham:
         {   
-            amrex::Print() << "are we here"  << "\n";
+            // amrex::Print() << "are we here"  << "\n";
             return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
             // expterm(sr/papa_reg)/papa_reg = (1-exp(-sr/papa_reg))/sr --> 1/2dot(gamma)'s papa ver.
         }
@@ -49,15 +49,17 @@ struct NonNewtonianViscosity //Apparent viscosity
         }
         case incflo::FluidModel::Granular:
         {
-            // amrex::Print() << "mu_1 = " << mu_1 << "\n";
+            // amrex::Print() << "sr = " << sr << "\n";
             // If you want pressure gradient add p_ext to p_bg
-            return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_1, A_1, alpha_1);
-            //return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_2, A_2, 2*alpha_2);
+            return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu*sr, A_1, alpha_1);
         }
         case incflo::FluidModel::Granular2:
         {
-            // amrex::Print() << "mu_2 = "<< mu_2 <<"\n";
-            return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg+p_ext)*inertialNum(sr, p_bg+p_ext, ro_0, diam, mu_2, A_2, 2*alpha_2);
+            return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+        }
+        case incflo::FluidModel::Granular3:
+        {
+            return (-1)*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, 0., A_3, 2*alpha_3);
         }
         default:
         {
@@ -91,7 +93,7 @@ void incflo::compute_viscosity_at_level (int lev,
     {
         vel_eta->setVal(m_mu, 0, 1, nghost);
     }
-    else if (m_fluid_model == FluidModel::Granular || m_fluid_model == FluidModel::Granular2)
+    else if (m_fluid_model == FluidModel::Granular || m_fluid_model == FluidModel::Granular2 || m_fluid_model == FluidModel::Granular3)
     {
         /* code */
         NonNewtonianViscosity non_newtonian_viscosity;
@@ -114,6 +116,9 @@ void incflo::compute_viscosity_at_level (int lev,
         non_newtonian_viscosity.A_2 = m_A_2;
         non_newtonian_viscosity.alpha_2 =m_alpha_2;
 
+        non_newtonian_viscosity.A_2 = m_A_3;
+        non_newtonian_viscosity.alpha_2 =m_alpha_3;
+
         non_newtonian_viscosity.p_bg =m_p_bg;
 
 
@@ -133,7 +138,7 @@ void incflo::compute_viscosity_at_level (int lev,
                 Array4<Real const> const& vel_arr = vel->const_array(mfi);
 
                 {
-                    //EY: 1st attempt
+                    //EY: Granular rheology
                     amrex::ParallelFor(bx,[=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
                         Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);

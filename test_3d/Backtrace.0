@@ -8,37 +8,49 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo3d.gnu.MPI.EB.ex(+0x469a55) [0x55ad318eba55]
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x468eb5) [0x562641540eb5]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo3d.gnu.MPI.EB.ex(+0x46beea) [0x55ad318edeea]
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x46b34a) [0x56264154334a]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: ./incflo3d.gnu.MPI.EB.ex(+0x3761e3) [0x55ad317f81e3]
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f06c7612090]
+
+ 3: /lib/x86_64-linux-gnu/libc.so.6(__write+0x4d) [0x7f06c76dd0ad]
+
+ 4: /lib/x86_64-linux-gnu/libc.so.6(_IO_file_write+0x2d) [0x7f06c765de8d]
+
+ 5: /lib/x86_64-linux-gnu/libc.so.6(_IO_do_write+0xb1) [0x7f06c765f951]
+
+ 6: /lib/x86_64-linux-gnu/libc.so.6(_IO_file_xsputn+0xe5) [0x7f06c765e6b5]
+
+ 7: /lib/x86_64-linux-gnu/libc.so.6(fwrite+0xc1) [0x7f06c76523c1]
+
+ 8: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l+0x194) [0x7f06c7a81824]
+    ?? ??:0
+
+ 9: ./incflo3d.gnu.MPI.EB.ex(+0x51040) [0x562641129040]
     std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const at /usr/include/c++/10/bits/basic_string.h:187
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_is_local() const at /usr/include/c++/10/bits/basic_string.h:222
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() at /usr/include/c++/10/bits/basic_string.h:231
  (inlined by) std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string() at /usr/include/c++/10/bits/basic_string.h:658
- (inlined by) amrex::FileOpenFailed(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Utility.cpp:167
+ (inlined by) amrex::Print::~Print() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Print.H:79
+ (inlined by) operator() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:443
+ (inlined by) call_f<incflo::ApplyPredictor(bool)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:29
+ (inlined by) ParallelFor<incflo::ApplyPredictor(bool)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:119
+ (inlined by) incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:441
 
- 3: ./incflo3d.gnu.MPI.EB.ex(+0x3a1ab0) [0x55ad31823ab0]
-    amrex::ParallelDescriptor::ReadAndBcastFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, amrex::Vector<char, std::allocator<char> >&, bool, ompi_communicator_t* const&) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_ParallelDescriptor.cpp:1415
+10: ./incflo3d.gnu.MPI.EB.ex(+0x4b737) [0x562641123737]
+    incflo::Advance() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_advance.cpp:57
 
- 4: ./incflo3d.gnu.MPI.EB.ex(+0x35da9a) [0x55ad317dfa9a]
-    amrex::(anonymous namespace)::read_file(char const*, std::__cxx11::list<amrex::ParmParse::PP_entry, std::allocator<amrex::ParmParse::PP_entry> >&) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_ParmParse.cpp:498 (discriminator 2)
+11: ./incflo3d.gnu.MPI.EB.ex(+0x43178) [0x56264111b178]
+    incflo::Evolve() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:136
 
- 5: ./incflo3d.gnu.MPI.EB.ex(+0x35ff2b) [0x55ad317e1f2b]
-    amrex::ParmParse::Initialize(int, char**, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_ParmParse.cpp:955
- (inlined by) amrex::ParmParse::Initialize(int, char**, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_ParmParse.cpp:1162
+12: ./incflo3d.gnu.MPI.EB.ex(+0x3a7ce) [0x5626411127ce]
+    main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:57
 
- 6: ./incflo3d.gnu.MPI.EB.ex(+0x3475db) [0x55ad317c95db]
-    amrex::Initialize(int&, char**&, bool, ompi_communicator_t*, std::function<void ()> const&, std::ostream&, std::ostream&, void (*)(char const*)) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX.cpp:411
+13: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f06c75f3083]
 
- 7: ./incflo3d.gnu.MPI.EB.ex(+0x3a844) [0x55ad314bc844]
-    main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:28
-
- 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f3bf41f8083]
-
- 9: ./incflo3d.gnu.MPI.EB.ex(+0x4291e) [0x55ad314c491e]
+14: ./incflo3d.gnu.MPI.EB.ex(+0x427ee) [0x56264111a7ee]
     ?? ??:0
 

@@ -489,6 +489,9 @@ private:
     amrex::Real m_A_2 = 0.0;
     amrex::Real m_alpha_2 = 0.0;
 
+    amrex::Real m_A_3 = 0.0;
+    amrex::Real m_alpha_3 = 0.0;
+
     amrex::Real m_p_bg = 0.0;
 
     amrex::Real m_vert_hi = 0.0;

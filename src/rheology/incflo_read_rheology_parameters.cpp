@@ -118,16 +118,12 @@ void incflo::ReadRheologyParameters()
                     "Fitting parameter must be positive");
         
          pp.query("mu_2", m_mu_2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 > 0.0,
-                    "Fitting parameter mu1 must be positive");
-
          pp.query("A_2", m_A_2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_2 > 0.0,
-                    "Fitting parameter must be positive");
-
          pp.query("alpha_2", m_alpha_2);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_2 >= 0.0,
-                    "Fitting parameter must be positive");
+
+         pp.query("A_3", m_A_3);
+         pp.query("alpha_3", m_alpha_3);
+    
 
          pp.query("vert_hi", m_vert_hi);
          pp.query("vert_lo", m_vert_lo);

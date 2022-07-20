@@ -393,6 +393,11 @@ void incflo::ApplyCorrector()
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)
             {
+                if (m_fluid_model == FluidModel::Granular)
+                {
+                    // amrex::Abort("Granular rheology requires Explicit method (cr-CN)");
+                }
+
                 Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
@@ -406,6 +411,11 @@ void incflo::ApplyCorrector()
             }
             else if (m_diff_type == DiffusionType::Implicit)
             {
+                if (m_fluid_model == FluidModel::Granular)
+                {
+                    // amrex::Abort("Granular rheology requires Explicit method (cr-Im)");
+                }
+
                 if (use_tensor_correction)
                 {
                     Array4<Real const> const& divtau   = ld.divtau.const_array(mfi);
