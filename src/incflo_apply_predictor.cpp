@@ -388,6 +388,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
 
                 if (use_tensor_correction)
                 {
+                    amrex::Print() << "am I here"<< "\n";
                     Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
@@ -397,12 +398,29 @@ void incflo::ApplyPredictor (bool incremental_projection)
                                      vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)););
                     });
                 } else {
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                    //EY : consider divtau2 as a force term
+                    if (m_fluid_model == FluidModel::Granular)
                     {
-                        AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0));,
-                                     vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1));,
-                                     vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)););
-                    });
+                        Array4<Real const> const& divtau2_o = ld.divtau2_o.const_array(mfi);
+                        amrex::Print() << "predictor_implicit"<< "\n";
+                        amrex::Print() << "predictor_implicit"<< "\n";
+                        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        {
+                            // amrex::Print() << "divtau2_o_2="<< divtau2_o(i,j,k,2) << "\n";
+                            AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau2_o(i,j,k,0));,
+                                        vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau2_o(i,j,k,1));,
+                                        vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau2_o(i,j,k,2)););
+                        });
+                    }
+                    else
+                    {
+                        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        {
+                            AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0));,
+                                        vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1));,
+                                        vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)););
+                        });
+                    }
                 }
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)
@@ -432,7 +450,6 @@ void incflo::ApplyPredictor (bool incremental_projection)
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
 
-                    amrex::Print() << "divtau2_o_0 = " << divtau2_o(i,j,k,0) << "\n";
                     AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o(i,j,k,0)+divtau2_o(i,j,k,0));,
                                  vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o(i,j,k,1)+divtau2_o(i,j,k,1));,
                                  vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)+divtau2_o(i,j,k,2)););

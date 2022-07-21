@@ -2,14 +2,14 @@ amrex.fpe_trap_invalid=1                # hav a trap to catch a bug
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-stop_time               =   0.1         # Max (simulated) time to evolve
+stop_time               =   0.005         # Max (simulated) time to evolve
 max_step                =   -1          # Max number of time steps
 steady_state            =   0           # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   -0.01       # Use this constant dt if > 0
+incflo.fixed_dt         =   0.001       # Use this constant dt if > 0
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
@@ -35,9 +35,9 @@ incflo.mu_1             =   0.1
 incflo.A_1              =   0.528
 incflo.alpha_1          =   0.4
 
-incflo.mu_2             =   0.00
-incflo.A_2              =   0.0
-incflo.alpha_2          =   0.0
+incflo.mu_2             =   0.02
+incflo.A_2              =   0.02
+incflo.alpha_2          =   0.3
 
 incflo.p_bg             =   1.         # constant pressure
 
@@ -46,7 +46,7 @@ incflo.vert_lo          =   0.          # Lo vertical coordinates
 incflo.vert_hi          =   1.          # Hi vertical coordinates
 incflo.vert_n           =   16          # Grid cells at coarsest AMRlevel
 
-incflo.diffusion_type   =   0          # Defualt is 2 (Implicit); 1 is CN, 0 is Explicit 
+#incflo.diffusion_type   =   2          # Defualt is 2 (Implicit); 1 is CN, 0 is Explicit 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
@@ -65,7 +65,7 @@ geometry.is_periodic    =   1   0   1   # Periodicity x y z (0/1)
 ylo.type                =   "nsw"
 yhi.type                =   "nsw"
 
-yhi.velocity            =   0.5  0.  0.
+yhi.velocity            =   0.1  0.  0.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #

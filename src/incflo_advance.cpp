@@ -54,7 +54,8 @@ void incflo::Advance()
 
     ApplyPredictor();
 
-    if (m_advection_type == "MOL") {
+    if (m_advection_type == "MOL") 
+    {
         for (int lev = 0; lev <= finest_level; ++lev) {
             fillpatch_velocity(lev, m_t_new[lev], m_leveldata[lev]->velocity, ng);
             fillpatch_density(lev, m_t_new[lev], m_leveldata[lev]->density, ng);
