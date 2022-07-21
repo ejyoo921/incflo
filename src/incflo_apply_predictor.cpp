@@ -140,10 +140,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
     if (m_fluid_model == FluidModel::Granular)
     {
 
-        // m_fluid_model = FluidModel::Granular2;
-        // compute_viscosity(GetVecOfPtrs(vel_eta2),
-        //               get_density_old(), get_velocity_old(),
-        //               m_cur_time, 1);
+        m_fluid_model = FluidModel::Granular2;
+        compute_viscosity(GetVecOfPtrs(vel_eta2),
+                      get_density_old(), get_velocity_old(),
+                      m_cur_time, 1);
                     
         // Go back to the first one - for eta1
         m_fluid_model = FluidModel::Granular;
@@ -161,12 +161,12 @@ void incflo::ApplyPredictor (bool incremental_projection)
                        get_density_old_const(),GetVecOfConstPtrs(vel_eta));
 
         //EY: Granular rheology
-        // if (m_fluid_model == FluidModel::Granular)
-        // {
-        //     compute_divtau2(get_divtau2_old(),get_velocity_old_const(),
-        //                get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
+        if (m_fluid_model == FluidModel::Granular)
+        {
+            compute_divtau2(get_divtau2_old(),get_velocity_old_const(),
+                       get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
 
-        // }
+        }
                     
     }
 
@@ -431,6 +431,8 @@ void incflo::ApplyPredictor (bool incremental_projection)
 
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
+
+                    amrex::Print() << "divtau2_o_0 = " << divtau2_o(i,j,k,0) << "\n";
                     AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o(i,j,k,0)+divtau2_o(i,j,k,0));,
                                  vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o(i,j,k,1)+divtau2_o(i,j,k,1));,
                                  vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)+divtau2_o(i,j,k,2)););
