@@ -150,17 +150,6 @@ void incflo::ApplyCorrector()
                       get_density_new(), get_velocity_new(), 
                       new_time, 1);
 
-    //EY: Granular rheology
-    if (m_fluid_model == FluidModel::Granular)
-    {
-        m_fluid_model = FluidModel::Granular2;
-        compute_viscosity(GetVecOfPtrs(vel_eta2),
-                      get_density_new(), get_velocity_new(),
-                      m_cur_time, 1);
-                    
-        // Go back to the first one - for eta1
-        m_fluid_model = FluidModel::Granular;
-    }
 
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
 
@@ -171,12 +160,6 @@ void incflo::ApplyCorrector()
         compute_divtau(get_divtau_new(), get_velocity_new_const(),
                        get_density_new_const(), GetVecOfConstPtrs(vel_eta));
         
-        //EY: Granular rheology
-        if (m_fluid_model == FluidModel::Granular)
-        {
-            compute_divtau2(get_divtau2_new(), get_velocity_new_const(),
-                       get_density_new_const(), GetVecOfConstPtrs(vel_eta2));
-        }
 
     }
 
@@ -360,35 +343,17 @@ void incflo::ApplyCorrector()
             {
                 Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
                 Array4<Real const> const& divtau   = ld.divtau.const_array(mfi);
-
-                //EY: Granular rheology
-                if (m_fluid_model == FluidModel::Granular)
+                
+                amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
-                    Array4<Real const> const& divtau2_o = ld.divtau2_o.const_array(mfi);
-                    Array4<Real const> const& divtau2 = ld.divtau2.const_array(mfi);
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
-                        for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
-                            vel(i,j,k,idim) = vel_o(i,j,k,idim) + l_dt * (
-                                0.5*(  dvdt_o(i,j,k,idim)+  dvdt(i,j,k,idim))
-                                +0.5*(divtau_o(i,j,k,idim)+divtau2_o(i,j,k,idim)
-                                +divtau(i,j,k,idim)+divtau2(i,j,k,idim))
-                                +        vel_f(i,j,k,idim) );
-                        }
-                    });
-                }
-                else
-                {
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
-                        for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
-                            vel(i,j,k,idim) = vel_o(i,j,k,idim) + l_dt * (
-                                0.5*(  dvdt_o(i,j,k,idim)+  dvdt(i,j,k,idim))
-                                +0.5*(divtau_o(i,j,k,idim)+divtau(i,j,k,idim))
-                                +        vel_f(i,j,k,idim) );
-                        }
-                    });
-                }
+                    for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
+                        vel(i,j,k,idim) = vel_o(i,j,k,idim) + l_dt * (
+                            0.5*(  dvdt_o(i,j,k,idim)+  dvdt(i,j,k,idim))
+                            +0.5*(divtau_o(i,j,k,idim)+divtau(i,j,k,idim))
+                            +        vel_f(i,j,k,idim) );
+                    }
+                });
+            
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)
             {
@@ -429,36 +394,18 @@ void incflo::ApplyCorrector()
                 } 
                 else 
                 {
-                    //EY: Granular rheology : consider divtau2 as a force term
-                    if (m_fluid_model == FluidModel::Granular)
+                  
+                    amrex::Print() << "Fluid model?"<< "\n";
+                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
-                        Array4<Real const> const& divtau2_o = ld.divtau2_o.const_array(mfi);
-
-                        amrex::Print() << "corrector_implicit"<< "\n";
-
-                        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
                         {
-                            for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
-                            {
-                                vel(i,j,k,idim) = vel_o(i,j,k,idim) + l_dt * (
-                                    0.5*(  dvdt_o(i,j,k,idim)+dvdt(i,j,k,idim))
-                                    +        vel_f(i,j,k,idim) + divtau2_o(i,j,k,idim) );
-                            }
-                        });
-                    }
-                    else
-                    {
-                        amrex::Print() << "Fluid model?"<< "\n";
-                        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                        {
-                            for (int idim = 0; idim < AMREX_SPACEDIM; ++idim)
-                            {
-                                vel(i,j,k,idim) = vel_o(i,j,k,idim) + l_dt * (
-                                    0.5*(  dvdt_o(i,j,k,idim)+dvdt(i,j,k,idim))
-                                    +        vel_f(i,j,k,idim) );
-                            }
-                        });
-                    }
+                            vel(i,j,k,idim) = vel_o(i,j,k,idim) + l_dt * (
+                                0.5*(  dvdt_o(i,j,k,idim)+dvdt(i,j,k,idim))
+                                +        vel_f(i,j,k,idim) );
+                        }
+                    });
+                    
                 }
             }
         }

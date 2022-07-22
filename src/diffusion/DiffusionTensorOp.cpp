@@ -73,25 +73,6 @@ DiffusionTensorOp::DiffusionTensorOp (incflo* a_incflo)
             m_reg_apply_op->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
                                         m_incflo->get_diffuse_tensor_bc(Orientation::high));
 
-
-            if (m_incflo->useHigherTensor())
-            {
-                m_reg_apply_op2.reset(new MLTensorOp(m_incflo->Geom(0,finest_level),
-                                                    m_incflo->boxArray(0,finest_level),
-                                                    m_incflo->DistributionMap(0,finest_level),
-                                                    info_apply));
-                m_reg_apply_op2->setMaxOrder(m_mg_maxorder);
-                m_reg_apply_op2->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
-                                            m_incflo->get_diffuse_tensor_bc(Orientation::high));
-
-                m_reg_apply_op3.reset(new MLTensorOp(m_incflo->Geom(0,finest_level),
-                                                    m_incflo->boxArray(0,finest_level),
-                                                    m_incflo->DistributionMap(0,finest_level),
-                                                    info_apply));
-                m_reg_apply_op3->setMaxOrder(m_mg_maxorder);
-                m_reg_apply_op3->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
-                                            m_incflo->get_diffuse_tensor_bc(Orientation::high));
-            }
         }
     }
 }
@@ -351,7 +332,7 @@ DiffusionTensorOp::compute_divtau2 (Vector<MultiFab*> const& a_divtau2,
         MultiFab::Copy(velocity[lev], *a_velocity[lev], 0, 0, AMREX_SPACEDIM, 1);
 
         // We want to return div (mu grad)) phi
-        m_reg_apply_op->setScalars(0.0, 0.0); // no need to use them 
+        m_reg_apply_op->setScalars(0.0, -0.0); // no need to use them 
         for (int lev = 0; lev <= finest_level; ++lev) 
         {
             m_reg_apply_op->setACoeffs(lev, *a_density[lev]);
