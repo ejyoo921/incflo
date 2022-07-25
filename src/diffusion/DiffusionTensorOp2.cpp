@@ -18,23 +18,23 @@ DiffusionTensorOp2::DiffusionTensorOp2 (incflo* a_incflo)
     {
         if (m_incflo->useTensorSolve())
         {
-            m_reg_solve_op.reset(new MyTensorOp(m_incflo->Geom(0,finest_level),
+            m_reg_solve_op2.reset(new MyTensorOp(m_incflo->Geom(0,finest_level),
                                                 m_incflo->boxArray(0,finest_level),
                                                 m_incflo->DistributionMap(0,finest_level),
                                                 info_solve));
-            m_reg_solve_op->setMaxOrder(m_mg_maxorder);
-            m_reg_solve_op->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
+            m_reg_solve_op2->setMaxOrder(m_mg_maxorder);
+            m_reg_solve_op2->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
                                         m_incflo->get_diffuse_tensor_bc(Orientation::high));
         }
 
         if (m_incflo->need_divtau() || m_incflo->useTensorCorrection())
         {
-            m_reg_apply_op.reset(new MyTensorOp(m_incflo->Geom(0,finest_level),
+            m_reg_apply_op2.reset(new MyTensorOp(m_incflo->Geom(0,finest_level),
                                                 m_incflo->boxArray(0,finest_level),
                                                 m_incflo->DistributionMap(0,finest_level),
                                                 info_apply));
-            m_reg_apply_op->setMaxOrder(m_mg_maxorder);
-            m_reg_apply_op->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
+            m_reg_apply_op2->setMaxOrder(m_mg_maxorder);
+            m_reg_apply_op2->setDomainBC(m_incflo->get_diffuse_tensor_bc(Orientation::low),
                                         m_incflo->get_diffuse_tensor_bc(Orientation::high));
         }
     }
@@ -107,11 +107,11 @@ DiffusionTensorOp2::diffuse_velocity (Vector<MultiFab*> const& velocity,
 //     else
 // #endif
     {
-        m_reg_solve_op->setScalars(1.0, dt);
+        m_reg_solve_op2->setScalars(1.0, dt);
         for (int lev = 0; lev <= finest_level; ++lev) {
-            m_reg_solve_op->setACoeffs(lev, *density[lev]);
+            m_reg_solve_op2->setACoeffs(lev, *density[lev]);
             Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *eta[lev]);
-            m_reg_solve_op->setShearViscosity(lev, GetArrOfConstPtrs(b));
+            m_reg_solve_op2->setShearViscosity(lev, GetArrOfConstPtrs(b));
         }
     }
 
@@ -140,15 +140,15 @@ DiffusionTensorOp2::diffuse_velocity (Vector<MultiFab*> const& velocity,
 //         } else
 // #endif
         {
-            m_reg_solve_op->setLevelBC(lev, velocity[lev]);
+            m_reg_solve_op2->setLevelBC(lev, velocity[lev]);
         }
     }
 
 // #ifdef AMREX_USE_EB
 //     MLMG mlmg(m_eb_solve_op ? static_cast<MLLinOp&>(*m_eb_solve_op)
-//               :               static_cast<MLLinOp&>(*m_reg_solve_op));
+//               :               static_cast<MLLinOp&>(*m_reg_solve_op2));
 // #else
-    MLMG mlmg(*m_reg_solve_op);
+    MLMG mlmg(*m_reg_solve_op2);
 // #endif
 
     // The default bottom solver is BiCG
@@ -239,15 +239,15 @@ void DiffusionTensorOp2::compute_divtau (Vector<MultiFab*> const& a_divtau,
     {
         // We want to return div (mu grad)) phi
         //EY: we don't use laplacian operator.
-        m_reg_apply_op->setScalars(0.0, -0.0);
+        m_reg_apply_op2->setScalars(0.0, -0.0);
         for (int lev = 0; lev <= finest_level; ++lev) {
-            m_reg_apply_op->setACoeffs(lev, *a_density[lev]);
+            m_reg_apply_op2->setACoeffs(lev, *a_density[lev]);
             Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_velocity_eta_to_faces(lev, *a_eta[lev]);
-            m_reg_apply_op->setShearViscosity(lev, GetArrOfConstPtrs(b));
-            m_reg_apply_op->setLevelBC(lev, &velocity[lev]);
+            m_reg_apply_op2->setShearViscosity(lev, GetArrOfConstPtrs(b));
+            m_reg_apply_op2->setLevelBC(lev, &velocity[lev]);
         }
 
-        MLMG mlmg(*m_reg_apply_op);
+        MLMG mlmg(*m_reg_apply_op2);
         mlmg.apply(a_divtau, GetVecOfPtrs(velocity));
     }
 
