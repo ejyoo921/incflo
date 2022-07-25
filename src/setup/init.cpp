@@ -225,19 +225,22 @@ void incflo::ReadIOParameters()
         m_plt_velx       = 1;
         m_plt_vely       = 1;
         m_plt_velz       = 1;
-        m_plt_gpx        = 1;
-        m_plt_gpy        = 1;
-        m_plt_gpz        = 1;
+        m_plt_gpx        = 0;
+        m_plt_gpy        = 0;
+        m_plt_gpz        = 0;
         m_plt_rho        = 1;
-        m_plt_tracer     = 1;
+        m_plt_tracer     = 0;
         m_plt_p_nd       = 0;
         m_plt_p_cc       = 0;
         m_plt_macphi     = 0;
-        m_plt_eta        = 0;
+        m_plt_eta        = 1;
         m_plt_vort       = 0;
-        m_plt_strainrate = 0;
+        m_plt_strainrate = 1;
         m_plt_divu       = 0;
         m_plt_vfrac      = 0;
+        
+        // EY: Granular rheology
+        m_plt_eta2       = 1;
     }
 
     // Which variables to write to plotfile

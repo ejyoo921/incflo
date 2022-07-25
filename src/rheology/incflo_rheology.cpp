@@ -10,13 +10,14 @@ amrex::Real expterm (amrex::Real nu) noexcept
 {
     return (nu < 1.e-9) ? (1.0-0.5*nu+nu*nu*(1.0/6.0)-(nu*nu*nu)*(1./24.))
                         : -std::expm1(-nu)/nu; 
+    // return -std::expm1(-nu)/nu;
 }
 
 // Compute the I term, where I is the inertial number, in mu(I) relation
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-amrex::Real inertialNum (amrex::Real sr, amrex::Real p_ext, amrex::Real ro_0, amrex::Real diam, amrex::Real mu_1, amrex::Real A_1, amrex::Real alpha_1) noexcept
+amrex::Real inertialNum (amrex::Real sr, amrex::Real prs, amrex::Real ro_0, amrex::Real diam, amrex::Real mu, amrex::Real A, amrex::Real alpha) noexcept
 {
-    return mu_1 + A_1*std::pow((sr/2)*diam/(std::pow(p_ext/ro_0, 0.5)), alpha_1);
+    return mu + A*std::pow((sr/2)*diam/(std::pow(prs/ro_0, 0.5)), alpha);
 }
 
 struct NonNewtonianViscosity //Apparent viscosity
@@ -49,13 +50,14 @@ struct NonNewtonianViscosity //Apparent viscosity
         }
         case incflo::FluidModel::Granular:
         {
-            // amrex::Print() << "sr = " << sr << "\n";
+            amrex::Print() << "sr1 = " << 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg) << "\n";
             // If you want pressure gradient add p_ext to p_bg
             return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
         }
         case incflo::FluidModel::Granular2:
         {
-            // amrex::Print() << "eta = " << std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2) << "\n";
+            // amrex::Print() << "eta2_sr = " << std::pow(2*(expterm(sr/papa_reg) / papa_reg),2) << "\n";
+            // amrex::Print() << "GR2" << "\n";
             return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
         }
         case incflo::FluidModel::Granular3:
@@ -117,8 +119,8 @@ void incflo::compute_viscosity_at_level (int lev,
         non_newtonian_viscosity.A_2 = m_A_2;
         non_newtonian_viscosity.alpha_2 =m_alpha_2;
 
-        non_newtonian_viscosity.A_2 = m_A_3;
-        non_newtonian_viscosity.alpha_2 =m_alpha_3;
+        non_newtonian_viscosity.A_3 = m_A_3;
+        non_newtonian_viscosity.alpha_3 =m_alpha_3;
 
         non_newtonian_viscosity.p_bg =m_p_bg;
 

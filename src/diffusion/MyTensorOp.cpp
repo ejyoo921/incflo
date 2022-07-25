@@ -250,15 +250,15 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
             AMREX_LAUNCH_HOST_DEVICE_LAMBDA_DIM
             ( xbx, txbx,
               {
-                  mltensor_cross_terms_fx(txbx,fxfab,vfab,etaxfab,kapxfab,dxinv);
+                  mltensor_cross_terms_fx_sq(txbx,fxfab,vfab,etaxfab,kapxfab,dxinv);
               }
             , ybx, tybx,
               {
-                  mltensor_cross_terms_fy(tybx,fyfab,vfab,etayfab,kapyfab,dxinv);
+                  mltensor_cross_terms_fy_sq(tybx,fyfab,vfab,etayfab,kapyfab,dxinv);
               }
             , zbx, tzbx,
               {
-                  mltensor_cross_terms_fz(tzbx,fzfab,vfab,etazfab,kapzfab,dxinv);
+                  mltensor_cross_terms_fz_sq(tzbx,fzfab,vfab,etazfab,kapzfab,dxinv);
               }
             );
 

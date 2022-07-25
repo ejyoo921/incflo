@@ -8,30 +8,42 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: /home/eyoo/CCSE_packages/Amrvis/amrvis3d.gnu.ex(+0x19ee15) [0x55b8b3528e15]
-    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/Amrvis/../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x46fa75) [0x560da9172a75]
+    amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: /home/eyoo/CCSE_packages/Amrvis/amrvis3d.gnu.ex(+0x1a12aa) [0x55b8b352b2aa]
-    amrex::BLBackTrace::handler(int) at /home/eyoo/Amrvis/../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x471f0a) [0x560da9174f0a]
+    amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f8a720fe090]
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f736f6ad090]
 
- 3: /lib/x86_64-linux-gnu/libc.so.6(__poll+0x17) [0x7f8a721cd967]
+ 3: ./incflo3d.gnu.MPI.EB.ex(+0x1c4a2d) [0x560da8ec7a2d]
+    void amrex::ParallelFor<Godunov::ExtrapVelToFacesOnBox(amrex::Box const&, int, amrex::Box const&, amrex::Box const&, amrex::Box const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Box const&, double const*, double, amrex::BCRec const*, bool, double*)::{lambda(int, int, int)#7}>(amrex::Box const&, Godunov::ExtrapVelToFacesOnBox(amrex::Box const&, int, amrex::Box const&, amrex::Box const&, amrex::Box const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Box const&, double const*, double, amrex::BCRec const*, bool, double*)::{lambda(int, int, int)#7}&&) at /home/eyoo/CCSE_packages/incflo/test_3d/../../AMReX-Hydro/Godunov/hydro_godunov_extrap_vel_to_faces_3D.cpp:415
+ (inlined by) call_f<Godunov::ExtrapVelToFacesOnBox(const amrex::Box&, int, const amrex::Box&, const amrex::Box&, const amrex::Box&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double const>&, const amrex::Array4<double const>&, const amrex::Array4<double const>&, const amrex::Array4<double const>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double const>&, const amrex::Box&, const Real*, amrex::Real, const amrex::BCRec*, bool, amrex::Real*)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:29
+ (inlined by) ParallelFor<Godunov::ExtrapVelToFacesOnBox(const amrex::Box&, int, const amrex::Box&, const amrex::Box&, const amrex::Box&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double const>&, const amrex::Array4<double const>&, const amrex::Array4<double const>&, const amrex::Array4<double const>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double>&, const amrex::Array4<double const>&, const amrex::Box&, const Real*, amrex::Real, const amrex::BCRec*, bool, amrex::Real*)::<lambda(int, int, int)> > at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_GpuLaunchFunctsC.H:119
 
- 4: /lib/x86_64-linux-gnu/libXt.so.6(_XtWaitForSomething+0x47a) [0x7f8a72a4fe7a]
-    ?? ??:0
+ 4: ./incflo3d.gnu.MPI.EB.ex(+0x1d3f66) [0x560da8ed6f66]
+    Godunov::ExtrapVelToFacesOnBox(amrex::Box const&, int, amrex::Box const&, amrex::Box const&, amrex::Box const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Box const&, double const*, double, amrex::BCRec const*, bool, double*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../AMReX-Hydro/Godunov/hydro_godunov_extrap_vel_to_faces_3D.cpp:423
+ (inlined by) Godunov::ExtrapVelToFaces(amrex::MultiFab const&, amrex::MultiFab const&, amrex::MultiFab&, amrex::MultiFab&, amrex::MultiFab&, amrex::Vector<amrex::BCRec, std::allocator<amrex::BCRec> > const&, amrex::BCRec const*, amrex::Geometry const&, double, bool, bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../../AMReX-Hydro/Godunov/hydro_godunov_extrap_vel_to_faces_3D.cpp:97
 
- 5: /lib/x86_64-linux-gnu/libXt.so.6(XtAppProcessEvent+0x2c2) [0x7f8a72a51632]
-    ?? ??:0
+ 5: ./incflo3d.gnu.MPI.EB.ex(+0xd90e3) [0x560da8ddc0e3]
+    incflo::compute_MAC_projected_velocities(amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, double) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/convection/incflo_compute_MAC_projected_velocities.cpp:113 (discriminator 5)
 
- 6: /lib/x86_64-linux-gnu/libXt.so.6(XtAppMainLoop+0x2d) [0x7f8a72a45d2d]
-    ?? ??:0
+ 6: ./incflo3d.gnu.MPI.EB.ex(+0x4e21c) [0x560da8d5121c]
+    std::vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
+ (inlined by) amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
+ (inlined by) incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:178
 
- 7: /home/eyoo/CCSE_packages/Amrvis/amrvis3d.gnu.ex(+0x22aa7) [0x55b8b33acaa7]
-    main at /home/eyoo/Amrvis/AmrVisTool.cpp:312
+ 7: ./incflo3d.gnu.MPI.EB.ex(+0x130260) [0x560da8e33260]
+    incflo::InitialIterations() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/setup/init.cpp:316
 
- 8: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f8a720df083]
+ 8: ./incflo3d.gnu.MPI.EB.ex(+0x4466a) [0x560da8d4766a]
+    incflo::InitData() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:70
 
- 9: /home/eyoo/CCSE_packages/Amrvis/amrvis3d.gnu.ex(+0x26a9e) [0x55b8b33b0a9e]
+ 9: ./incflo3d.gnu.MPI.EB.ex(+0x3ac51) [0x560da8d3dc51]
+    main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:51
+
+10: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f736f68e083]
+
+11: ./incflo3d.gnu.MPI.EB.ex(+0x42d7e) [0x560da8d45d7e]
     ?? ??:0
 

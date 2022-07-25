@@ -106,16 +106,16 @@ void incflo::ReadRheologyParameters()
                     "Papanastasiou regularisation parameter must be positive");
 
          pp.query("mu_1", m_mu_1);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_1 > 0.0,
-                    "Fitting parameter mu1 must be positive");
+        //     AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_1 > 0.0,
+        //             "Fitting parameter mu1 must be positive");
 
          pp.query("A_1", m_A_1);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_1 > 0.0,
-                    "Fitting parameter must be positive");
+        //     AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_A_1 > 0.0,
+        //             "Fitting parameter must be positive");
 
          pp.query("alpha_1", m_alpha_1);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 >= 0.0,
-                    "Fitting parameter must be positive");
+        //     AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_alpha_1 >= 0.0,
+        //             "Fitting parameter must be positive");
         
          pp.query("mu_2", m_mu_2);
          pp.query("A_2", m_A_2);

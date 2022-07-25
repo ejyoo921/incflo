@@ -321,8 +321,8 @@ void incflo::WriteJobInfo(const std::string& path) const
 void incflo::WritePlotFile()
 {
     BL_PROFILE("incflo::WritePlotFile()");
-
-    if (m_plt_vort || m_plt_divu || m_plt_forcing || m_plt_eta || m_plt_strainrate) {
+    // EY: Granular rheology - tryting to add eta2
+    if (m_plt_vort || m_plt_divu || m_plt_forcing || m_plt_eta || m_plt_eta2 || m_plt_strainrate) {
         for (int lev = 0; lev <= finest_level; ++lev) {
 #ifdef AMREX_USE_EB
             const int ng = (EBFactory(0).isAllRegular()) ? 1 : 2;
@@ -387,6 +387,9 @@ void incflo::WritePlotFile()
 
     // Apparent viscosity
     if(m_plt_eta) ++ncomp;
+
+    // EY: Granular rheology
+    if(m_plt_eta2) ++ncomp;
 
     // Vorticity
     if(m_plt_vort) ++ncomp;
@@ -587,6 +590,21 @@ void incflo::WritePlotFile()
         pltscaVarsName.push_back("eta");
         ++icomp;
     }
+    // EY: Granular rheology
+    if (m_plt_eta2) {
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab vel_eta2(mf[lev], amrex::make_alias, icomp, 1);
+            compute_viscosity_at_level(lev,
+                                       &vel_eta2,
+                                       &m_leveldata[lev]->density,
+                                       &m_leveldata[lev]->velocity,
+                                       Geom(lev),
+                                       m_cur_time, 0);
+        }
+        pltscaVarsName.push_back("eta2");
+        ++icomp;
+    }
+
     if (m_plt_vort) {
         for (int lev = 0; lev <= finest_level; ++lev) {
             (m_leveldata[lev]->velocity).FillBoundary(geom[lev].periodicity());

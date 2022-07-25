@@ -1187,7 +1187,7 @@ void mltensor_cross_terms_fx_sq (Box const& box, Array4<Real> const& fx,
                 fx(i,j,k,1) = -mut*((dudz + dwdx)*(dvdz + dwdy) + 2.*(dudx + dvdy)*(dudy + dvdx));
                 fx(i,j,k,2) = -mut*((dudy + dvdx)*(dvdz + dwdy) + 2.*(dudx + dwdz)*(dudz + dwdx));
 
-                amrex::Print() << "fx0 = " << fx(i,j,k,0) << "\n";
+                // amrex::Print() << "fx0 = " << fx(i,j,k,0) << "\n";
             }
         }
     }
@@ -1220,7 +1220,7 @@ void mltensor_cross_terms_fy_sq (Box const& box, Array4<Real> const& fy,
                 Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j,k-1,2)-vel(i-1,j,k,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dxi);
                 Real dwdy = (vel(i,j+1,k,2)+vel(i,j+1,k-1,2)-vel(i,j-1,k,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dyi);
                 Real dwdz = (vel(i,j,k+1,2)+vel(i,j-1,k+1,2)-vel(i,j,k-1,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dzi);
-                Real mut =             etay(i,j,k,0);
+                Real mut =             etay(i,j,k,1);
 
                 Real term2 = 2.*(dudz + dwdx)*(dudz + dwdx);
                 Real term4 = 4.*(dwdz*dwdz + dudx*dudx);
@@ -1229,6 +1229,8 @@ void mltensor_cross_terms_fy_sq (Box const& box, Array4<Real> const& fy,
                 fy(i,j,k,0) = -mut*((dudz + dwdx)*(dvdz + dwdy) + 2*(dudx + dvdy)*(dudy + dvdx));
                 fy(i,j,k,1) = -(mut/3.)*((dudy + dvdx)*(dudy + dvdx) + (dvdz + dwdy)*(dvdz + dwdy) - term2 - term4) - mut*(term8);
                 fy(i,j,k,2) = -mut*((dudy + dvdx)*(dudz + dwdx) + 2*(dvdy + dwdz)*(dvdz + dwdy));
+
+                // amrex::Print() << "mut-y= " <<mut << "\n";
             }
         }
     }
@@ -1261,7 +1263,7 @@ void mltensor_cross_terms_fz_sq (Box const& box, Array4<Real> const& fz,
                 Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j,k-1,2)-vel(i-1,j,k,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dxi);
                 Real dwdy = (vel(i,j+1,k,2)+vel(i,j+1,k-1,2)-vel(i,j-1,k,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dyi);
                 Real dwdz = (vel(i,j,k+1,2)+vel(i,j-1,k+1,2)-vel(i,j,k-1,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dzi);
-                Real mut =             etaz(i,j,k,0);
+                Real mut =             etaz(i,j,k,2);
 
                 Real term2 = 2.*(dudy + dvdx)*(dudy + dvdx);
                 Real term4 = 4.*(dudx*dudx + dvdy*dvdy);

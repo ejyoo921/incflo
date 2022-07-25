@@ -135,11 +135,15 @@ void incflo::ApplyPredictor (bool incremental_projection)
                       m_cur_time, 1);
 
     // To obtain vel_eta2 corresponding to eta2
-    m_fluid_model = FluidModel::Granular2;
-    compute_viscosity(GetVecOfPtrs(vel_eta2),
-                      get_density_old(), get_velocity_old(),
-                      m_cur_time, 1);
-    m_fluid_model = FluidModel::Granular; // Go back to the next time 
+    if (m_fluid_model == FluidModel::Granular)
+    {
+        m_fluid_model = FluidModel::Granular2;
+        compute_viscosity(GetVecOfPtrs(vel_eta2),
+                        get_density_old(), get_velocity_old(),
+                        m_cur_time, 1);
+        m_fluid_model = FluidModel::Granular; // Go back to the next time 
+    }
+
 
 
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
@@ -372,6 +376,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     // HERE INCLUDE NONE OF DIVTAU1 and ALL OF DIVTAU2
+                    // amrex::Print() << "check-implicit = "  << "\n";
                     AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o2(i,j,k,0));,
                                  vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o2(i,j,k,1));,
                                  vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o2(i,j,k,2)););
