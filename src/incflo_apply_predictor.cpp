@@ -103,7 +103,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // Forcing terms
     Vector<MultiFab> vel_forces, tra_forces;
 
-    Vector<MultiFab> vel_eta, vel_eta2, vel_eta3, tra_eta;
+    Vector<MultiFab> vel_eta1, vel_eta2, tra_eta;
 
     // *************************************************************************************
     // Allocate space for the forcing terms
@@ -116,10 +116,8 @@ void incflo::ApplyPredictor (bool incremental_projection)
             tra_forces.emplace_back(grids[lev], dmap[lev], m_ntrac, nghost_force(),
                                     MFInfo(), Factory(lev));
         }
-        vel_eta.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
-        vel_eta2.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
-        vel_eta3.emplace_back(grids[lev], dmap[lev], 3, 1, MFInfo(), Factory(lev));
-        
+        vel_eta1.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
+        vel_eta2.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
         if (m_advect_tracer) {
             tra_eta.emplace_back(grids[lev], dmap[lev], m_ntrac, 1, MFInfo(), Factory(lev));
         }
@@ -132,22 +130,16 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // *************************************************************************************
     // Compute viscosity / diffusive coefficients
     // *************************************************************************************
-    compute_viscosity(GetVecOfPtrs(vel_eta),
+    compute_viscosity(GetVecOfPtrs(vel_eta1),
                       get_density_old(), get_velocity_old(),
                       m_cur_time, 1);
 
-    //EY: Granular rheology
-    if (m_fluid_model == FluidModel::Granular)
-    {
-
-        m_fluid_model = FluidModel::Granular2;
-        compute_viscosity(GetVecOfPtrs(vel_eta2),
+    // To obtain vel_eta2 corresponding to eta2
+    m_fluid_model = FluidModel::Granular2;
+    compute_viscosity(GetVecOfPtrs(vel_eta2),
                       get_density_old(), get_velocity_old(),
                       m_cur_time, 1);
-                    
-        // Go back to the first one - for eta1
-        m_fluid_model = FluidModel::Granular;
-    }
+    m_fluid_model = FluidModel::Granular; // Go back to the next time 
 
 
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
@@ -157,17 +149,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // *************************************************************************************
     if (need_divtau() || use_tensor_correction)
     {
-        compute_divtau(get_divtau_old(),get_velocity_old_const(),
-                       get_density_old_const(),GetVecOfConstPtrs(vel_eta));
-
-        //EY: Granular rheology
-        if (m_fluid_model == FluidModel::Granular)
-        {
-            compute_divtau2(get_divtau2_old(),get_velocity_old_const(),
-                       get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
-
-        }
-                    
+        compute_divtau1(get_divtau_old1(),get_velocity_old_const(),
+                        get_density_old_const(),GetVecOfConstPtrs(vel_eta1));
+        compute_divtau2(get_divtau_old2(),get_velocity_old_const(),
+                        get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
     }
 
     // *************************************************************************************
@@ -380,91 +365,47 @@ void incflo::ApplyPredictor (bool incremental_projection)
             Array4<Real const> const& dvdt = ld.conv_velocity_o.const_array(mfi);
             Array4<Real const> const& vel_f = vel_forces[lev].const_array(mfi);
 
-            if (m_diff_type == DiffusionType::Implicit) {
-                if (m_fluid_model == FluidModel::Granular)
+            if (m_diff_type == DiffusionType::Implicit)
+            {
+                Array4<Real const> const& divtau_o1 = ld.divtau_o1.const_array(mfi);
+                Array4<Real const> const& divtau_o2 = ld.divtau_o2.const_array(mfi);
+                amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
-                    // amrex::Abort("Granular rheology requires Explicit method (pr-Im) ");
-                }
-
-                if (use_tensor_correction)
-                {
-                    amrex::Print() << "am I here"<< "\n";
-                    Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
-                        // Here divtau_o is the difference of tensor and scalar divtau_o!
-                        AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o(i,j,k,0));,
-                                     vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o(i,j,k,1));,
-                                     vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)););
-                    });
-                } else {
-                    //EY : consider divtau2 as a force term
-                    if (m_fluid_model == FluidModel::Granular)
-                    {
-                        Array4<Real const> const& divtau2_o = ld.divtau2_o.const_array(mfi);
-                        amrex::Print() << "predictor_implicit"<< "\n";
-                        amrex::Print() << "predictor_implicit"<< "\n";
-                        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                        {
-                            // amrex::Print() << "divtau2_o="<< divtau2_o(i,j,k,0) << "\n";
-                            AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau2_o(i,j,k,0));,
-                                        vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau2_o(i,j,k,1));,
-                                        vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau2_o(i,j,k,2)););
-                        });
-                    }
-                    else
-                    {
-                        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                        {
-                            AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0));,
-                                        vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1));,
-                                        vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)););
-                        });
-                    }
-                }
+                    // HERE INCLUDE NONE OF DIVTAU1 and ALL OF DIVTAU2
+                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o2(i,j,k,0));,
+                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o2(i,j,k,1));,
+                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o2(i,j,k,2)););
+                });
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)
             {
-                if (m_fluid_model == FluidModel::Granular)
-                {
-                    // amrex::Abort("Granular rheology requires Explicit method (pr-CN)");
-                }
-
-                Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
+                Array4<Real const> const& divtau_o1 = ld.divtau_o1.const_array(mfi);
+                Array4<Real const> const& divtau_o2 = ld.divtau_o2.const_array(mfi);
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
-                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+0.5*divtau_o(i,j,k,0));,
-                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+0.5*divtau_o(i,j,k,1));,
-                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+0.5*divtau_o(i,j,k,2)););
+                    // HERE INCLUDE HALF OF DIVTAU1 and ALL OF DIVTAU2
+                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+
+                                                       0.5*divtau_o1(i,j,k,0) + divtau_o2(i,j,k,0));,
+                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+
+                                                       0.5*divtau_o1(i,j,k,1) + divtau_o2(i,j,k,1));,
+                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+
+                                                       0.5*divtau_o1(i,j,k,2) + divtau_o2(i,j,k,2)););
                 });
             }
             else if (m_diff_type == DiffusionType::Explicit)
             {
-                Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
-
-                //EY: Granular rheology
-                if (m_fluid_model == FluidModel::Granular)
+                Array4<Real const> const& divtau_o1 = ld.divtau_o1.const_array(mfi);
+                Array4<Real const> const& divtau_o2 = ld.divtau_o2.const_array(mfi);
+                amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
-                    Array4<Real const> const& divtau2_o = ld.divtau2_o.const_array(mfi);
-
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                {
-
-                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o(i,j,k,0)+divtau2_o(i,j,k,0));,
-                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o(i,j,k,1)+divtau2_o(i,j,k,1));,
-                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)+divtau2_o(i,j,k,2)););
+                    // HERE INCLUDE ALL DIVTAU1 and ALL OF DIVTAU2
+                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+
+                                                       divtau_o1(i,j,k,0) + divtau_o2(i,j,k,0));,
+                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+
+                                                       divtau_o1(i,j,k,1) + divtau_o2(i,j,k,1));,
+                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+
+                                                       divtau_o1(i,j,k,2) + divtau_o2(i,j,k,2)););
                 });
-                }
-                else
-                {
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {   
-                        AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o(i,j,k,0));,
-                                    vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o(i,j,k,1));,
-                                    vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o(i,j,k,2)););
-                    });
-
-                }
             }
         } // mfi
     } // lev
@@ -481,7 +422,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
         }
 
         Real dt_diff = (m_diff_type == DiffusionType::Implicit) ? m_dt : 0.5*m_dt;
-        diffuse_velocity(get_velocity_new(), get_density_new(), GetVecOfConstPtrs(vel_eta), dt_diff);
+        diffuse_velocity(get_velocity_new(), get_density_new(), GetVecOfConstPtrs(vel_eta1), dt_diff);
     }
 
     // **********************************************************************************************

@@ -1,12 +1,9 @@
-#ifndef DIFFUSION_TENSOR_OP_H_
-#define DIFFUSION_TENSOR_OP_H_
+#ifndef DIFFUSION_TENSOR_OP2_H_
+#define DIFFUSION_TENSOR_OP2_H_
 
 #include <AMReX_MLMG.H>
 
-#ifdef AMREX_USE_EB
-#include <AMReX_MLEBTensorOp.H>
-#endif
-#include <AMReX_MLTensorOp.H>
+#include <MyTensorOp.H>
 
 //
 // Solver for the implicit part of the diffusion equation:
@@ -18,10 +15,10 @@
 
 class incflo;
 
-class DiffusionTensorOp
+class DiffusionTensorOp2
 {
 public:
-    DiffusionTensorOp (incflo* a_incflo);
+    DiffusionTensorOp2 (incflo* a_incflo);
 
     void diffuse_velocity (amrex::Vector<amrex::MultiFab*> const& velocity,
                            amrex::Vector<amrex::MultiFab*> const& density,
@@ -33,31 +30,14 @@ public:
                          amrex::Vector<amrex::MultiFab const*> const& density,
                          amrex::Vector<amrex::MultiFab const*> const& eta);
 
-    //EY: Granular rheology
-    void compute_divtau2 (amrex::Vector<amrex::MultiFab*> const& divtau2,
-                         amrex::Vector<amrex::MultiFab const*> const& velocity,
-                         amrex::Vector<amrex::MultiFab const*> const& density,
-                         amrex::Vector<amrex::MultiFab const*> const& eta);
-
 private:
 
     void readParameters ();
 
     incflo* m_incflo;
 
-#ifdef AMREX_USE_EB
-    std::unique_ptr<amrex::MLEBTensorOp> m_eb_solve_op;
-    std::unique_ptr<amrex::MLEBTensorOp> m_eb_apply_op;
-#endif
-    std::unique_ptr<amrex::MLTensorOp> m_reg_solve_op;
-    std::unique_ptr<amrex::MLTensorOp> m_reg_apply_op;
-    
-    //EY: Granular rheology 
-    std::unique_ptr<amrex::MLTensorOp> m_reg_apply_op2;
-    std::unique_ptr<amrex::MLTensorOp> m_reg_apply_op3;
-
-    int m_higher_tensor = 1;
-
+    std::unique_ptr<amrex::MyTensorOp> m_reg_solve_op;
+    std::unique_ptr<amrex::MyTensorOp> m_reg_apply_op;
 
     // DiffusionOp verbosity
     int m_verbose = 0;
@@ -72,7 +52,6 @@ private:
     int m_mg_maxorder = 2;
     int m_num_pre_smooth = 2;
     int m_num_post_smooth = 2;
-    
 #ifdef AMREX_USE_FLOAT
     amrex::Real m_mg_rtol = 1.0e-4;
     amrex::Real m_mg_atol = 1.0e-7;

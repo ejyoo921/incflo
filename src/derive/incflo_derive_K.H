@@ -4,8 +4,6 @@
 #include <AMReX_FArrayBox.H>
 #include <cmath>
 
-
-
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 amrex::Real incflo_strainrate (int i, int j, int k,
                                AMREX_D_DECL(amrex::Real idx, amrex::Real idy, amrex::Real idz),

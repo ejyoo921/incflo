@@ -13,14 +13,16 @@
 #include <AMReX_EBMultiFabUtil.H>
 #endif
 
-#include <DiffusionTensorOp.H>
+#include <DiffusionTensorOp1.H>
+#include <DiffusionTensorOp2.H>
 #include <DiffusionScalarOp.H>
 
 class incflo : public amrex::AmrCore
 {
 public:
 
-    friend DiffusionTensorOp;
+    friend DiffusionTensorOp1;
+    friend DiffusionTensorOp2;
     friend DiffusionScalarOp;
 
     enum struct FluidModel {
@@ -106,7 +108,6 @@ public: // for cuda
     ///////////////////////////////////////////////////////////////////////////
 
     void ApplyPredictor(bool incremental_projection = false);
-    void ApplyCorrector();
     void compute_convective_term (amrex::Vector<amrex::MultiFab*> const& conv_u,
                                   amrex::Vector<amrex::MultiFab*> const& conv_r,
                                   amrex::Vector<amrex::MultiFab*> const& conv_t,
@@ -181,13 +182,11 @@ public: // for cuda
     amrex::Array<amrex::MultiFab,AMREX_SPACEDIM>
     average_velocity_eta_to_faces (int lev, amrex::MultiFab const& cc_eta) const;
 
-    void compute_divtau  (amrex::Vector<amrex::MultiFab      *> const& divtau,
+    void compute_divtau1 (amrex::Vector<amrex::MultiFab      *> const& divtau,
                           amrex::Vector<amrex::MultiFab const*> const& velocity,
                           amrex::Vector<amrex::MultiFab const*> const& density,
                           amrex::Vector<amrex::MultiFab const*> const& eta);
-
-    //EY : Granular rheology
-    void compute_divtau2  (amrex::Vector<amrex::MultiFab      *> const& divtau2,
+    void compute_divtau2 (amrex::Vector<amrex::MultiFab      *> const& divtau,
                           amrex::Vector<amrex::MultiFab const*> const& velocity,
                           amrex::Vector<amrex::MultiFab const*> const& density,
                           amrex::Vector<amrex::MultiFab const*> const& eta);
@@ -478,7 +477,7 @@ private:
     amrex::Real m_tau_0 = 0.0;
     amrex::Real m_papa_reg = 0.0;
     amrex::Real m_eta_0 = 0.0;
-    
+
     //EY
     amrex::Real m_diam = 0.0;
     amrex::Real m_mu_1 = 0.0;
@@ -497,9 +496,6 @@ private:
     amrex::Real m_vert_hi = 0.0;
     amrex::Real m_vert_lo = 0.0;
     amrex::Real m_vert_n = 0.0;
-    
-    int m_higher_tensor = 1;
-
 
     int m_plot_int = -1;
 
@@ -528,20 +524,20 @@ private:
     int m_plt_velx        = 1;
     int m_plt_vely        = 1;
     int m_plt_velz        = 1;
-    int m_plt_gpx         = 0;
-    int m_plt_gpy         = 0;
-    int m_plt_gpz         = 0;
-    int m_plt_rho         = 0;
-    int m_plt_tracer      = 0;
+    int m_plt_gpx         = 1;
+    int m_plt_gpy         = 1;
+    int m_plt_gpz         = 1;
+    int m_plt_rho         = 1;
+    int m_plt_tracer      = 1;
     int m_plt_p_nd        = 0;
     int m_plt_p_cc        = 0;
     int m_plt_macphi      = 0;
-    int m_plt_eta         = 1;
-    int m_plt_vort        = 0;
+    int m_plt_eta         = 0;
+    int m_plt_vort        = 1;
     int m_plt_forcing     = 0;
-    int m_plt_strainrate  = 1;
+    int m_plt_strainrate  = 0;
     int m_plt_divu        = 0;
-    int m_plt_vfrac       = 0;
+    int m_plt_vfrac       = 1;
     int m_plt_error_u     = 0;
     int m_plt_error_v     = 0;
     int m_plt_error_w     = 0;
@@ -582,11 +578,8 @@ private:
         amrex::MultiFab conv_tracer_o;
         //
         amrex::MultiFab divtau;
-        amrex::MultiFab divtau_o;
-        // EY: Granular rheology
-        amrex::MultiFab divtau2;
-        amrex::MultiFab divtau2_o;
-
+        amrex::MultiFab divtau_o1;
+        amrex::MultiFab divtau_o2;
         amrex::MultiFab laps;
         amrex::MultiFab laps_o;
     };
@@ -630,7 +623,8 @@ private:
 
     int m_ntrac = 1;
 
-    std::unique_ptr<DiffusionTensorOp> m_diffusion_tensor_op;
+    std::unique_ptr<DiffusionTensorOp1> m_diffusion_tensor_op1;
+    std::unique_ptr<DiffusionTensorOp2> m_diffusion_tensor_op2;
     std::unique_ptr<DiffusionScalarOp> m_diffusion_scalar_op;
 
     //
@@ -692,11 +686,6 @@ private:
         return ( m_godunov_include_diff_in_forcing || DiffusionType::Implicit != m_diff_type );
     }
 
-    //EY: Granular rheology 
-    bool useHigherTensor () const {
-        return m_higher_tensor;
-    }
-
     bool useTensorSolve () const {
         return use_tensor_solve;
     }
@@ -711,9 +700,8 @@ private:
     }
 #endif
 
-    DiffusionTensorOp* get_diffusion_tensor_op ();
-    //EY: Granular rheology
-    DiffusionTensorOp* get_diffusion_tensor2_op ();
+    DiffusionTensorOp1* get_diffusion_tensor_op1 ();
+    DiffusionTensorOp2* get_diffusion_tensor_op2 ();
     DiffusionScalarOp* get_diffusion_scalar_op ();
 
     amrex::Vector<amrex::MultiFab*> get_velocity_old () noexcept;
@@ -734,13 +722,9 @@ private:
     amrex::Vector<amrex::MultiFab*> get_conv_density_new () noexcept;
     amrex::Vector<amrex::MultiFab*> get_conv_tracer_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_conv_tracer_new () noexcept;
-    amrex::Vector<amrex::MultiFab*> get_divtau_old () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_divtau_old1 () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_divtau_old2 () noexcept;
     amrex::Vector<amrex::MultiFab*> get_divtau_new () noexcept;
-
-    //EY: Granular rheology
-    amrex::Vector<amrex::MultiFab*> get_divtau2_old () noexcept;
-    amrex::Vector<amrex::MultiFab*> get_divtau2_new () noexcept;
-
     amrex::Vector<amrex::MultiFab*> get_laps_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_laps_new () noexcept;
     //

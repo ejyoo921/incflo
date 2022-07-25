@@ -7,10 +7,9 @@ void incflo::set_background_pressure ()
     m_p000 = m_ic_p;
 
     if (m_probtype == 11 || m_probtype == 111 || m_probtype == 112 || m_probtype == 113 ||
-        m_probtype == 500) {
+        m_probtype == 500 ) {
         m_use_boussinesq = true;
-    }     
-    else {
+    } else {
         const auto problo = geom[0].ProbLoArray();
         const auto probhi = geom[0].ProbHiArray();
         GpuArray<Real,AMREX_SPACEDIM> problen{AMREX_D_DECL(probhi[0]-problo[0],

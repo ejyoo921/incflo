@@ -1,92 +1,22 @@
 #include <incflo.H>
 
 using namespace amrex;
-
 void
-incflo::compute_divtau(Vector<MultiFab      *> const& divtau,
-                       Vector<MultiFab const*> const& vel,
-                       Vector<MultiFab const*> const& density,
-                       Vector<MultiFab const*> const& eta)
+incflo::compute_divtau1(Vector<MultiFab      *> const& divtau,
+                        Vector<MultiFab const*> const& vel,
+                        Vector<MultiFab const*> const& density,
+                        Vector<MultiFab const*> const& eta)
 {
-    if (use_tensor_correction) {
-
-        get_diffusion_tensor_op()->compute_divtau(divtau, vel, density, eta);
-#ifdef AMREX_USE_EB
-        EB_set_covered(*divtau[0]     , 0.0);
-#endif
-
-        Vector<MultiFab*> divtau_scal;
-        divtau_scal.push_back(new MultiFab(grids[0], dmap[0], divtau[0]->nComp(),
-                                           divtau[0]->nGrow(),MFInfo(),*m_factory[0]));
-        divtau_scal[0]->setVal(0.);
-
-        get_diffusion_scalar_op()->compute_divtau({divtau_scal}, vel, density, eta);
-#ifdef AMREX_USE_EB
-        EB_set_covered(*divtau_scal[0], 0.0);
-#endif
-
-        // Define divtau to be (divtau_full - divtau_separate)
-        if (m_verbose > 0)
-            amrex::Print() << " ... Defining divtau as the difference between tensor and scalar versions" << std::endl;
-
-        // amrex::Print() << "X-comp: Norm of tensor apply vs scalar apply " <<
-        //                    divtau[0]->norm0(0) << " " << divtau_scal[0]->norm0(0) << std::endl;
-        // amrex::Print() << "Y-comp: Norm of tensor apply vs scalar apply " <<
-        //                    divtau[0]->norm0(1) << " " << divtau_scal[0]->norm0(1) << std::endl;
-        // amrex::Print() << "Z-comp: Norm of tensor apply vs scalar apply " <<
-        //                    divtau[0]->norm0(2) << " " << divtau_scal[0]->norm0(2) << std::endl;
-
-        divtau[0]->Saxpy(*divtau[0], -1.0, *divtau_scal[0], 0, 0, AMREX_SPACEDIM, 0);
-
-        // amrex::Print() << "X-comp: Norm of difference of tensor apply vs scalar apply " <<
-        //                    divtau[0]->norm0(0) << std::endl;
-        // amrex::Print() << "Y-comp: Norm of difference of tensor apply vs scalar apply " <<
-        //                    divtau[0]->norm0(1) << std::endl;
-        // amrex::Print() << "Z-comp: Norm of difference of tensor apply vs scalar apply " <<
-        //                    divtau[0]->norm0(2) << std::endl;
-
-    } else if (use_tensor_solve) {
-        get_diffusion_tensor_op()->compute_divtau(divtau, vel, density, eta);
-    } else {
-        get_diffusion_scalar_op()->compute_divtau(divtau, vel, density, eta);
-    }
+    get_diffusion_tensor_op1()->compute_divtau(divtau, vel, density, eta);
 }
 
-//EY: Granular rheology
 void
 incflo::compute_divtau2(Vector<MultiFab      *> const& divtau,
-                       Vector<MultiFab const*> const& vel,
-                       Vector<MultiFab const*> const& density,
-                       Vector<MultiFab const*> const& eta)
+                        Vector<MultiFab const*> const& vel,
+                        Vector<MultiFab const*> const& density,
+                        Vector<MultiFab const*> const& eta)
 {
-    if (use_tensor_correction) {
-
-        get_diffusion_tensor_op()->compute_divtau2(divtau, vel, density, eta);
-#ifdef AMREX_USE_EB
-        EB_set_covered(*divtau[0]     , 0.0);
-#endif
-
-        Vector<MultiFab*> divtau_scal;
-        divtau_scal.push_back(new MultiFab(grids[0], dmap[0], divtau[0]->nComp(),
-                                           divtau[0]->nGrow(),MFInfo(),*m_factory[0]));
-        divtau_scal[0]->setVal(0.);
-
-        get_diffusion_scalar_op()->compute_divtau({divtau_scal}, vel, density, eta);
-#ifdef AMREX_USE_EB
-        EB_set_covered(*divtau_scal[0], 0.0);
-#endif
-
-        // Define divtau to be (divtau_full - divtau_separate)
-        if (m_verbose > 0)
-            amrex::Print() << " ... Defining divtau as the difference between tensor and scalar versions" << std::endl;
-
-        divtau[0]->Saxpy(*divtau[0], -1.0, *divtau_scal[0], 0, 0, AMREX_SPACEDIM, 0);
-
-    } else if (use_tensor_solve) {
-        get_diffusion_tensor_op()->compute_divtau2(divtau, vel, density, eta);
-    } else {
-        get_diffusion_scalar_op()->compute_divtau(divtau, vel, density, eta);
-    }
+    get_diffusion_tensor_op2()->compute_divtau(divtau, vel, density, eta);
 }
 
 void
@@ -114,21 +44,21 @@ incflo::diffuse_velocity(Vector<MultiFab      *> const& vel,
                          Vector<MultiFab const*> const& eta,
                          Real dt_diff)
 {
-    if (use_tensor_correction) {
-        amrex::Print() << " \n ... diffuse components separately but with tensor terms added explicitly... " << std::endl;
-        get_diffusion_scalar_op()->diffuse_vel_components(vel, density, eta, dt_diff);
-    } else if (use_tensor_solve) {
-        get_diffusion_tensor_op()->diffuse_velocity(vel, density, eta, dt_diff);
-    } else {
-        get_diffusion_scalar_op()->diffuse_vel_components(vel, density, eta, dt_diff);
-    }
+    // We only do the linear operator implicitly
+    get_diffusion_tensor_op1()->diffuse_velocity(vel, density, eta, dt_diff);
 }
 
-DiffusionTensorOp*
-incflo::get_diffusion_tensor_op ()
+DiffusionTensorOp1*
+incflo::get_diffusion_tensor_op1 ()
 {
-    if (!m_diffusion_tensor_op) m_diffusion_tensor_op.reset(new DiffusionTensorOp(this));
-    return m_diffusion_tensor_op.get();
+    if (!m_diffusion_tensor_op1) m_diffusion_tensor_op1.reset(new DiffusionTensorOp1(this));
+    return m_diffusion_tensor_op1.get();
+}
+DiffusionTensorOp2*
+incflo::get_diffusion_tensor_op2 ()
+{
+    if (!m_diffusion_tensor_op2) m_diffusion_tensor_op2.reset(new DiffusionTensorOp2(this));
+    return m_diffusion_tensor_op2.get();
 }
 
 DiffusionScalarOp*

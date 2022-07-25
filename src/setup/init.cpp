@@ -17,17 +17,12 @@ void incflo::ReadParameters ()
     pp.query("steady_state", m_steady_state);
     }
 
-    ReadIOParameters();
-    ReadRheologyParameters();
-
     { // Prefix amr
-     ParmParse pp("amr");
-
-    pp.query("regrid_int", m_regrid_int);
+        ParmParse pp("amr");
+        pp.query("regrid_int", m_regrid_int);
 #ifdef AMREX_USE_EB
         pp.query("refine_cutcells", m_refine_cutcells);
 #endif
-
         pp.query("KE_int", m_KE_int);
 
     } // end prefix amr
@@ -37,22 +32,22 @@ void incflo::ReadParameters ()
 
         pp.query("verbose", m_verbose);
 
-    pp.query("steady_state_tol", m_steady_state_tol);
+        pp.query("steady_state_tol", m_steady_state_tol);
         pp.query("initial_iterations", m_initial_iterations);
         pp.query("do_initial_proj", m_do_initial_proj);
 
-    pp.query("fixed_dt", m_fixed_dt);
-    pp.query("cfl", m_cfl);
+        pp.query("fixed_dt", m_fixed_dt);
+        pp.query("cfl", m_cfl);
 
         // This will multiply the time-step in the very first step only
-    pp.query("init_shrink", m_init_shrink);
+        pp.query("init_shrink", m_init_shrink);
         if (m_init_shrink > 1.0) {
             amrex::Abort("We require m_init_shrink <= 1.0");
         }
 
         // Physics
-    pp.queryarr("delp", m_delp, 0, AMREX_SPACEDIM);
-    pp.queryarr("gravity", m_gravity, 0, AMREX_SPACEDIM);
+        pp.queryarr("delp", m_delp, 0, AMREX_SPACEDIM);
+        pp.queryarr("gravity", m_gravity, 0, AMREX_SPACEDIM);
 
         pp.query("constant_density"         , m_constant_density);
         pp.query("advect_tracer"            , m_advect_tracer);
@@ -148,6 +143,9 @@ void incflo::ReadParameters ()
         }
     } // end prefix incflo
 
+    ReadIOParameters();
+    ReadRheologyParameters();
+
     { // Prefix mac
         ParmParse pp_mac("mac_proj");
         pp_mac.query( "mg_verbose"             , m_mac_mg_verbose );
@@ -227,17 +225,17 @@ void incflo::ReadIOParameters()
         m_plt_velx       = 1;
         m_plt_vely       = 1;
         m_plt_velz       = 1;
-        m_plt_gpx        = 0;
-        m_plt_gpy        = 0;
-        m_plt_gpz        = 0;
-        m_plt_rho        = 0;
-        m_plt_tracer     = 0;
+        m_plt_gpx        = 1;
+        m_plt_gpy        = 1;
+        m_plt_gpz        = 1;
+        m_plt_rho        = 1;
+        m_plt_tracer     = 1;
         m_plt_p_nd       = 0;
         m_plt_p_cc       = 0;
         m_plt_macphi     = 0;
-        m_plt_eta        = 1;
+        m_plt_eta        = 0;
         m_plt_vort       = 0;
-        m_plt_strainrate = 1;
+        m_plt_strainrate = 0;
         m_plt_divu       = 0;
         m_plt_vfrac      = 0;
     }
@@ -296,8 +294,6 @@ void incflo::InitialIterations ()
 
     for (int lev = 0; lev <= finest_level; ++lev) m_t_old[lev] = m_t_new[lev];
     for (int lev = 0; lev <= finest_level; ++lev) mac_phi[lev]->setVal(0.);
-
-    
 
     int ng = nghost_state();
     for (int lev = 0; lev <= finest_level; ++lev) {
