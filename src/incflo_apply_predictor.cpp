@@ -376,7 +376,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     // HERE INCLUDE NONE OF DIVTAU1 and ALL OF DIVTAU2
-                    // amrex::Print() << "check-implicit = "  << "\n";
+                    // amrex::Print() << "divtau2_z =" << divtau_o2(i,j,k,2) << "\n";
                     AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o2(i,j,k,0));,
                                  vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o2(i,j,k,1));,
                                  vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o2(i,j,k,2)););

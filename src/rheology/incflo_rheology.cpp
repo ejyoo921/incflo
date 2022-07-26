@@ -50,13 +50,12 @@ struct NonNewtonianViscosity //Apparent viscosity
         }
         case incflo::FluidModel::Granular:
         {
-            amrex::Print() << "sr1 = " << 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg) << "\n";
+            // amrex::Print() << "sr1 = " << 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg) << "\n";
             // If you want pressure gradient add p_ext to p_bg
             return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
         }
         case incflo::FluidModel::Granular2:
         {
-            // amrex::Print() << "eta2_sr = " << std::pow(2*(expterm(sr/papa_reg) / papa_reg),2) << "\n";
             // amrex::Print() << "GR2" << "\n";
             return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
         }

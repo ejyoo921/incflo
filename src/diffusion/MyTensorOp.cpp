@@ -272,6 +272,8 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
             } else {
                 AMREX_LAUNCH_HOST_DEVICE_LAMBDA ( bx, tbx,
                 {
+                    //EY: Granular rheology - do not kill cross terms 
+                    Real bscalar = -1.0;
                     mltensor_cross_terms(tbx, axfab, AMREX_D_DECL(fxfab,fyfab,fzfab),
                                          dxinv, bscalar);
                 });
