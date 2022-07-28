@@ -403,6 +403,12 @@ void incflo::WritePlotFile()
     // Divergence of velocity field
     if(m_plt_divu) ++ncomp;
 
+    // DivTau1
+    if (m_plt_divtau1) ncomp += 3;
+
+    // DivTau2
+    if (m_plt_divtau2) ncomp += 3;
+
 #ifdef AMREX_USE_EB
     // Cut cell volume fraction
     if(m_plt_vfrac) ++ncomp;
@@ -594,6 +600,8 @@ void incflo::WritePlotFile()
     if (m_plt_eta2) {
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab vel_eta2(mf[lev], amrex::make_alias, icomp, 1);
+            //Only works for granular2
+            m_fluid_model = FluidModel::Granular2; 
             compute_viscosity_at_level(lev,
                                        &vel_eta2,
                                        &m_leveldata[lev]->density,
@@ -601,6 +609,7 @@ void incflo::WritePlotFile()
                                        Geom(lev),
                                        m_cur_time, 0);
         }
+        m_fluid_model = FluidModel::Granular; 
         pltscaVarsName.push_back("eta2");
         ++icomp;
     }
@@ -646,6 +655,47 @@ void incflo::WritePlotFile()
         pltscaVarsName.push_back("divu");
         ++icomp;
     }
+
+    if (m_plt_divtau1) {
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->divtau_o1, 0, icomp, 1, 0);
+        }
+        pltscaVarsName.push_back("divtau1x");
+        ++icomp;
+
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->divtau_o1, 1, icomp, 1, 0);
+        }
+        pltscaVarsName.push_back("divtau1y");
+        ++icomp;
+
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->divtau_o1, 2, icomp, 1, 0);
+        }
+        pltscaVarsName.push_back("divtau1z");
+        ++icomp;
+    }
+
+    if (m_plt_divtau2) {
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->divtau_o2, 0, icomp, 1, 0);
+        }
+        pltscaVarsName.push_back("divtau2x");
+        ++icomp;
+
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->divtau_o2, 1, icomp, 1, 0);
+        }
+        pltscaVarsName.push_back("divtau2y");
+        ++icomp;
+
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->divtau_o2, 2, icomp, 1, 0);
+        }
+        pltscaVarsName.push_back("divtau2z");
+        ++icomp;
+    }
+
 #ifdef AMREX_USE_EB
     if (m_plt_vfrac) {
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -674,3 +724,4 @@ void incflo::WritePlotFile()
                                    pltscaVarsName, Geom(), m_cur_time, istep, refRatio());
     WriteJobInfo(plotfilename);
 }
+

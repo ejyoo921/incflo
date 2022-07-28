@@ -262,6 +262,8 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
               }
             );
 
+
+
             if (m_overset_mask[amrlev][mglev]) {
                 const auto& osm = m_overset_mask[amrlev][mglev]->array(mfi);
                 AMREX_LAUNCH_HOST_DEVICE_LAMBDA ( bx, tbx,
@@ -276,9 +278,21 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
                     Real bscalar = -1.0;
                     mltensor_cross_terms(tbx, axfab, AMREX_D_DECL(fxfab,fyfab,fzfab),
                                          dxinv, bscalar);
+                    // amrex::Print() << "out = "<< out[0] << "\n";
                 });
             }
         }
+        
+        std::ofstream ofs1("axout", std::ofstream::out);
+        std::ofstream ofs2("ayout", std::ofstream::out);
+        std::ofstream ofs3("azout", std::ofstream::out);
+        ofs1 << std::setprecision(16) << fluxfab_tmp[0] << std::endl;
+        ofs2 << std::setprecision(16) << fluxfab_tmp[1] << std::endl;
+        ofs3 << std::setprecision(16) << fluxfab_tmp[2] << std::endl;
+        ofs1.close();
+        ofs2.close();
+        ofs3.close();
+
     }
 #endif
 }

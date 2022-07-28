@@ -537,6 +537,8 @@ private:
     int m_plt_forcing     = 0;
     int m_plt_strainrate  = 1;
     int m_plt_divu        = 0;
+    int m_plt_divtau1     = 1;
+    int m_plt_divtau2     = 1;
     int m_plt_vfrac       = 0;
     int m_plt_error_u     = 0;
     int m_plt_error_v     = 0;
@@ -885,6 +887,7 @@ private:
     void PrintMaxValues (amrex::Real time);
     void PrintMaxVel (int lev);
     void PrintMaxGp (int lev);
+
 
 };
 

@@ -10,7 +10,6 @@ amrex::Real expterm (amrex::Real nu) noexcept
 {
     return (nu < 1.e-9) ? (1.0-0.5*nu+nu*nu*(1.0/6.0)-(nu*nu*nu)*(1./24.))
                         : -std::expm1(-nu)/nu; 
-    // return -std::expm1(-nu)/nu;
 }
 
 // Compute the I term, where I is the inertial number, in mu(I) relation
@@ -50,14 +49,16 @@ struct NonNewtonianViscosity //Apparent viscosity
         }
         case incflo::FluidModel::Granular:
         {
-            // amrex::Print() << "sr1 = " << 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg) << "\n";
+            // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1) << "\n";
             // If you want pressure gradient add p_ext to p_bg
-            return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+            // return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+            return inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
         }
         case incflo::FluidModel::Granular2:
         {
-            // amrex::Print() << "GR2" << "\n";
-            return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+            // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, alpha_2)<< "\n";
+            // return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+            return inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, alpha_2);
         }
         case incflo::FluidModel::Granular3:
         {

@@ -373,6 +373,15 @@ void incflo::ApplyPredictor (bool incremental_projection)
             {
                 Array4<Real const> const& divtau_o1 = ld.divtau_o1.const_array(mfi);
                 Array4<Real const> const& divtau_o2 = ld.divtau_o2.const_array(mfi);
+
+                // std::ofstream ofs1("divtau1", std::ofstream::out);
+                // ofs1 << std::setprecision(16) << ld.divtau_o1[0] << std::endl;
+                // ofs1.close();
+
+                // std::ofstream ofs2("divtau2", std::ofstream::out);
+                // ofs2 << std::setprecision(16) << ld.divtau_o2[0] << std::endl;
+                // ofs2.close();
+
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     // HERE INCLUDE NONE OF DIVTAU1 and ALL OF DIVTAU2
@@ -413,7 +422,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 });
             }
         } // mfi
-    } // lev
+    }
 
     // *************************************************************************************
     // Solve diffusion equation for u* but using eta_old at old time

@@ -237,6 +237,8 @@ void incflo::ReadIOParameters()
         m_plt_vort       = 0;
         m_plt_strainrate = 1;
         m_plt_divu       = 0;
+        m_plt_divtau1    = 1;
+        m_plt_divtau2    = 1;
         m_plt_vfrac      = 0;
         
         // EY: Granular rheology
@@ -262,6 +264,8 @@ void incflo::ReadIOParameters()
     pp.query("plt_vort",       m_plt_vort  );
     pp.query("plt_strainrate", m_plt_strainrate);
     pp.query("plt_divu",       m_plt_divu  );
+    pp.query("plt_divtau1",    m_plt_divtau1  );
+    pp.query("plt_divtau2",    m_plt_divtau2  );
     pp.query("plt_vfrac",      m_plt_vfrac );
 
     pp.query("plt_forcing",    m_plt_forcing );
@@ -271,6 +275,9 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_w",    m_plt_error_w );
     pp.query("plt_error_p",    m_plt_error_p );
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
+
+    //EY
+    pp.query("plt_eta2",       m_plt_eta2  );
 }
 
 //
