@@ -2,7 +2,7 @@ amrex.fpe_trap_invalid=1                # hav a trap to catch a bug
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-stop_time               =   5.5         # Max (simulated) time to evolve
+stop_time               =   2.5         # Max (simulated) time to evolve
 max_step                =   -2          # Max number of time steps
 steady_state            =   0           # Steady-state solver? 
 
@@ -36,12 +36,12 @@ incflo.papa_reg         =   1.0e-5      # Papanastasiou regularisation parameter
 incflo.diam             =   0.1         # Particle (mean) diameter
 
 incflo.mu_1             =   1.
-incflo.A_1              =   0.0
-incflo.alpha_1          =   0.0
+incflo.A_1              =   0.5
+incflo.alpha_1          =   0.5
 
-incflo.mu_2             =   0.1
-incflo.A_2              =   0.
-incflo.alpha_2          =   0.
+incflo.mu_2             =   .1
+incflo.A_2              =   0.5
+incflo.alpha_2          =   0.4
 
 incflo.p_bg             =   1.          # constant pressure
 
@@ -50,7 +50,7 @@ incflo.vert_lo          =   0.          # Lo vertical coordinates
 incflo.vert_hi          =   1.          # Hi vertical coordinates
 incflo.vert_n           =   16          # Grid cells at coarsest AMRlevel
 
-#incflo.diffusion_type   =   2          # Defualt is 2 (Implicit); 1 is CN, 0 is Explicit 
+incflo.diffusion_type   =   2          # Defualt is 2 (Implicit); 1 is CN, 0 is Explicit 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
@@ -58,7 +58,7 @@ incflo.vert_n           =   16          # Grid cells at coarsest AMRlevel
 amr.n_cell              =   16  16  16  # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
-#amr.max_grid_size       =   16  16  16 
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
@@ -70,7 +70,7 @@ geometry.is_periodic    =   1   0   1   # Periodicity x y z (0/1)
 ylo.type                =   "nsw"
 yhi.type                =   "nsw"
 
-yhi.velocity            =   1.  0.0  0.
+yhi.velocity            =   .5  0.0  0.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #

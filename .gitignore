@@ -49,6 +49,7 @@ exec/*.ex
 exec/tmp_build_dir/
 exec/Backtrace.*
 test_2d/Backtrace.*
+test_2d/Backtrace.*
 exec/plt*/
 exec/chk*/
 exec/movie.visit

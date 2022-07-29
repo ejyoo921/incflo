@@ -14,9 +14,29 @@ amrex::Real expterm (amrex::Real nu) noexcept
 
 // Compute the I term, where I is the inertial number, in mu(I) relation
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-amrex::Real inertialNum (amrex::Real sr, amrex::Real prs, amrex::Real ro_0, amrex::Real diam, amrex::Real mu, amrex::Real A, amrex::Real alpha) noexcept
+amrex::Real inertialNum (amrex::Real sr, amrex::Real prs, amrex::Real ro, amrex::Real diam, amrex::Real mu, amrex::Real A, amrex::Real alpha) noexcept
 {
-    return mu + A*std::pow((sr/2)*diam/(std::pow(prs/ro_0, 0.5)), alpha);
+    return mu + A*std::pow((sr/2)*diam/(std::pow(prs/ro, 0.5)), alpha);
+}
+
+// Compute the eta here
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+amrex::Real eta1 (amrex::Real A, amrex::Real d, amrex::Real ro, amrex::Real alpha, amrex::Real sr, amrex::Real papa_reg, amrex::Real p)
+{
+    return (A*std::pow(d * std::pow(ro,1/2), alpha)) * std::pow(2*(expterm(sr/papa_reg)/papa_reg),-alpha+1) * std::pow(p, 1-alpha/2);
+} 
+// Compute the eta here
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+amrex::Real eta2 (amrex::Real A, amrex::Real d, amrex::Real ro, amrex::Real alpha, amrex::Real sr, amrex::Real papa_reg, amrex::Real p)
+{
+    return (A*std::pow(d * std::pow(ro,1/2), alpha)) * std::pow(2*(expterm(sr/papa_reg)/papa_reg),-alpha+2) * std::pow(p, 1-alpha/2);
+} 
+
+// Compute the kappa here
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+amrex::Real kappaterm (amrex::Real mu, amrex::Real p)
+{
+    return mu * p;
 }
 
 struct NonNewtonianViscosity //Apparent viscosity
@@ -50,15 +70,16 @@ struct NonNewtonianViscosity //Apparent viscosity
         case incflo::FluidModel::Granular:
         {
             // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1) << "\n";
-            // If you want pressure gradient add p_ext to p_bg
-            // return 2*(expterm(sr/papa_reg) / papa_reg)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
-            return inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+            // If you want a pressure gradient due to gravity, add p_ext to p_bg
+            // For the strainrate, power is zero for an initial test. Take it out for a real simulation
+            return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+            // return eta1(A_1,diam,ro_0,alpha_1,sr,papa_reg,p_bg) + kappaterm(mu_1,p_bg)*std::pow(2*(expterm(sr/papa_reg)/papa_reg),1);
         }
         case incflo::FluidModel::Granular2:
         {
-            // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, alpha_2)<< "\n";
-            // return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
-            return inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, alpha_2);
+            // For the strainrate, power is zero for an initial test. Take it out for a real simulation
+            return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+            // return eta2(A_2,diam,ro_0,2*alpha_2,sr,papa_reg,p_bg)+ kappaterm(mu_2,p_bg)*std::pow(2*(expterm(sr/papa_reg)/papa_reg),2);
         }
         case incflo::FluidModel::Granular3:
         {
