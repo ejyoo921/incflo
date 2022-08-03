@@ -1368,7 +1368,7 @@ void mltensor_cross_terms_fy_sq2 (Box const& box, Array4<Real> const& fy,
 
                 fy(i,j,k,0) = -mut*(-2)*(dudz*dvdz + (dvdy - dudx)*(dudy - dvdx) - dwdx*dwdy);
                 fy(i,j,k,1) = -mut*2*(-dvdx*dvdx - dvdz*dvdz + dudy*dudy + dwdy*dwdy);
-                fy(i,j,k,2) = -mut*(-2)*(-dudy*dudz + (dwdz - dvdw)*(dvdz - dwdy) + dvdx*dwdx);
+                fy(i,j,k,2) = -mut*(-2)*(-dudy*dudz + (dwdz - dvdy)*(dvdz - dwdy) + dvdx*dwdx);
             }
         }
     }
@@ -1407,7 +1407,7 @@ void mltensor_cross_terms_fz_sq2 (Box const& box, Array4<Real> const& fz,
                 Real mut  = etaz(i,j,k,2);
 
                 fz(i,j,k,0) = -mut*(-2)*(dudy*dwdy + (dwdz - dudx)*(dudz - dwdx) - dvdx*dvdz);
-                fz(i,j,k,1) = -mut*(-2)*(-dudy*dudz + (dwdz - dvdw)*(dvdz - dwdy) + dvdx*dwdx);
+                fz(i,j,k,1) = -mut*(-2)*(-dudy*dudz + (dwdz - dvdy)*(dvdz - dwdy) + dvdx*dwdx);
                 fz(i,j,k,2) = -mut*2*(-dwdx*dwdx - dwdy*dwdy + dudz*dudz + dvdz*dvdz);
             }
         }
