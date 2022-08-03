@@ -238,7 +238,7 @@ void DiffusionTensorOp2::compute_divtau (Vector<MultiFab*> const& a_divtau,
 // #endif
     {
         // We want to return div (mu grad)) phi
-        //EY: we don't use laplacian operator.
+        //EY: we don't use laplacian operator for higher-order strain rate.
         m_reg_apply_op2->setScalars(0.0, 0.0);
         for (int lev = 0; lev <= finest_level; ++lev) {
             m_reg_apply_op2->setACoeffs(lev, *a_density[lev]);
@@ -248,6 +248,7 @@ void DiffusionTensorOp2::compute_divtau (Vector<MultiFab*> const& a_divtau,
         }
 
         MLMG mlmg(*m_reg_apply_op2);
+        // This goes to MyTensor.Op
         mlmg.apply(a_divtau, GetVecOfPtrs(velocity));
     }
 

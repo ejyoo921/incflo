@@ -369,6 +369,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
             Array4<Real const> const& dvdt = ld.conv_velocity_o.const_array(mfi);
             Array4<Real const> const& vel_f = vel_forces[lev].const_array(mfi);
 
+            std::ofstream ofs1("velocity_em2", std::ofstream::out);
+            ofs1 << std::setprecision(16) << ld.velocity[0] << std::endl;
+            ofs1.close();
+
             if (m_diff_type == DiffusionType::Implicit)
             {
                 Array4<Real const> const& divtau_o1 = ld.divtau_o1.const_array(mfi);
@@ -447,7 +451,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
     ApplyProjection(GetVecOfConstPtrs(density_nph),
                     AMREX_D_DECL(GetVecOfPtrs(u_mac), GetVecOfPtrs(v_mac),
                     GetVecOfPtrs(w_mac)),new_time,m_dt,incremental_projection);
-
+    
 #ifdef AMREX_USE_EB
     // **********************************************************************************************
     //

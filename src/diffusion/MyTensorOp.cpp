@@ -283,15 +283,15 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
             }
         }
         
-        std::ofstream ofs1("axout", std::ofstream::out);
-        std::ofstream ofs2("ayout", std::ofstream::out);
-        std::ofstream ofs3("azout", std::ofstream::out);
-        ofs1 << std::setprecision(16) << fluxfab_tmp[0] << std::endl;
-        ofs2 << std::setprecision(16) << fluxfab_tmp[1] << std::endl;
-        ofs3 << std::setprecision(16) << fluxfab_tmp[2] << std::endl;
-        ofs1.close();
-        ofs2.close();
-        ofs3.close();
+        // std::ofstream ofs1("fxout", std::ofstream::out);
+        // std::ofstream ofs2("fyout", std::ofstream::out);
+        // std::ofstream ofs3("fzout", std::ofstream::out);
+        // ofs1 << std::setprecision(16) << fluxfab_tmp[0] << std::endl;
+        // ofs2 << std::setprecision(16) << fluxfab_tmp[1] << std::endl;
+        // ofs3 << std::setprecision(16) << fluxfab_tmp[2] << std::endl;
+        // ofs1.close();
+        // ofs2.close();
+        // ofs3.close();
 
     }
 #endif
