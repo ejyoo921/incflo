@@ -53,7 +53,7 @@ void incflo::Advance()
 #endif
 
     ApplyPredictor();
-    //EY: we use corrector for D^2 stress tensor
+
     if (m_advection_type == "MOL") 
     {
         for (int lev = 0; lev <= finest_level; ++lev) {

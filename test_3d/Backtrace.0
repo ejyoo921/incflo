@@ -8,51 +8,49 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo3d.gnu.MPI.EB.ex(+0x46f8c5) [0x5571737158c5]
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x474385) [0x5628333be385]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo3d.gnu.MPI.EB.ex(+0x471d5a) [0x557173717d5a]
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x47681a) [0x5628333c081a]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f22a8426090]
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7fa3696e5090]
 
- 3: ./incflo3d.gnu.MPI.EB.ex(+0x5877d6) [0x55717382d7d6]
-    amrex::mlabeclap_adotx(int, int, int, int, amrex::Array4<double> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::Array4<double const> const&, amrex::GpuArray<double, 3u> const&, double, double) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/LinearSolvers/MLMG/AMReX_MLABecLap_3D_K.H:26
- (inlined by) amrex::MLABecLaplacian::Fapply(int, int, amrex::MultiFab&, amrex::MultiFab const&) const at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/LinearSolvers/MLMG/AMReX_MLABecLaplacian.cpp:587
+ 3: /lib/x86_64-linux-gnu/libc.so.6(+0x5cdd9) [0x7fa3696fedd9]
 
- 4: ./incflo3d.gnu.MPI.EB.ex(+0x632ee6) [0x5571738d8ee6]
-    amrex::MLTensorOp::apply(int, int, amrex::MultiFab&, amrex::MultiFab&, amrex::MLLinOp::BCMode, amrex::MLLinOp::StateMode, amrex::MLMGBndry const*) const at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/LinearSolvers/MLMG/AMReX_MLTensorOp.cpp:212
+ 4: /lib/x86_64-linux-gnu/libc.so.6(+0x774ba) [0x7fa3697194ba]
 
- 5: ./incflo3d.gnu.MPI.EB.ex(+0x53d72b) [0x5571737e372b]
-    amrex::MLCellLinOp::solutionResidual(int, amrex::MultiFab&, amrex::MultiFab&, amrex::MultiFab const&, amrex::MultiFab const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/LinearSolvers/MLMG/AMReX_MLCellLinOp.cpp:539
+ 5: /lib/x86_64-linux-gnu/libc.so.6(+0x8bf9a) [0x7fa36972df9a]
 
- 6: ./incflo3d.gnu.MPI.EB.ex(+0x50b903) [0x5571737b1903]
-    amrex::MLMG::computeMLResidual(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/LinearSolvers/MLMG/AMReX_MLMG.cpp:306 (discriminator 4)
+ 6: /lib/x86_64-linux-gnu/libstdc++.so.6(+0xf4c40) [0x7fa369b15c40]
+    amrex::MyTensorOp::applyBCTensor(int, int, amrex::MultiFab&, amrex::MLLinOp::BCMode, amrex::MLLinOp::StateMode, amrex::MLMGBndry const*) const at /home/eyoo/CCSE_packages/incflo/test_3d/../src/diffusion/MyTensorOp.cpp:435
 
- 7: ./incflo3d.gnu.MPI.EB.ex(+0x51cd08) [0x5571737c2d08]
-    amrex::MLMG::solve(amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, double, double, char const*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/LinearSolvers/MLMG/AMReX_MLMG.cpp:87
+ 7: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE15_M_insert_floatIdEES3_S3_RSt8ios_baseccT_+0x106) [0x7fa369b47246]
+    ?? ??:0
 
- 8: ./incflo3d.gnu.MPI.EB.ex(+0xe3aae) [0x557173389aae]
-    std::vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
- (inlined by) amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
- (inlined by) DiffusionTensorOp1::diffuse_velocity(amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, double) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/diffusion/DiffusionTensorOp1.cpp:211
+ 8: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZNSo9_M_insertIdEERSoT_+0x93) [0x7fa369b55973]
+    ?? ??:0
 
- 9: ./incflo3d.gnu.MPI.EB.ex(+0x4ed7f) [0x5571732f4d7f]
-    std::vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
- (inlined by) amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
- (inlined by) incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:443
+ 9: ./incflo3d.gnu.MPI.EB.ex(+0x40248b) [0x56283334c48b]
+    amrex::FABio_ascii::write(std::ostream&, amrex::FArrayBox const&, int, int) const at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_FArrayBox.cpp:717
 
-10: ./incflo3d.gnu.MPI.EB.ex(+0x4bc7f) [0x5571732f1c7f]
+10: ./incflo3d.gnu.MPI.EB.ex(+0x4041d5) [0x56283334e1d5]
+    amrex::operator<<(std::ostream&, amrex::FArrayBox const&) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_FArrayBox.cpp:1010
+
+11: ./incflo3d.gnu.MPI.EB.ex(+0x4eb57) [0x562832f98b57]
+    incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:373
+
+12: ./incflo3d.gnu.MPI.EB.ex(+0x4bcbf) [0x562832f95cbf]
     incflo::Advance() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_advance.cpp:57
 
-11: ./incflo3d.gnu.MPI.EB.ex(+0x43848) [0x5571732e9848]
+13: ./incflo3d.gnu.MPI.EB.ex(+0x43888) [0x562832f8d888]
     incflo::Evolve() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:136
 
-12: ./incflo3d.gnu.MPI.EB.ex(+0x3acee) [0x5571732e0cee]
+14: ./incflo3d.gnu.MPI.EB.ex(+0x3ad2e) [0x562832f84d2e]
     main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:57
 
-13: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f22a8407083]
+15: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fa3696c6083]
 
-14: ./incflo3d.gnu.MPI.EB.ex(+0x42ebe) [0x5571732e8ebe]
+16: ./incflo3d.gnu.MPI.EB.ex(+0x42efe) [0x562832f8cefe]
     ?? ??:0
 
