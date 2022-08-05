@@ -369,9 +369,9 @@ void incflo::ApplyPredictor (bool incremental_projection)
             Array4<Real const> const& dvdt = ld.conv_velocity_o.const_array(mfi);
             Array4<Real const> const& vel_f = vel_forces[lev].const_array(mfi);
 
-            std::ofstream ofs1("velocity_1em4", std::ofstream::out);
-            ofs1 << std::setprecision(16) << ld.velocity[0] << std::endl;
-            ofs1.close();
+            // std::ofstream ofs1("velocity_1em4", std::ofstream::out);
+            // ofs1 << std::setprecision(16) << ld.velocity[0] << std::endl;
+            // ofs1.close();
 
             if (m_diff_type == DiffusionType::Implicit)
             {
@@ -382,9 +382,12 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 {
                     // HERE INCLUDE NONE OF DIVTAU1 and ALL OF DIVTAU2
                     // amrex::Print() << "divtau2_z =" << divtau_o2(i,j,k,2) << "\n";
-                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o2(i,j,k,0));,
-                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o2(i,j,k,1));,
-                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o2(i,j,k,2)););
+                    AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)
+                                                        +(0.5)*divtau_o1(i,j,k,0)+divtau_o2(i,j,k,0));,
+                                 vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)
+                                                        +(0.5)*divtau_o1(i,j,k,1)+divtau_o2(i,j,k,1));,
+                                 vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)
+                                                        +(0.5)*divtau_o1(i,j,k,2)+divtau_o2(i,j,k,2)););
                 });
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)

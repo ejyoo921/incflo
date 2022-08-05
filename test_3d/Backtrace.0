@@ -8,49 +8,36 @@
             readelf -wl my_exefile | grep my_line_address'
     to find out the offset for that line.
 
- 0: ./incflo3d.gnu.MPI.EB.ex(+0x474385) [0x5628333be385]
+ 0: ./incflo3d.gnu.MPI.EB.ex(+0x47f375) [0x559b54df6375]
     amrex::BLBackTrace::print_backtrace_info(_IO_FILE*) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:179
 
- 1: ./incflo3d.gnu.MPI.EB.ex(+0x47681a) [0x5628333c081a]
+ 1: ./incflo3d.gnu.MPI.EB.ex(+0x48180a) [0x559b54df880a]
     amrex::BLBackTrace::handler(int) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_BLBackTrace.cpp:85
 
- 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7fa3696e5090]
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x43090) [0x7f47f29be090]
 
- 3: /lib/x86_64-linux-gnu/libc.so.6(+0x5cdd9) [0x7fa3696fedd9]
+ 3: ./incflo3d.gnu.MPI.EB.ex(+0x65cb8) [0x559b549dccb8]
+    incflo::compute_vel_forces(amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_compute_forces.cpp:42 (discriminator 2)
 
- 4: /lib/x86_64-linux-gnu/libc.so.6(+0x774ba) [0x7fa3697194ba]
+ 4: ./incflo3d.gnu.MPI.EB.ex(+0xe0bde) [0x559b54a57bde]
+    incflo::compute_convective_term(amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab const*, std::allocator<amrex::MultiFab const*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> > const&, double) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/convection/incflo_compute_advection_term.cpp:138
 
- 5: /lib/x86_64-linux-gnu/libc.so.6(+0x8bf9a) [0x7fa36972df9a]
+ 5: ./incflo3d.gnu.MPI.EB.ex(+0x5a3ef) [0x559b549d13ef]
+    std::vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~vector() at /usr/include/c++/10/bits/stl_vector.h:680
+ (inlined by) amrex::Vector<amrex::MultiFab*, std::allocator<amrex::MultiFab*> >::~Vector() at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_Vector.H:25
+ (inlined by) incflo::ApplyCorrector() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_corrector.cpp:143
 
- 6: /lib/x86_64-linux-gnu/libstdc++.so.6(+0xf4c40) [0x7fa369b15c40]
-    amrex::MyTensorOp::applyBCTensor(int, int, amrex::MultiFab&, amrex::MLLinOp::BCMode, amrex::MLLinOp::StateMode, amrex::MLMGBndry const*) const at /home/eyoo/CCSE_packages/incflo/test_3d/../src/diffusion/MyTensorOp.cpp:435
+ 6: ./incflo3d.gnu.MPI.EB.ex(+0x4d44c) [0x559b549c444c]
+    incflo::Advance() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_advance.cpp:67
 
- 7: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE15_M_insert_floatIdEES3_S3_RSt8ios_baseccT_+0x106) [0x7fa369b47246]
-    ?? ??:0
-
- 8: /lib/x86_64-linux-gnu/libstdc++.so.6(_ZNSo9_M_insertIdEERSoT_+0x93) [0x7fa369b55973]
-    ?? ??:0
-
- 9: ./incflo3d.gnu.MPI.EB.ex(+0x40248b) [0x56283334c48b]
-    amrex::FABio_ascii::write(std::ostream&, amrex::FArrayBox const&, int, int) const at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_FArrayBox.cpp:717
-
-10: ./incflo3d.gnu.MPI.EB.ex(+0x4041d5) [0x56283334e1d5]
-    amrex::operator<<(std::ostream&, amrex::FArrayBox const&) at /home/eyoo/CCSE_packages/incflo/test_3d/../../amrex/Src/Base/AMReX_FArrayBox.cpp:1010
-
-11: ./incflo3d.gnu.MPI.EB.ex(+0x4eb57) [0x562832f98b57]
-    incflo::ApplyPredictor(bool) at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_apply_predictor.cpp:373
-
-12: ./incflo3d.gnu.MPI.EB.ex(+0x4bcbf) [0x562832f95cbf]
-    incflo::Advance() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo_advance.cpp:57
-
-13: ./incflo3d.gnu.MPI.EB.ex(+0x43888) [0x562832f8d888]
+ 7: ./incflo3d.gnu.MPI.EB.ex(+0x44578) [0x559b549bb578]
     incflo::Evolve() at /home/eyoo/CCSE_packages/incflo/test_3d/../src/incflo.cpp:136
 
-14: ./incflo3d.gnu.MPI.EB.ex(+0x3ad2e) [0x562832f84d2e]
+ 8: ./incflo3d.gnu.MPI.EB.ex(+0x3ba1e) [0x559b549b2a1e]
     main at /home/eyoo/CCSE_packages/incflo/test_3d/../src/main.cpp:57
 
-15: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7fa3696c6083]
+ 9: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f47f299f083]
 
-16: ./incflo3d.gnu.MPI.EB.ex(+0x42efe) [0x562832f8cefe]
+10: ./incflo3d.gnu.MPI.EB.ex(+0x43bee) [0x559b549babee]
     ?? ??:0
 
