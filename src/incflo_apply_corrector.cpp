@@ -153,15 +153,32 @@ void incflo::ApplyCorrector()
                       get_density_new(), get_velocity_new(),
                       new_time, 1);
 
-    // To obtain vel_eta2 corresponding to eta2
+    // To obtain vel_eta2 corresponding to eta2 -- first with old velocity
     if (m_fluid_model == FluidModel::Granular)
     {
+        compute_viscosity(GetVecOfPtrs(vel_eta_o1),
+                      get_density_old(), get_velocity_old(),
+                      new_time, 1);
         m_fluid_model = FluidModel::Granular2;
-        compute_viscosity(GetVecOfPtrs(vel_eta_n2),
+        compute_viscosity(GetVecOfPtrs(vel_eta_o2),
                         get_density_old(), get_velocity_old(),
                         m_cur_time, 1);
-        m_fluid_model = FluidModel::Granular; // Go back to the next time 
+        m_fluid_model = FluidModel::Granular; // Go back 
     }
+
+    // with new velocity
+    if (m_fluid_model == FluidModel::Granular)
+    {
+        compute_viscosity(GetVecOfPtrs(vel_eta_n1),
+                      get_density_new(), get_velocity_new(),
+                      new_time, 1);
+        m_fluid_model = FluidModel::Granular2;
+        compute_viscosity(GetVecOfPtrs(vel_eta_n2),
+                        get_density_new(), get_velocity_new(),
+                        m_cur_time, 1);
+        m_fluid_model = FluidModel::Granular; // Go back 
+    }
+
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
 
     // Here we create divtau of the (n+1,*) state that was computed in the predictor;
@@ -174,6 +191,7 @@ void incflo::ApplyCorrector()
 
     if (m_fluid_model == FluidModel::Granular)
     {
+        //EY: vel_eta_o1
         compute_divtau1(get_divtau_old1(),get_velocity_old_const(),
                         get_density_old_const(),GetVecOfConstPtrs(vel_eta_o1));
         compute_divtau2(get_divtau_old2(),get_velocity_old_const(),
@@ -464,6 +482,7 @@ void incflo::ApplyCorrector()
         {
             fillphysbc_velocity(lev, new_time, m_leveldata[lev]->velocity, ng_diffusion);
             fillphysbc_density (lev, new_time, m_leveldata[lev]->density , ng_diffusion);
+            vel_eta_n1[lev].mult(0.5,0);
         }
 
         Real dt_diff = (m_diff_type == DiffusionType::Implicit) ? m_dt : 0.5*m_dt;

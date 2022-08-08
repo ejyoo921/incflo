@@ -432,6 +432,9 @@ void incflo::ApplyPredictor (bool incremental_projection)
         for (int lev = 0; lev <= finest_level; ++lev) {
             fillphysbc_velocity(lev, new_time, m_leveldata[lev]->velocity, ng_diffusion);
             fillphysbc_density (lev, new_time, m_leveldata[lev]->density , ng_diffusion);
+
+            //EY: We use only half in the predictor: solve for tau*/2
+            vel_eta1[lev].mult(0.5,0); 
         }
 
         Real dt_diff = (m_diff_type == DiffusionType::Implicit) ? m_dt : 0.5*m_dt;
@@ -442,10 +445,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
     //
     // Project velocity field, update pressure
     //
-    // **********************************************************************************************
-    ApplyProjection(GetVecOfConstPtrs(density_nph),
-                    AMREX_D_DECL(GetVecOfPtrs(u_mac), GetVecOfPtrs(v_mac),
-                    GetVecOfPtrs(w_mac)),new_time,m_dt,incremental_projection);
+    // // **********************************************************************************************
+    // ApplyProjection(GetVecOfConstPtrs(density_nph),
+    //                 AMREX_D_DECL(GetVecOfPtrs(u_mac), GetVecOfPtrs(v_mac),
+    //                 GetVecOfPtrs(w_mac)),new_time,m_dt,incremental_projection);
     
 #ifdef AMREX_USE_EB
     // **********************************************************************************************
