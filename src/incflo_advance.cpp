@@ -53,19 +53,6 @@ void incflo::Advance()
 #endif
 
     ApplyPredictor();
-    //EY: we use corrector for D^2 stress tensor
-    // if (m_fluid_model == FluidModel::Granular) 
-    // {
-    //     for (int lev = 0; lev <= finest_level; ++lev) {
-    //         fillpatch_velocity(lev, m_t_new[lev], m_leveldata[lev]->velocity, ng);
-    //         fillpatch_density(lev, m_t_new[lev], m_leveldata[lev]->density, ng);
-    //         if (m_advect_tracer) {
-    //             fillpatch_tracer(lev, m_t_new[lev], m_leveldata[lev]->tracer, ng);
-    //         }
-    //     }
-
-    //     ApplyCorrector();
-    // }
 
     if (m_verbose > 2)
     {

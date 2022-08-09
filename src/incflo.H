@@ -108,7 +108,6 @@ public: // for cuda
     ///////////////////////////////////////////////////////////////////////////
 
     void ApplyPredictor(bool incremental_projection = false);
-    void ApplyCorrector();
     void compute_convective_term (amrex::Vector<amrex::MultiFab*> const& conv_u,
                                   amrex::Vector<amrex::MultiFab*> const& conv_r,
                                   amrex::Vector<amrex::MultiFab*> const& conv_t,
@@ -583,8 +582,6 @@ private:
         amrex::MultiFab conv_tracer_o;
         //
         amrex::MultiFab divtau;
-        amrex::MultiFab divtau_n1;
-        amrex::MultiFab divtau_n2;
         amrex::MultiFab divtau_o1;
         amrex::MultiFab divtau_o2;
         amrex::MultiFab laps;
@@ -732,8 +729,6 @@ private:
     amrex::Vector<amrex::MultiFab*> get_divtau_old1 () noexcept;
     amrex::Vector<amrex::MultiFab*> get_divtau_old2 () noexcept;
     amrex::Vector<amrex::MultiFab*> get_divtau_new () noexcept;
-    amrex::Vector<amrex::MultiFab*> get_divtau_new1 () noexcept;
-    amrex::Vector<amrex::MultiFab*> get_divtau_new2 () noexcept;
     amrex::Vector<amrex::MultiFab*> get_laps_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_laps_new () noexcept;
     //
