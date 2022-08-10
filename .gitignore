@@ -45,7 +45,21 @@ doc/UsersGuide/*.toc
 *.swp
 *.swo
 
+## Compiler debris
 **/tmp_build_dir
+
+## Crash debris
+**/Backtrace.*
+
+## Plot files
+**/plt*
+**/stag*
+
+## Checkpoints
+**/chk*
+
+## Output data
+**/out
 
 exec/*.ex
 exec/tmp_build_dir/
