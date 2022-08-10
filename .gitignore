@@ -45,6 +45,8 @@ doc/UsersGuide/*.toc
 *.swp
 *.swo
 
+**/tmp_build_dir
+
 exec/*.ex
 exec/tmp_build_dir/
 exec/Backtrace.*
