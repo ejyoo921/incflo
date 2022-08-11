@@ -71,10 +71,10 @@ struct NonNewtonianViscosity //Apparent viscosity
                 // If you want a pressure gradient due to gravity, add p_ext to p_bg
                 // For the strainrate, power is zero for an initial test. Make it "1" for a real simulation
                 if (type == 1) {
-                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),1)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
                 }
                 else if (type == 2) {
-                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
                 }
                 else if (type == 3) {
                     return -1*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_3, A_3, 2*alpha_3);

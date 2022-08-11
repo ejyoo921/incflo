@@ -693,7 +693,7 @@ private:
     }
 
     bool need_divtau2 () const {
-        return  1 ; // always need divtau2 as it is always explicit
+        return  1 ; // if granular, always need divtau2 as it is always explicit
     }
 
     bool useTensorSolve () const {
