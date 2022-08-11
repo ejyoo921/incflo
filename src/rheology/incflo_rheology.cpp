@@ -49,42 +49,41 @@ struct NonNewtonianViscosity //Apparent viscosity
     amrex::Real operator() (amrex::Real sr, amrex::Real p_ext)const noexcept {
         switch (fluid_model)
         {
-        case incflo::FluidModel::powerlaw:
-        {
-            return mu * std::pow(sr,n_flow-1.0);
-        }
-        case incflo::FluidModel::Bingham:
-        {   
-            return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
-        }
-        case incflo::FluidModel::HerschelBulkley:
-        {
-            return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
-        }
-        case incflo::FluidModel::deSouzaMendesDutra:
-        {
-            return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr*(eta_0/tau_0))*(eta_0/tau_0);
-        }
-        case incflo::FluidModel::Granular:
-        {
-            // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1) << "\n";
-            // If you want a pressure gradient due to gravity, add p_ext to p_bg
-            // For the strainrate, power is zero for an initial test. Make it "1" for a real simulation
-            if (type == 1) {
-                return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+            case incflo::FluidModel::powerlaw:
+            {
+                return mu * std::pow(sr,n_flow-1.0);
             }
-            else if (type == 2) {
-                return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+            case incflo::FluidModel::Bingham:
+            {   
+                return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
             }
-            else if (type == 3) {
-                return -1*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, 0., A_3, 2*alpha_3);
+            case incflo::FluidModel::HerschelBulkley:
+            {
+                return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
             }
-            // return eta1(A_1,diam,ro_0,alpha_1,sr,papa_reg,p_bg) + kappaterm(mu_1,p_bg)*std::pow(2*(expterm(sr/papa_reg)/papa_reg),1);
-        }
-        default:
-        {
-            return mu;
-        }
+            case incflo::FluidModel::deSouzaMendesDutra:
+            {
+                return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr*(eta_0/tau_0))*(eta_0/tau_0);
+            }
+            case incflo::FluidModel::Granular:
+            {
+                // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1) << "\n";
+                // If you want a pressure gradient due to gravity, add p_ext to p_bg
+                // For the strainrate, power is zero for an initial test. Make it "1" for a real simulation
+                if (type == 1) {
+                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+                }
+                else if (type == 2) {
+                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),0)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+                }
+                else if (type == 3) {
+                    return -1*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_3, A_3, 2*alpha_3);
+                }
+            }
+            default:
+            {
+                return mu;
+            }
         };
     }
 };
