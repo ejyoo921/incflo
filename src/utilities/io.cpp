@@ -321,8 +321,7 @@ void incflo::WriteJobInfo(const std::string& path) const
 void incflo::WritePlotFile()
 {
     BL_PROFILE("incflo::WritePlotFile()");
-    // EY: Granular rheology - tryting to add eta2
-    if (m_plt_vort || m_plt_divu || m_plt_forcing || m_plt_eta || m_plt_eta2 || m_plt_strainrate) {
+    if (m_plt_vort || m_plt_divu || m_plt_forcing || m_plt_eta || m_plt_eta2 || m_plt_eta3 || m_plt_strainrate) {
         for (int lev = 0; lev <= finest_level; ++lev) {
 #ifdef AMREX_USE_EB
             const int ng = (EBFactory(0).isAllRegular()) ? 1 : 2;
@@ -390,6 +389,9 @@ void incflo::WritePlotFile()
 
     // EY: Granular rheology
     if(m_plt_eta2) ++ncomp;
+
+    // EY: Granular rheology
+    if(m_plt_eta3) ++ncomp;
 
     // Vorticity
     if(m_plt_vort) ++ncomp;
@@ -591,27 +593,48 @@ void incflo::WritePlotFile()
                                        &m_leveldata[lev]->density,
                                        &m_leveldata[lev]->velocity,
                                        Geom(lev),
-                                       m_cur_time, 0);
+                                       m_cur_time, 0, 1);
         }
         pltscaVarsName.push_back("eta");
         ++icomp;
     }
-    // EY: Granular rheology
+
     if (m_plt_eta2) {
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab vel_eta2(mf[lev], amrex::make_alias, icomp, 1);
-            //Only works for granular2
-            m_fluid_model = FluidModel::Granular2; 
-            compute_viscosity_at_level(lev,
-                                       &vel_eta2,
-                                       &m_leveldata[lev]->density,
-                                       &m_leveldata[lev]->velocity,
-                                       Geom(lev),
-                                       m_cur_time, 0);
+        if (m_fluid_model == FluidModel::Granular) {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab vel_eta2(mf[lev], amrex::make_alias, icomp, 1);
+                compute_viscosity_at_level(lev,
+                                           &vel_eta2,
+                                           &m_leveldata[lev]->density,
+                                           &m_leveldata[lev]->velocity,
+                                           Geom(lev),
+                                           m_cur_time, 0, 2);
+            }
+            pltscaVarsName.push_back("eta2");
+            ++icomp;
         }
-        m_fluid_model = FluidModel::Granular; 
-        pltscaVarsName.push_back("eta2");
-        ++icomp;
+        else {
+            amrex::Error("2nd viscosity output only for granular models");
+        }
+    }
+
+    if (m_plt_eta3) {
+        if (m_fluid_model == FluidModel::Granular) {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab vel_eta3(mf[lev], amrex::make_alias, icomp, 1);
+                compute_viscosity_at_level(lev,
+                                           &vel_eta3,
+                                           &m_leveldata[lev]->density,
+                                           &m_leveldata[lev]->velocity,
+                                           Geom(lev),
+                                           m_cur_time, 0, 3);
+            }
+            pltscaVarsName.push_back("eta3");
+            ++icomp;
+        }
+        else {
+            amrex::Error("3rd viscosity output only for granular models");
+        }
     }
 
     if (m_plt_vort) {

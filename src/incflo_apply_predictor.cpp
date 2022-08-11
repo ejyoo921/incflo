@@ -103,7 +103,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // Forcing terms
     Vector<MultiFab> vel_forces, tra_forces;
 
-    Vector<MultiFab> vel_eta1, vel_eta2, tra_eta;
+    Vector<MultiFab> vel_eta, vel_eta2, tra_eta;
 
     // *************************************************************************************
     // Allocate space for the forcing terms
@@ -116,7 +116,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
             tra_forces.emplace_back(grids[lev], dmap[lev], m_ntrac, nghost_force(),
                                     MFInfo(), Factory(lev));
         }
-        vel_eta1.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
+        vel_eta.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
         vel_eta2.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
         if (m_advect_tracer) {
             tra_eta.emplace_back(grids[lev], dmap[lev], m_ntrac, 1, MFInfo(), Factory(lev));
@@ -130,21 +130,17 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // *************************************************************************************
     // Compute viscosity / diffusive coefficients
     // *************************************************************************************
-    compute_viscosity(GetVecOfPtrs(vel_eta1),
+    compute_viscosity(GetVecOfPtrs(vel_eta),
                       get_density_old(), get_velocity_old(),
-                      m_cur_time, 1);
+                      m_cur_time, 1, 1);
 
     // To obtain vel_eta2 corresponding to eta2
     if (m_fluid_model == FluidModel::Granular)
     {
-        m_fluid_model = FluidModel::Granular2;
         compute_viscosity(GetVecOfPtrs(vel_eta2),
                         get_density_old(), get_velocity_old(),
-                        m_cur_time, 1);
-        m_fluid_model = FluidModel::Granular; // Go back to the next time 
+                        m_cur_time, 1, 2);
     }
-
-
 
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
 
@@ -154,7 +150,10 @@ void incflo::ApplyPredictor (bool incremental_projection)
     if (need_divtau() || use_tensor_correction)
     {
         compute_divtau1(get_divtau_old1(),get_velocity_old_const(),
-                        get_density_old_const(),GetVecOfConstPtrs(vel_eta1));
+                        get_density_old_const(),GetVecOfConstPtrs(vel_eta));
+    }
+    if (need_divtau2() || use_tensor_correction)
+    {
         compute_divtau2(get_divtau_old2(),get_velocity_old_const(),
                         get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
     }
@@ -162,7 +161,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // *************************************************************************************
     // Compute explicit diffusive terms
     // *************************************************************************************
-    if (m_advect_tracer && need_divtau())
+    if (m_advect_tracer && need_divtau() && need_divtau2())
     {
         compute_laps(get_laps_old(), get_tracer_old_const(), get_density_old_const(),
                      GetVecOfConstPtrs(tra_eta));
@@ -440,7 +439,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
         }
 
         Real dt_diff = (m_diff_type == DiffusionType::Implicit) ? m_dt : 0.5*m_dt;
-        diffuse_velocity(get_velocity_new(), get_density_new(), GetVecOfConstPtrs(vel_eta1), dt_diff);
+        diffuse_velocity(get_velocity_new(), get_density_new(), GetVecOfConstPtrs(vel_eta), dt_diff);
     }
 
     // **********************************************************************************************

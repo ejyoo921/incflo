@@ -26,7 +26,7 @@ public:
     friend DiffusionScalarOp;
 
     enum struct FluidModel {
-        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular, Granular2, Granular3
+        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular
     };
 
     incflo ();
@@ -255,13 +255,13 @@ public: // for cuda
     virtual void compute_viscosity (amrex::Vector<amrex::MultiFab*> const& eta,
                                     amrex::Vector<amrex::MultiFab*> const& rho,
                                     amrex::Vector<amrex::MultiFab*> const& vel,
-                                    amrex::Real time, int nghost);
+                                    amrex::Real time, int nghost, int type=1);
     virtual void compute_viscosity_at_level (int lev,
                                              amrex::MultiFab* eta,
                                              amrex::MultiFab* rho,
                                              amrex::MultiFab* vel,
                                              amrex::Geometry& lev_geom,
-                                             amrex::Real time, int nghost);
+                                             amrex::Real time, int nghost, int type);
     virtual void compute_tracer_diff_coeff (amrex::Vector<amrex::MultiFab*> const& tra_eta,
                                             int nghost);
 
@@ -488,6 +488,7 @@ private:
     amrex::Real m_A_2 = 0.0;
     amrex::Real m_alpha_2 = 0.0;
 
+    amrex::Real m_mu_3 = 0.0;
     amrex::Real m_A_3 = 0.0;
     amrex::Real m_alpha_3 = 0.0;
 
@@ -537,8 +538,8 @@ private:
     int m_plt_forcing     = 0;
     int m_plt_strainrate  = 1;
     int m_plt_divu        = 0;
-    int m_plt_divtau1     = 1;
-    int m_plt_divtau2     = 1;
+    int m_plt_divtau1     = 0;
+    int m_plt_divtau2     = 0;
     int m_plt_vfrac       = 0;
     int m_plt_error_u     = 0;
     int m_plt_error_v     = 0;
@@ -546,7 +547,8 @@ private:
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
     // EY: Granular rheology
-    int m_plt_eta2         = 1;
+    int m_plt_eta2        = 0;
+    int m_plt_eta3        = 0;
 
     struct LevelData {
         LevelData () = default;
@@ -688,6 +690,10 @@ private:
 
     bool need_divtau () const {
         return ( m_godunov_include_diff_in_forcing || DiffusionType::Implicit != m_diff_type );
+    }
+
+    bool need_divtau2 () const {
+        return  1 ; // always need divtau2 as it is always explicit
     }
 
     bool useTensorSolve () const {

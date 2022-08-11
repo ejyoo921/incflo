@@ -242,7 +242,8 @@ void incflo::ReadIOParameters()
         m_plt_vfrac      = 0;
         
         // EY: Granular rheology
-        m_plt_eta2       = 1;
+        m_plt_eta2       = 0;
+        m_plt_eta3       = 0;
     }
 
     // Which variables to write to plotfile
@@ -278,6 +279,7 @@ void incflo::ReadIOParameters()
 
     //EY
     pp.query("plt_eta2",       m_plt_eta2  );
+    pp.query("plt_eta3",       m_plt_eta3  );
 }
 
 //

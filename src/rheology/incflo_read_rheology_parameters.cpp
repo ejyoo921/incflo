@@ -121,20 +121,24 @@ void incflo::ReadRheologyParameters()
          pp.query("A_2", m_A_2);
          pp.query("alpha_2", m_alpha_2);
 
+         pp.query("mu_3", m_mu_3);
          pp.query("A_3", m_A_3);
          pp.query("alpha_3", m_alpha_3);
-    
 
          pp.query("vert_hi", m_vert_hi);
          pp.query("vert_lo", m_vert_lo);
          pp.query("vert_n", m_vert_n);
 
-
-
          amrex::Print() << "Granular stress with"
+                        << " mu_1 = " << m_mu_1
+                        << ", A_1 = " << m_A_1
+                        << ", alpha_1 = " << m_alpha_1
                         << " mu_2 = " << m_mu_2
                         << ", A_2 = " << m_A_2
                         << ", alpha_2 = " << m_alpha_2
+                        << " mu_3 = " << m_mu_3
+                        << ", A_3 = " << m_A_3
+                        << ", alpha_3 = " << m_alpha_3
                         << ", p_bg = " << m_p_bg
                         << ", papa_reg = " << m_papa_reg << std::endl;
      }
