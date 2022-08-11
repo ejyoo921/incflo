@@ -84,7 +84,7 @@ void incflo::ReadRheologyParameters()
                         << ", tau_0 = " << m_tau_0
                         << ", eta_0 = " << m_eta_0 << std::endl;
      }
-     else if(fluid_model_s == "Granular")
+     else if(fluid_model_s == "granular")
      {
          m_fluid_model = FluidModel::Granular;
          pp.query("diam", m_diam);
@@ -144,6 +144,6 @@ void incflo::ReadRheologyParameters()
      }
      else
      {
-         amrex::Abort("Unknown fluid_model! Choose either newtonian, powerlaw, bingham, hb, smd");
+         amrex::Abort("Unknown fluid_model! Choose either newtonian, powerlaw, bingham, hb, smd, or granular");
      }
 }
