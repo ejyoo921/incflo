@@ -84,6 +84,16 @@ void incflo::ReadRheologyParameters()
                         << ", tau_0 = " << m_tau_0
                         << ", eta_0 = " << m_eta_0 << std::endl;
      }
+     else if(fluid_model_s == "secondorder")
+     {
+         m_fluid_model = FluidModel::SecondOrder;
+         pp.query("mu_2", m_mu_2);
+         AMREX_ALWAYS_ASSERT(m_mu_2 > 0.0);
+
+         amrex::Print() << "second order fluid with"
+                        << " mu = " << m_mu
+                        << ", mu_2 = " << m_mu_2 << std::endl;
+     }
      else if(fluid_model_s == "granular")
      {
          m_fluid_model = FluidModel::Granular;

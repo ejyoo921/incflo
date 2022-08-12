@@ -111,6 +111,14 @@ void incflo::compute_viscosity_at_level (int lev,
     if (m_fluid_model == FluidModel::Newtonian) {
         vel_eta->setVal(m_mu, 0, 1, nghost);
     }
+    else if (m_fluid_model == FluidModel::SecondOrder) {
+        if (type == 1) {
+            vel_eta->setVal(m_mu, 0, 1, nghost);
+        }
+        else if (type == 2) {
+            vel_eta->setVal(m_mu_2, 0, 1, nghost);
+        }
+    }
     else {
 
         // Set Non-Newtonian Parameters

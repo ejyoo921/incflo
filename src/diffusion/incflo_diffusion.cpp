@@ -58,7 +58,9 @@ incflo::compute_divtau2(Vector<MultiFab      *> const& divtau,
                         Vector<MultiFab const*> const& density,
                         Vector<MultiFab const*> const& eta)
 {
-    get_diffusion_tensor_op2()->compute_divtau(divtau, vel, density, eta);
+    if (use_tensor_solve) {
+        get_diffusion_tensor_op2()->compute_divtau(divtau, vel, density, eta);
+    }
 }
 
 void
