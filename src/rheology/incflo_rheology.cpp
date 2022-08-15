@@ -42,7 +42,11 @@ amrex::Real kappaterm (amrex::Real mu, amrex::Real p)
 struct NonNewtonianViscosity //Apparent viscosity
 {
     incflo::FluidModel fluid_model;
-    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg, ro_0, p_bg, diam, mu_1, A_1, alpha_1, mu_2, A_2, alpha_2, mu_3, A_3, alpha_3;
+
+    amrex::Real mu, n_flow, tau_0, eta_0, papa_reg; 
+    amrex::Real ro_0, p_bg, diam, mu_1, A_1, alpha_1, mu_2, A_2, alpha_2, mu_3, A_3, alpha_3;
+    amrex::Real n_flow_1, tau_1, papa_reg_1;
+
     int type;
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -60,6 +64,15 @@ struct NonNewtonianViscosity //Apparent viscosity
             case incflo::FluidModel::HerschelBulkley:
             {
                 return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
+            }
+            case incflo::FluidModel::HerschelBulkley2:
+            {
+                if (type == 1) {
+                    return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
+                }
+                else if (type == 2) {
+                    return (mu_1*std::pow(sr,n_flow_1)+tau_1)*expterm(sr/papa_reg_1)/papa_reg_1;
+                }
             }
             case incflo::FluidModel::deSouzaMendesDutra:
             {
@@ -155,6 +168,25 @@ void incflo::compute_viscosity_at_level (int lev,
             else {
                 amrex::Error("For FluidModel::Granular viscosity types can only be 1, 2 or 3");
             }
+        }
+        else if (m_fluid_model == FluidModel::HerschelBulkley2) {
+            
+            non_newtonian_viscosity.fluid_model = m_fluid_model;
+            non_newtonian_viscosity.type = type;
+
+            if (type == 1) {
+                non_newtonian_viscosity.mu = m_mu;
+                non_newtonian_viscosity.n_flow = m_n_0;
+                non_newtonian_viscosity.tau_0 = m_tau_0;
+                non_newtonian_viscosity.papa_reg = m_papa_reg;
+            }
+            else if (type == 2) {
+                non_newtonian_viscosity.mu_1 = m_mu_1;
+                non_newtonian_viscosity.n_flow_1 = m_n_1;
+                non_newtonian_viscosity.tau_1 = m_tau_1;
+                non_newtonian_viscosity.papa_reg_1 = m_papa_reg_1;
+            }
+
         }
 
         // Other non_Newtonian Models

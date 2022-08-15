@@ -117,7 +117,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                                     MFInfo(), Factory(lev));
         }
         vel_eta.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
-        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder)) {
+        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
             vel_eta2.emplace_back(grids[lev], dmap[lev], 1, 1, MFInfo(), Factory(lev));
         }
         if (m_advect_tracer) {
@@ -137,7 +137,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                       m_cur_time, 1, 1);
 
     // To obtain vel_eta2 corresponding to eta2
-    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder))
+    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2))
     {
         compute_viscosity(GetVecOfPtrs(vel_eta2),
                         get_density_old(), get_velocity_old(),
@@ -154,7 +154,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
         compute_divtau1(get_divtau_old1(),get_velocity_old_const(),
                         get_density_old_const(),GetVecOfConstPtrs(vel_eta));
     }
-    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder)) {
+    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
         if (need_divtau2() || use_tensor_correction)
         {
             compute_divtau2(get_divtau_old2(),get_velocity_old_const(),
@@ -380,7 +380,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                     Array4<Real const> const& divtau_o2 = ld.divtau_o2.const_array(mfi);
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
-                        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder)) {
+                        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
                             AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o1(i,j,k,0)+divtau_o2(i,j,k,0));,
                                          vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o1(i,j,k,1)+divtau_o2(i,j,k,1));,
                                          vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o1(i,j,k,2)+divtau_o2(i,j,k,2)););
@@ -396,7 +396,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                     Array4<Real const> const& divtau_o2 = ld.divtau_o2.const_array(mfi);
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
-                        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder)) {
+                        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
                             AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+divtau_o2(i,j,k,0));,
                                          vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+divtau_o2(i,j,k,1));,
                                          vel(i,j,k,2) += l_dt*(dvdt(i,j,k,2)+vel_f(i,j,k,2)+divtau_o2(i,j,k,2)););
@@ -417,7 +417,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     // HERE INCLUDE HALF OF DIVTAU1 and ALL OF DIVTAU2
-                    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder)) {
+                    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
                         AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+
                                                            0.5*divtau_o1(i,j,k,0) + divtau_o2(i,j,k,0));,
                                      vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+
@@ -439,7 +439,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
                 amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     // HERE INCLUDE ALL DIVTAU1 and ALL OF DIVTAU2
-                    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder)) {
+                    if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
                         AMREX_D_TERM(vel(i,j,k,0) += l_dt*(dvdt(i,j,k,0)+vel_f(i,j,k,0)+
                                                            divtau_o1(i,j,k,0) + divtau_o2(i,j,k,0));,
                                      vel(i,j,k,1) += l_dt*(dvdt(i,j,k,1)+vel_f(i,j,k,1)+

@@ -65,6 +65,37 @@ void incflo::ReadRheologyParameters()
                         << ", tau_0 = " << m_tau_0
                         << ", papa_reg = " << m_papa_reg << std::endl;
      }
+     else if(fluid_model_s == "hb2")
+     {
+         m_fluid_model = FluidModel::HerschelBulkley2;
+         pp.query("mu_2", m_mu_1);
+         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 > 0.0,
+                 "All viscosities (mu and mu_2) must be positive");
+
+         pp.query("n_1", m_n_0);
+         pp.query("n_2", m_n_1);
+
+         pp.query("tau_1", m_tau_0);
+         pp.query("tau_2", m_tau_1);
+
+         pp.query("papa_reg_1", m_papa_reg);
+         pp.query("papa_reg_2", m_papa_reg_1);
+
+         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg > 0.0,
+                 "Papanastasiou regularisation parameter must be positive");
+         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_papa_reg_1 > 0.0,
+                 "Papanastasiou regularisation parameter must be positive");
+
+         amrex::Print() << "Herschel-Bulkley second-order fluid with"
+                        << " mu = " << m_mu
+                        << " mu_2 = " << m_mu_2
+                        << ", n1 = " << m_n_0
+                        << ", n2 = " << m_n_1
+                        << ", tau_1 = " << m_tau_0
+                        << ", tau_2 = " << m_tau_1
+                        << ", papa_reg_1 = " << m_papa_reg 
+                        << ", papa_reg_2 = " << m_papa_reg_1 << std::endl;
+     }
      else if(fluid_model_s == "smd")
      {
          m_fluid_model = FluidModel::deSouzaMendesDutra;

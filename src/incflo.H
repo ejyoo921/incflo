@@ -26,7 +26,7 @@ public:
     friend DiffusionScalarOp;
 
     enum struct FluidModel {
-        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular, SecondOrder
+        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular, SecondOrder, HerschelBulkley2
     };
 
     incflo ();
@@ -473,14 +473,17 @@ private:
     // Fluid properties
     FluidModel m_fluid_model;
     amrex::Real m_mu = 1.0;
+    amrex::Real m_mu_1 = 0.0;
     amrex::Real m_n_0 = 0.0;
+    amrex::Real m_n_1 = 0.0;
     amrex::Real m_tau_0 = 0.0;
+    amrex::Real m_tau_1 = 0.0;
     amrex::Real m_papa_reg = 0.0;
+    amrex::Real m_papa_reg_1 = 0.0;
     amrex::Real m_eta_0 = 0.0;
 
     //EY
     amrex::Real m_diam = 0.0;
-    amrex::Real m_mu_1 = 0.0;
     amrex::Real m_A_1 = 0.0;
     amrex::Real m_alpha_1 = 0.0;
     
