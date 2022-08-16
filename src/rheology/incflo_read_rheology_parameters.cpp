@@ -69,8 +69,8 @@ void incflo::ReadRheologyParameters()
      {
          m_fluid_model = FluidModel::HerschelBulkley2;
          pp.query("mu_2", m_mu_1);
-         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 > 0.0,
-                 "All viscosities (mu and mu_2) must be positive");
+         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 >= 0.0,
+                 "All viscosities (mu and mu_2) must be positive or zero");
 
          pp.query("n_1", m_n_0);
          pp.query("n_2", m_n_1);
