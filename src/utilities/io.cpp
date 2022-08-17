@@ -600,7 +600,7 @@ void incflo::WritePlotFile()
     }
 
     if (m_plt_eta2) {
-        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2)) {
+        if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2) or (m_fluid_model == FluidModel::powerlaw2)) {
             for (int lev = 0; lev <= finest_level; ++lev) {
                 MultiFab vel_eta2(mf[lev], amrex::make_alias, icomp, 1);
                 compute_viscosity_at_level(lev,

@@ -26,6 +26,22 @@ void incflo::ReadRheologyParameters()
                         << " mu = " << m_mu
                         << ", n = " << m_n_0 <<  std::endl;
      }
+     else if(fluid_model_s == "powerlaw2")
+     {
+         m_fluid_model = FluidModel::powerlaw2;
+         pp.query("mu_2", m_mu_1);
+         AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_mu_2 >= 0.0,
+                 "All viscosities (mu and mu_2) must be positive or zero");
+
+         pp.query("n_1", m_n_0);
+         pp.query("n_2", m_n_1);
+
+         amrex::Print() << "Second-order power-law fluid with"
+                        << " mu = " << m_mu
+                        << " mu_2 = " << m_mu_2
+                        << ", n1 = " << m_n_0
+                        << ", n2 = " << m_n_1 << std::endl;
+     }
      else if(fluid_model_s == "bingham")
      {
          m_fluid_model = FluidModel::Bingham;

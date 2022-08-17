@@ -26,7 +26,7 @@ public:
     friend DiffusionScalarOp;
 
     enum struct FluidModel {
-        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular, SecondOrder, HerschelBulkley2
+        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, Granular, SecondOrder, HerschelBulkley2, powerlaw2
     };
 
     incflo ();

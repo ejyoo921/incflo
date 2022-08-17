@@ -47,7 +47,7 @@ struct NonNewtonianViscosity //Apparent viscosity
     amrex::Real ro_0, p_bg, diam, mu_1, A_1, alpha_1, mu_2, A_2, alpha_2, mu_3, A_3, alpha_3;
     amrex::Real n_flow_1, tau_1, papa_reg_1;
 
-    int type;
+    int order;
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real operator() (amrex::Real sr, amrex::Real p_ext)const noexcept {
@@ -56,6 +56,15 @@ struct NonNewtonianViscosity //Apparent viscosity
             case incflo::FluidModel::powerlaw:
             {
                 return mu * std::pow(sr,n_flow-1.0);
+            }
+            case incflo::FluidModel::powerlaw2:
+            {
+                if (order == 1) {
+                    return mu * std::pow(sr,n_flow-1.0);
+                }
+                else if (order == 2) {
+                    return mu_1 * std::pow(sr,n_flow_1-1.0);
+                }
             }
             case incflo::FluidModel::Bingham:
             {   
@@ -67,11 +76,13 @@ struct NonNewtonianViscosity //Apparent viscosity
             }
             case incflo::FluidModel::HerschelBulkley2:
             {
-                if (type == 1) {
-                    return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
+                if (order == 1) {
+                    // return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
+                    return ( mu*std::pow(sr,n_flow-1.0) + (tau_0/sr)*(1.0-expterm(-1.0*sr/papa_reg)));
                 }
-                else if (type == 2) {
-                    return (mu_1*std::pow(sr,n_flow_1)+tau_1)*expterm(sr/papa_reg_1)/papa_reg_1;
+                else if (order == 2) {
+                    // return (mu_1*std::pow(sr,n_flow_1)+tau_1)*expterm(sr/papa_reg_1)/papa_reg_1;
+                    return ( mu_1*std::pow(sr,n_flow_1-1.0) + (tau_1/sr)*(1.0-expterm(-1.0*sr/papa_reg_1)));
                 }
             }
             case incflo::FluidModel::deSouzaMendesDutra:
@@ -83,13 +94,13 @@ struct NonNewtonianViscosity //Apparent viscosity
                 // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1) << "\n";
                 // If you want a pressure gradient due to gravity, add p_ext to p_bg
                 // For the strainrate, power is zero for an initial test. Make it "1" for a real simulation
-                if (type == 1) {
+                if (order == 1) {
                     return std::pow(2*(expterm(sr/papa_reg) / papa_reg),1)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
                 }
-                else if (type == 2) {
+                else if (order == 2) {
                     return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
                 }
-                else if (type == 3) {
+                else if (order == 3) {
                     return -1*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_3, A_3, 2*alpha_3);
                 }
             }
@@ -106,11 +117,11 @@ struct NonNewtonianViscosity //Apparent viscosity
 void incflo::compute_viscosity (Vector<MultiFab*> const& vel_eta,
                                 Vector<MultiFab*> const& rho,
                                 Vector<MultiFab*> const& vel,
-                                Real time, int nghost, int type)
+                                Real time, int nghost, int order)
 {
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        compute_viscosity_at_level(lev, vel_eta[lev], rho[lev], vel[lev], geom[lev], time, nghost, type);
+        compute_viscosity_at_level(lev, vel_eta[lev], rho[lev], vel[lev], geom[lev], time, nghost, order);
     }
 }
 
@@ -119,16 +130,16 @@ void incflo::compute_viscosity_at_level (int lev,
                                          MultiFab* /*rho*/,
                                          MultiFab* vel,
                                          Geometry& lev_geom,
-                                         Real /*time*/, int nghost, int type)
+                                         Real /*time*/, int nghost, int order)
 {
     if (m_fluid_model == FluidModel::Newtonian) {
         vel_eta->setVal(m_mu, 0, 1, nghost);
     }
     else if (m_fluid_model == FluidModel::SecondOrder) {
-        if (type == 1) {
+        if (order == 1) {
             vel_eta->setVal(m_mu, 0, 1, nghost);
         }
-        else if (type == 2) {
+        else if (order == 2) {
             vel_eta->setVal(m_mu_2, 0, 1, nghost);
         }
     }
@@ -141,7 +152,7 @@ void incflo::compute_viscosity_at_level (int lev,
         if (m_fluid_model == FluidModel::Granular) {
 
             non_newtonian_viscosity.fluid_model = m_fluid_model;
-            non_newtonian_viscosity.type = type;
+            non_newtonian_viscosity.order = order;
 
             non_newtonian_viscosity.ro_0 = m_ro_0;
             non_newtonian_viscosity.diam = m_diam;
@@ -150,41 +161,56 @@ void incflo::compute_viscosity_at_level (int lev,
 
             non_newtonian_viscosity.papa_reg = m_papa_reg;
 
-            if (type == 1) {
+            if (order == 1) {
                 non_newtonian_viscosity.mu_1 = m_mu_1;
                 non_newtonian_viscosity.A_1 = m_A_1;
                 non_newtonian_viscosity.alpha_1 = m_alpha_1;
             }
-            else if (type == 2) {
+            else if (order == 2) {
                 non_newtonian_viscosity.mu_2 = m_mu_2;
                 non_newtonian_viscosity.A_2 = m_A_2;
                 non_newtonian_viscosity.alpha_2 = m_alpha_2;
             }
-            else if (type == 3) {
+            else if (order == 3) {
                 non_newtonian_viscosity.mu_3 = m_mu_3;
                 non_newtonian_viscosity.A_3 = m_A_3;
                 non_newtonian_viscosity.alpha_3 = m_alpha_3;
             }
             else {
-                amrex::Error("For FluidModel::Granular viscosity types can only be 1, 2 or 3");
+                amrex::Error("For FluidModel::Granular viscosity orders can only be 1, 2 or 3");
             }
         }
         else if (m_fluid_model == FluidModel::HerschelBulkley2) {
             
             non_newtonian_viscosity.fluid_model = m_fluid_model;
-            non_newtonian_viscosity.type = type;
+            non_newtonian_viscosity.order = order;
 
-            if (type == 1) {
+            if (order == 1) {
                 non_newtonian_viscosity.mu = m_mu;
                 non_newtonian_viscosity.n_flow = m_n_0;
                 non_newtonian_viscosity.tau_0 = m_tau_0;
                 non_newtonian_viscosity.papa_reg = m_papa_reg;
             }
-            else if (type == 2) {
+            else if (order == 2) {
                 non_newtonian_viscosity.mu_1 = m_mu_1;
                 non_newtonian_viscosity.n_flow_1 = m_n_1;
                 non_newtonian_viscosity.tau_1 = m_tau_1;
                 non_newtonian_viscosity.papa_reg_1 = m_papa_reg_1;
+            }
+
+        }
+        else if (m_fluid_model == FluidModel::powerlaw2) {
+            
+            non_newtonian_viscosity.fluid_model = m_fluid_model;
+            non_newtonian_viscosity.order = order;
+
+            if (order == 1) {
+                non_newtonian_viscosity.mu = m_mu;
+                non_newtonian_viscosity.n_flow = m_n_0;
+            }
+            else if (order == 2) {
+                non_newtonian_viscosity.mu_1 = m_mu_1;
+                non_newtonian_viscosity.n_flow_1 = m_n_1;
             }
 
         }
