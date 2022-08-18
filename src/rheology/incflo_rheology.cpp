@@ -44,71 +44,60 @@ struct NonNewtonianViscosity //Apparent viscosity
     incflo::FluidModel fluid_model;
 
     amrex::Real mu, n_flow, tau_0, eta_0, papa_reg; 
-    amrex::Real ro_0, p_bg, diam, mu_1, A_1, alpha_1, mu_2, A_2, alpha_2, mu_3, A_3, alpha_3;
-    amrex::Real n_flow_1, tau_1, papa_reg_1;
+    amrex::Real ro_0, p_bg, diam, A_1, alpha_1, mu_2, A_2, alpha_2, mu_3, A_3, alpha_3;
+    amrex::Real mu_1, n_flow_1, tau_1, papa_reg_1;
 
     int order;
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real operator() (amrex::Real sr, amrex::Real p_ext)const noexcept {
-        switch (fluid_model)
-        {
-            case incflo::FluidModel::powerlaw:
-            {
-                return mu * std::pow(sr,n_flow-1.0);
-            }
-            case incflo::FluidModel::powerlaw2:
-            {
+
+        amrex::Real visc = mu;
+
+        if (fluid_model == incflo::FluidModel::powerlaw) {
+                visc = mu * std::pow(sr,n_flow-1.0);
+        }
+        else if (fluid_model == incflo::FluidModel::powerlaw2) {
                 if (order == 1) {
-                    return mu * std::pow(sr,n_flow-1.0);
+                    visc = (mu * std::pow(sr,n_flow-1.0));
                 }
                 else if (order == 2) {
-                    return mu_1 * std::pow(sr,n_flow_1-1.0);
+                    visc = (mu_1 * std::pow(sr,n_flow_1-1.0));
                 }
-            }
-            case incflo::FluidModel::Bingham:
-            {   
-                return mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
-            }
-            case incflo::FluidModel::HerschelBulkley:
-            {
-                return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
-            }
-            case incflo::FluidModel::HerschelBulkley2:
-            {
+        }
+        else if (fluid_model == incflo::FluidModel::Bingham) {
+                visc = mu + tau_0 * expterm(sr/papa_reg) / papa_reg;
+        }
+        else if (fluid_model == incflo::FluidModel::HerschelBulkley) {
+                visc = (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
+        }
+        else if (fluid_model == incflo::FluidModel::HerschelBulkley2) {
                 if (order == 1) {
                     // return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr/papa_reg)/papa_reg;
-                    return ( mu*std::pow(sr,n_flow-1.0) + (tau_0/sr)*(1.0-expterm(-1.0*sr/papa_reg)));
+                    visc = ( mu*std::pow(sr,n_flow-1.0) + (tau_0/sr)*(1.0-expterm(-1.0*sr/papa_reg)));
                 }
                 else if (order == 2) {
                     // return (mu_1*std::pow(sr,n_flow_1)+tau_1)*expterm(sr/papa_reg_1)/papa_reg_1;
-                    return ( mu_1*std::pow(sr,n_flow_1-1.0) + (tau_1/sr)*(1.0-expterm(-1.0*sr/papa_reg_1)));
+                    visc = ( mu_1*std::pow(sr,n_flow_1-1.0) + (tau_1/sr)*(1.0-expterm(-1.0*sr/papa_reg_1)));
                 }
-            }
-            case incflo::FluidModel::deSouzaMendesDutra:
-            {
-                return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr*(eta_0/tau_0))*(eta_0/tau_0);
-            }
-            case incflo::FluidModel::Granular:
-            {
-                // amrex::Print() << "numI = " << inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1) << "\n";
+        }
+        else if (fluid_model == incflo::FluidModel::deSouzaMendesDutra) {
+                visc = (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr*(eta_0/tau_0))*(eta_0/tau_0);
+        }
+        else if (fluid_model == incflo::FluidModel::Granular) {
                 // If you want a pressure gradient due to gravity, add p_ext to p_bg
                 // For the strainrate, power is zero for an initial test. Make it "1" for a real simulation
                 if (order == 1) {
-                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),1)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
+                    visc = std::pow(2*(expterm(sr/papa_reg) / papa_reg),1)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_1, A_1, alpha_1);
                 }
                 else if (order == 2) {
-                    return std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
+                    visc = std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_2, A_2, 2*alpha_2);
                 }
                 else if (order == 3) {
-                    return -1*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_3, A_3, 2*alpha_3);
+                    visc = -1*std::pow(2*(expterm(sr/papa_reg) / papa_reg),2)*(p_bg)*inertialNum(sr, p_bg, ro_0, diam, mu_3, A_3, 2*alpha_3);
                 }
-            }
-            default:
-            {
-                return mu;
-            }
-        };
+        }
+        return visc;
     }
 };
 
@@ -262,8 +251,9 @@ void incflo::compute_viscosity_at_level (int lev,
                 {
                     Real sr = incflo_strainrate_eb(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr,flag_arr(i,j,k));
 
-                    Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
-                    Real p_ext = m_gp0[1]*(j*nn);
+                    //Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
+                    //Real p_ext = m_gp0[1]*(j*nn);
+                    Real p_ext = 1.0;
 
                     eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);
                 });
@@ -275,8 +265,9 @@ void incflo::compute_viscosity_at_level (int lev,
                 {
                     Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);
 
-                    Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
-                    Real p_ext = m_gp0[1]*(j*nn);
+                    //Real nn = (m_vert_hi - m_vert_lo)/m_vert_n;
+                    //Real p_ext = m_gp0[1]*(j*nn);
+                    Real p_ext = 1.0;
 
                     eta_arr(i,j,k) = non_newtonian_viscosity(sr, p_ext);
                 });
