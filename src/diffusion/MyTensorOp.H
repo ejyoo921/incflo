@@ -83,9 +83,6 @@ public:
     virtual void apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc_mode,
                         StateMode s_mode, const MLMGBndry* bndry=nullptr) const final override;
 
-    virtual void apply2 (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc_mode,
-                        StateMode s_mode, const MLMGBndry* bndry=nullptr) const final;
-
     virtual void compFlux (int amrlev, const Array<MultiFab*,AMREX_SPACEDIM>& fluxes,
                            MultiFab& sol, Location loc) const override;
 

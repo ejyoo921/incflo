@@ -1055,11 +1055,11 @@ void mltensor_fill_edges (int iedge, Box const& vbox, // vbox: the valid box
 }
 
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-void mltensor_cross_terms_fx (Box const& box, Array4<Real> const& fx,
-                              Array4<Real const> const& vel,
-                              Array4<Real const> const& etax,
-                              Array4<Real const> const& kapx,
-                              GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
+void mltensor_cross_terms_fx_sq_no_trace (Box const& box, Array4<Real> const& fx,
+                                          Array4<Real const> const& vel,
+                                          Array4<Real const> const& etax,
+                                          Array4<Real const> const& kapx,
+                                          GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
 {
     const Real dyi = dxinv[1];
     const Real dzi = dxinv[2];
@@ -1071,28 +1071,41 @@ void mltensor_cross_terms_fx (Box const& box, Array4<Real> const& fx,
         for     (int j = lo.y; j <= hi.y; ++j) {
             AMREX_PRAGMA_SIMD
             for (int i = lo.x; i <= hi.x; ++i) {
+
+                Real dudx = (vel(i,j,k,0)-vel(i-1,j,k,0))*(dxi);
+                Real dvdx = (vel(i,j,k,1)-vel(i-1,j,k,1))*(dxi);
+                Real dwdx = (vel(i,j,k,2)-vel(i-1,j,k,2))*(dxi);
+
                 Real dudy = (vel(i,j+1,k,0)+vel(i-1,j+1,k,0)-vel(i,j-1,k,0)-vel(i-1,j-1,k,0))*(Real(0.25)*dyi);
                 Real dvdy = (vel(i,j+1,k,1)+vel(i-1,j+1,k,1)-vel(i,j-1,k,1)-vel(i-1,j-1,k,1))*(Real(0.25)*dyi);
+                Real dwdy = (vel(i,j+1,k,2)+vel(i-1,j+1,k,2)-vel(i,j-1,k,2)-vel(i-1,j-1,k,2))*(Real(0.25)*dyi);
+
                 Real dudz = (vel(i,j,k+1,0)+vel(i-1,j,k+1,0)-vel(i,j,k-1,0)-vel(i-1,j,k-1,0))*(Real(0.25)*dzi);
+                Real dvdz = (vel(i,j,k+1,1)+vel(i-1,j,k+1,1)-vel(i,j,k-1,1)-vel(i-1,j,k-1,1))*(Real(0.25)*dzi);
                 Real dwdz = (vel(i,j,k+1,2)+vel(i-1,j,k+1,2)-vel(i,j,k-1,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dzi);
-                Real divu = dvdy + dwdz;
-                Real xif = kapx(i,j,k);
-                Real mun = Real(0.75)*(etax(i,j,k,0)-xif);  // restore the original eta
-                Real mut =             etax(i,j,k,1);
-                fx(i,j,k,0) = -mun*(-twoThirds*divu) - xif*divu;
-                fx(i,j,k,1) = -mut*(dudy);
-                fx(i,j,k,2) = -mut*(dudz);
+                    
+                Real mut   = Real(0.25)*etax(i,j,k,0);
+
+                Real term2 = 2.*(dvdz + dwdy)*(dvdz + dwdy);
+                Real term4 = 4.*(dvdy*dvdy + dwdz*dwdz);
+                Real term8 = 8*dudx*dudx;
+
+                //fx(i,j,k,0) = -(mut/3.)*((dudy + dvdx)*(dudy + dvdx) + (dudz + dwdx)*(dudz + dwdx) - term2 - term4 + term8);
+                fx(i,j,k,0) = -mut*(4.*dudx*dudx + (dudy + dvdx)*(dudy + dvdx) + (dudz + dwdx)*(dudz + dwdx));
+                fx(i,j,k,1) = -mut*((dudz + dwdx)*(dvdz + dwdy) + 2.*(dudx + dvdy)*(dudy + dvdx));
+                fx(i,j,k,2) = -mut*((dudy + dvdx)*(dvdz + dwdy) + 2.*(dudx + dwdz)*(dudz + dwdx));
+
             }
         }
     }
 }
 
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-void mltensor_cross_terms_fy (Box const& box, Array4<Real> const& fy,
-                              Array4<Real const> const& vel,
-                              Array4<Real const> const& etay,
-                              Array4<Real const> const& kapy,
-                              GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
+void mltensor_cross_terms_fy_sq_notrace (Box const& box, Array4<Real> const& fy,
+                                         Array4<Real const> const& vel,
+                                         Array4<Real const> const& etay,
+                                         Array4<Real const> const& kapy,
+                                         GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
 {
     const Real dxi = dxinv[0];
     const Real dzi = dxinv[2];
@@ -1104,28 +1117,41 @@ void mltensor_cross_terms_fy (Box const& box, Array4<Real> const& fy,
         for     (int j = lo.y; j <= hi.y; ++j) {
             AMREX_PRAGMA_SIMD
             for (int i = lo.x; i <= hi.x; ++i) {
+
                 Real dudx = (vel(i+1,j,k,0)+vel(i+1,j-1,k,0)-vel(i-1,j,k,0)-vel(i-1,j-1,k,0))*(Real(0.25)*dxi);
                 Real dvdx = (vel(i+1,j,k,1)+vel(i+1,j-1,k,1)-vel(i-1,j,k,1)-vel(i-1,j-1,k,1))*(Real(0.25)*dxi);
+                Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j-1,k,2)-vel(i-1,j,k,2)-vel(i-1,j-1,k,2))*(Real(0.25)*dxi);
+
+                Real dudy = (vel(i,j,k,0)-vel(i,j-1,k,0))*(dyi);
+                Real dvdy = (vel(i,j,k,1)-vel(i,j-1,k,1))*(dyi);
+                Real dwdy = (vel(i,j,k,2)-vel(i,j-1,k,2))*(dyi);
+
+                Real dudz = (vel(i,j,k+1,0)+vel(i,j-1,k+1,0)-vel(i,j,k-1,0)-vel(i,j-1,k-1,0))*(Real(0.25)*dzi);
                 Real dvdz = (vel(i,j,k+1,1)+vel(i,j-1,k+1,1)-vel(i,j,k-1,1)-vel(i,j-1,k-1,1))*(Real(0.25)*dzi);
                 Real dwdz = (vel(i,j,k+1,2)+vel(i,j-1,k+1,2)-vel(i,j,k-1,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dzi);
-                Real divu = dudx + dwdz;
-                Real xif = kapy(i,j,k);
-                Real mun = Real(0.75)*(etay(i,j,k,1)-xif);  // restore the original eta
-                Real mut =             etay(i,j,k,0);
-                fy(i,j,k,0) = -mut*(dvdx);
-                fy(i,j,k,1) = -mun*(-twoThirds*divu) - xif*divu;
-                fy(i,j,k,2) = -mut*(dvdz);
+
+                Real mut  = Real(0.25)*etay(i,j,k,1);
+
+                Real term2 = 2.*(dudz + dwdx)*(dudz + dwdx);
+                Real term4 = 4.*(dwdz*dwdz + dudx*dudx);
+                Real term8 = 8*dvdy*dvdy;
+
+                fy(i,j,k,0) = -mut*((dudz + dwdx)*(dvdz + dwdy) + 2*(dudx + dvdy)*(dudy + dvdx));
+                //fy(i,j,k,1) = -(mut/3.)*((dudy + dvdx)*(dudy + dvdx) + (dvdz + dwdy)*(dvdz + dwdy) - term2 - term4 + term8);
+                fy(i,j,k,1) = -mut*(4.*dvdy*dvdy + (dudy + dvdx)*(dudy + dvdx) + (dvdz + dwdy)*(dvdz + dwdy));
+                fy(i,j,k,2) = -mut*((dudy + dvdx)*(dudz + dwdx) + 2*(dvdy + dwdz)*(dvdz + dwdy));
+
             }
         }
     }
 }
 
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-void mltensor_cross_terms_fz (Box const& box, Array4<Real> const& fz,
-                              Array4<Real const> const& vel,
-                              Array4<Real const> const& etaz,
-                              Array4<Real const> const& kapz,
-                              GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
+void mltensor_cross_terms_fz_sq_no_trace (Box const& box, Array4<Real> const& fz,
+                                          Array4<Real const> const& vel,
+                                          Array4<Real const> const& etaz,
+                                          Array4<Real const> const& kapz,
+                                          GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
 {
     const Real dxi = dxinv[0];
     const Real dyi = dxinv[1];
@@ -1137,17 +1163,30 @@ void mltensor_cross_terms_fz (Box const& box, Array4<Real> const& fz,
         for     (int j = lo.y; j <= hi.y; ++j) {
             AMREX_PRAGMA_SIMD
             for (int i = lo.x; i <= hi.x; ++i) {
+
                 Real dudx = (vel(i+1,j,k,0)+vel(i+1,j,k-1,0)-vel(i-1,j,k,0)-vel(i-1,j,k-1,0))*(Real(0.25)*dxi);
+                Real dvdx = (vel(i+1,j,k,1)+vel(i+1,j,k-1,1)-vel(i-1,j,k,1)-vel(i-1,j,k-1,1))*(Real(0.25)*dxi);
                 Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j,k-1,2)-vel(i-1,j,k,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dxi);
+
+                Real dudy = (vel(i,j+1,k,0)+vel(i,j+1,k-1,0)-vel(i,j-1,k,0)-vel(i,j-1,k-1,0))*(Real(0.25)*dyi);
                 Real dvdy = (vel(i,j+1,k,1)+vel(i,j+1,k-1,1)-vel(i,j-1,k,1)-vel(i,j-1,k-1,1))*(Real(0.25)*dyi);
                 Real dwdy = (vel(i,j+1,k,2)+vel(i,j+1,k-1,2)-vel(i,j-1,k,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dyi);
-                Real divu = dudx + dvdy;
-                Real xif = kapz(i,j,k);
-                Real mun = Real(0.75)*(etaz(i,j,k,2)-xif);  // restore the original eta
-                Real mut =             etaz(i,j,k,0);
-                fz(i,j,k,0) = -mut*(dwdx);
-                fz(i,j,k,1) = -mut*(dwdy);
-                fz(i,j,k,2) = -mun*(-twoThirds*divu) - xif*divu;
+
+                Real dudz = (vel(i,j,k,0)-vel(i,j,k-1,0))*(dzi);
+                Real dvdz = (vel(i,j,k,1)-vel(i,j,k-1,1))*(dzi);
+                Real dwdz = (vel(i,j,k,2)-vel(i,j,k-1,2))*(dzi);
+
+                Real mut  = Real(0.25)*etaz(i,j,k,2);
+
+                Real term2 = 2.*(dudy + dvdx)*(dudy + dvdx);
+                Real term4 = 4.*(dudx*dudx + dvdy*dvdy);
+                Real term8 = 8*dwdz*dwdz;
+                
+                fz(i,j,k,0) = -mut*((dudy + dvdx)*(dvdz + dwdy) + 2*(dudx + dwdz)*(dudz + dwdx));
+                fz(i,j,k,1) = -mut*((dudy + dvdx)*(dudz + dwdx) + 2*(dvdy + dwdz)*(dvdz + dwdy));
+                // fz(i,j,k,2) = -(mut/3.)*((dudz + dwdx)*(dudz + dwdx) + (dvdz + dwdy)*(dvdz + dwdy)- term2 - term4 + term8);
+                fz(i,j,k,2) = -mut*(4.*dwdz*dwdz + (dudz + dwdx)*(dudz + dwdx) + (dvdz + dwdy)*(dvdz + dwdy));
+
             }
         }
     }
@@ -1178,10 +1217,10 @@ void mltensor_cross_terms_fx_sq (Box const& box, Array4<Real> const& fx,
 
                 Real dudy = (vel(i,j+1,k,0)+vel(i-1,j+1,k,0)-vel(i,j-1,k,0)-vel(i-1,j-1,k,0))*(Real(0.25)*dyi);
                 Real dvdy = (vel(i,j+1,k,1)+vel(i-1,j+1,k,1)-vel(i,j-1,k,1)-vel(i-1,j-1,k,1))*(Real(0.25)*dyi);
-                Real dwdy = (vel(i,j+1,k,2)+vel(i,j+1,k-1,2)-vel(i,j-1,k,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dyi);
+                Real dwdy = (vel(i,j+1,k,2)+vel(i-1,j+1,k,2)-vel(i,j-1,k,2)-vel(i-1,j-1,k,2))*(Real(0.25)*dyi);
 
                 Real dudz = (vel(i,j,k+1,0)+vel(i-1,j,k+1,0)-vel(i,j,k-1,0)-vel(i-1,j,k-1,0))*(Real(0.25)*dzi);
-                Real dvdz = (vel(i,j,k+1,1)+vel(i,j-1,k+1,1)-vel(i,j,k-1,1)-vel(i,j-1,k-1,1))*(Real(0.25)*dzi);
+                Real dvdz = (vel(i,j,k+1,1)+vel(i-1,j,k+1,1)-vel(i,j,k-1,1)-vel(i-1,j,k-1,1))*(Real(0.25)*dzi);
                 Real dwdz = (vel(i,j,k+1,2)+vel(i-1,j,k+1,2)-vel(i,j,k-1,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dzi);
                     
                 Real mut   = etax(i,j,k,0);
@@ -1194,7 +1233,6 @@ void mltensor_cross_terms_fx_sq (Box const& box, Array4<Real> const& fx,
                 fx(i,j,k,1) = -mut*((dudz + dwdx)*(dvdz + dwdy) + 2.*(dudx + dvdy)*(dudy + dvdx));
                 fx(i,j,k,2) = -mut*((dudy + dvdx)*(dvdz + dwdy) + 2.*(dudx + dwdz)*(dudz + dwdx));
 
-                // amrex::Print() << "fx0 = " << fx(i,j,k,0) << "\n";
             }
         }
     }
@@ -1221,13 +1259,13 @@ void mltensor_cross_terms_fy_sq (Box const& box, Array4<Real> const& fy,
 
                 Real dudx = (vel(i+1,j,k,0)+vel(i+1,j-1,k,0)-vel(i-1,j,k,0)-vel(i-1,j-1,k,0))*(Real(0.25)*dxi);
                 Real dvdx = (vel(i+1,j,k,1)+vel(i+1,j-1,k,1)-vel(i-1,j,k,1)-vel(i-1,j-1,k,1))*(Real(0.25)*dxi);
-                Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j,k-1,2)-vel(i-1,j,k,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dxi);
+                Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j-1,k,2)-vel(i-1,j,k,2)-vel(i-1,j-1,k,2))*(Real(0.25)*dxi);
 
                 Real dudy = (vel(i,j,k,0)-vel(i,j-1,k,0))*(dyi);
                 Real dvdy = (vel(i,j,k,1)-vel(i,j-1,k,1))*(dyi);
                 Real dwdy = (vel(i,j,k,2)-vel(i,j-1,k,2))*(dyi);
 
-                Real dudz = (vel(i,j,k+1,0)+vel(i-1,j,k+1,0)-vel(i,j,k-1,0)-vel(i-1,j,k-1,0))*(Real(0.25)*dzi);
+                Real dudz = (vel(i,j,k+1,0)+vel(i,j-1,k+1,0)-vel(i,j,k-1,0)-vel(i,j-1,k-1,0))*(Real(0.25)*dzi);
                 Real dvdz = (vel(i,j,k+1,1)+vel(i,j-1,k+1,1)-vel(i,j,k-1,1)-vel(i,j-1,k-1,1))*(Real(0.25)*dzi);
                 Real dwdz = (vel(i,j,k+1,2)+vel(i,j-1,k+1,2)-vel(i,j,k-1,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dzi);
 
@@ -1241,7 +1279,6 @@ void mltensor_cross_terms_fy_sq (Box const& box, Array4<Real> const& fy,
                 fy(i,j,k,1) = -(mut/3.)*((dudy + dvdx)*(dudy + dvdx) + (dvdz + dwdy)*(dvdz + dwdy) - term2 - term4 + term8);
                 fy(i,j,k,2) = -mut*((dudy + dvdx)*(dudz + dwdx) + 2*(dvdy + dwdz)*(dvdz + dwdy));
 
-                // amrex::Print() << "fy1 = " << fy(i,j,k,1) << "\n";
             }
         }
     }
@@ -1265,11 +1302,12 @@ void mltensor_cross_terms_fz_sq (Box const& box, Array4<Real> const& fz,
         for     (int j = lo.y; j <= hi.y; ++j) {
             AMREX_PRAGMA_SIMD
             for (int i = lo.x; i <= hi.x; ++i) {
+
                 Real dudx = (vel(i+1,j,k,0)+vel(i+1,j,k-1,0)-vel(i-1,j,k,0)-vel(i-1,j,k-1,0))*(Real(0.25)*dxi);
-                Real dvdx = (vel(i+1,j,k,1)+vel(i+1,j-1,k,1)-vel(i-1,j,k,1)-vel(i-1,j-1,k,1))*(Real(0.25)*dxi);
+                Real dvdx = (vel(i+1,j,k,1)+vel(i+1,j,k-1,1)-vel(i-1,j,k,1)-vel(i-1,j,k-1,1))*(Real(0.25)*dxi);
                 Real dwdx = (vel(i+1,j,k,2)+vel(i+1,j,k-1,2)-vel(i-1,j,k,2)-vel(i-1,j,k-1,2))*(Real(0.25)*dxi);
 
-                Real dudy = (vel(i,j+1,k,0)+vel(i-1,j+1,k,0)-vel(i,j-1,k,0)-vel(i-1,j-1,k,0))*(Real(0.25)*dyi);
+                Real dudy = (vel(i,j+1,k,0)+vel(i,j+1,k-1,0)-vel(i,j-1,k,0)-vel(i,j-1,k-1,0))*(Real(0.25)*dyi);
                 Real dvdy = (vel(i,j+1,k,1)+vel(i,j+1,k-1,1)-vel(i,j-1,k,1)-vel(i,j-1,k-1,1))*(Real(0.25)*dyi);
                 Real dwdy = (vel(i,j+1,k,2)+vel(i,j+1,k-1,2)-vel(i,j-1,k,2)-vel(i,j-1,k-1,2))*(Real(0.25)*dyi);
 
@@ -1286,7 +1324,7 @@ void mltensor_cross_terms_fz_sq (Box const& box, Array4<Real> const& fz,
                 fz(i,j,k,0) = -mut*((dudy + dvdx)*(dvdz + dwdy) + 2*(dudx + dwdz)*(dudz + dwdx));
                 fz(i,j,k,1) = -mut*((dudy + dvdx)*(dudz + dwdx) + 2*(dvdy + dwdz)*(dvdz + dwdy));
                 fz(i,j,k,2) = -(mut/3.)*((dudz + dwdx)*(dudz + dwdx) + (dvdz + dwdy)*(dvdz + dwdy)- term2 - term4 + term8);
-                // amrex::Print() << "fz2 = " << fz(i,j,k,2) << "\n";
+
             }
         }
     }
