@@ -1055,17 +1055,17 @@ void mltensor_fill_edges (int iedge, Box const& vbox, // vbox: the valid box
 }
 
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-void mltensor_cross_terms_fx_sq_no_trace (Box const& box, Array4<Real> const& fx,
+void mltensor_cross_terms_fx_sq_notrace (Box const& box, Array4<Real> const& fx,
                                           Array4<Real const> const& vel,
                                           Array4<Real const> const& etax,
                                           Array4<Real const> const& kapx,
                                           GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
 {
+    const Real dxi = dxinv[0];
     const Real dyi = dxinv[1];
     const Real dzi = dxinv[2];
     const auto lo = amrex::lbound(box);
     const auto hi = amrex::ubound(box);
-    constexpr Real twoThirds = Real(2./3.);
 
     for         (int k = lo.z; k <= hi.z; ++k) {
         for     (int j = lo.y; j <= hi.y; ++j) {
@@ -1108,10 +1108,10 @@ void mltensor_cross_terms_fy_sq_notrace (Box const& box, Array4<Real> const& fy,
                                          GpuArray<Real,AMREX_SPACEDIM> const& dxinv) noexcept
 {
     const Real dxi = dxinv[0];
+    const Real dyi = dxinv[1];
     const Real dzi = dxinv[2];
     const auto lo = amrex::lbound(box);
     const auto hi = amrex::ubound(box);
-    constexpr Real twoThirds = Real(2./3.);
 
     for         (int k = lo.z; k <= hi.z; ++k) {
         for     (int j = lo.y; j <= hi.y; ++j) {
@@ -1147,7 +1147,7 @@ void mltensor_cross_terms_fy_sq_notrace (Box const& box, Array4<Real> const& fy,
 }
 
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-void mltensor_cross_terms_fz_sq_no_trace (Box const& box, Array4<Real> const& fz,
+void mltensor_cross_terms_fz_sq_notrace (Box const& box, Array4<Real> const& fz,
                                           Array4<Real const> const& vel,
                                           Array4<Real const> const& etaz,
                                           Array4<Real const> const& kapz,
@@ -1155,9 +1155,9 @@ void mltensor_cross_terms_fz_sq_no_trace (Box const& box, Array4<Real> const& fz
 {
     const Real dxi = dxinv[0];
     const Real dyi = dxinv[1];
+    const Real dzi = dxinv[2];
     const auto lo = amrex::lbound(box);
     const auto hi = amrex::ubound(box);
-    constexpr Real twoThirds = Real(2./3.);
 
     for         (int k = lo.z; k <= hi.z; ++k) {
         for     (int j = lo.y; j <= hi.y; ++j) {
@@ -1232,6 +1232,7 @@ void mltensor_cross_terms_fx_sq (Box const& box, Array4<Real> const& fx,
                 fx(i,j,k,0) = -(mut/3.)*((dudy + dvdx)*(dudy + dvdx) + (dudz + dwdx)*(dudz + dwdx) - term2 - term4 + term8);
                 fx(i,j,k,1) = -mut*((dudz + dwdx)*(dvdz + dwdy) + 2.*(dudx + dvdy)*(dudy + dvdx));
                 fx(i,j,k,2) = -mut*((dudy + dvdx)*(dvdz + dwdy) + 2.*(dudx + dwdz)*(dudz + dwdx));
+                // amrex::Print() << i << " " << j << " " << k << " " << mut << " " << dudx << " " << dudy << " " << dudz << " " << dvdx << " " << dvdy << " " << dvdz << " " << dwdx << " " << dwdy << " " << dwdz << "\n";
 
             }
         }
@@ -1481,7 +1482,7 @@ void mltensor_cross_terms (Box const& box, Array4<Real> const& Ax,
                 Ax(i,j,k,2) += dxi*(fx(i+1,j  ,k  ,2) - fx(i,j,k,2))
                     +          dyi*(fy(i  ,j+1,k  ,2) - fy(i,j,k,2))
                     +          dzi*(fz(i  ,j  ,k+1,2) - fz(i,j,k,2));
-                // amrex::Print() << "Ax0, Ax1, Ax2 = "<< Ax(i,j,k,0) <<"" << Ax(i,j,k,1) << "" << Ax(i,j,k,2) << "\n";
+                // amrex::Print() << "Ax0, Ax1, Ax2 = " << i << " " << j << " " << k << " " << Ax(i,j,k,0) <<"" << Ax(i,j,k,1) << "" << Ax(i,j,k,2) << "\n";
             }
         }
     }

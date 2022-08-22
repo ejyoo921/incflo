@@ -206,7 +206,7 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
 #else
     BL_PROFILE("MyTensorOp::apply()");
 
-    // MLABecLaplacian::apply(amrlev, mglev, out, in, bc_mode, s_mode, bndry);
+    MLABecLaplacian::apply(amrlev, mglev, out, in, bc_mode, s_mode, bndry);
 
     if (mglev >= m_kappa[amrlev].size()) return;
 
@@ -217,6 +217,7 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
     Array<MultiFab,AMREX_SPACEDIM> const& etamf = m_b_coeffs[amrlev][mglev];
     Array<MultiFab,AMREX_SPACEDIM> const& kapmf = m_kappa[amrlev][mglev];
     Real bscalar = m_b_scalar;
+    bscalar = -1.0;
 
 #ifdef AMREX_USE_OMP
 #pragma omp parallel if (Gpu::notInLaunchRegion())
@@ -250,15 +251,15 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
             AMREX_LAUNCH_HOST_DEVICE_LAMBDA_DIM
             ( xbx, txbx,
               {
-                  mltensor_cross_terms_fx_sq_no_trace(txbx,fxfab,vfab,etaxfab,kapxfab,dxinv);
+                  mltensor_cross_terms_fx_sq_notrace(txbx,fxfab,vfab,etaxfab,kapxfab,dxinv);
               }
             , ybx, tybx,
               {
-                  mltensor_cross_terms_fy_sq_no_trace(tybx,fyfab,vfab,etayfab,kapyfab,dxinv);
+                  mltensor_cross_terms_fy_sq_notrace(tybx,fyfab,vfab,etayfab,kapyfab,dxinv);
               }
             , zbx, tzbx,
               {
-                  mltensor_cross_terms_fz_sq_no_trace(tzbx,fzfab,vfab,etazfab,kapzfab,dxinv);
+                  mltensor_cross_terms_fz_sq_notrace(tzbx,fzfab,vfab,etazfab,kapzfab,dxinv);
               }
             );
 
