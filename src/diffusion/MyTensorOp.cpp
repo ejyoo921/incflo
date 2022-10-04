@@ -206,11 +206,43 @@ MyTensorOp::apply (int amrlev, int mglev, MultiFab& out, MultiFab& in, BCMode bc
 #else
     BL_PROFILE("MyTensorOp::apply()");
 
+    {
+        std::string plotfilename = "vel2_before_Lap";
+        std::ofstream ofs(plotfilename, std::ofstream::out);
+        for (MFIter mfi(in); mfi.isValid(); ++mfi) {
+            ofs<<std::setprecision(16)<< (in[mfi])<<std::endl;
+        }
+        ofs.close();
+    }
     MLABecLaplacian::apply(amrlev, mglev, out, in, bc_mode, s_mode, bndry);
+    {
+        std::string plotfilename = "divtau_Lap";
+        std::ofstream ofs(plotfilename, std::ofstream::out);
+        for (MFIter mfi(out); mfi.isValid(); ++mfi) {
+            ofs<<std::setprecision(16)<< (out[mfi])<<std::endl;
+        }
+        ofs.close();
+    }
+    {
+        std::string plotfilename = "vel2_after_Lap";
+        std::ofstream ofs(plotfilename, std::ofstream::out);
+        for (MFIter mfi(in); mfi.isValid(); ++mfi) {
+            ofs<<std::setprecision(16)<< (in[mfi])<<std::endl;
+        }
+        ofs.close();
+    }
 
     if (mglev >= m_kappa[amrlev].size()) return;
 
     applyBCTensor(amrlev, mglev, in, bc_mode, s_mode, bndry );
+    {
+        std::string plotfilename = "vel2_after_BC";
+        std::ofstream ofs(plotfilename, std::ofstream::out);
+        for (MFIter mfi(in); mfi.isValid(); ++mfi) {
+            ofs<<std::setprecision(16)<< (in[mfi])<<std::endl;
+        }
+        ofs.close();
+    }
 
     const auto dxinv = m_geom[amrlev][mglev].InvCellSizeArray();
 

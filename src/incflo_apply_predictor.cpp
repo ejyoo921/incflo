@@ -136,12 +136,37 @@ void incflo::ApplyPredictor (bool incremental_projection)
                       get_density_old(), get_velocity_old(),
                       m_cur_time, 1, 1);
 
+    //{
+    //    auto& ld = *m_leveldata[0];
+    //    std::string plotfilename = "vel";
+    //    std::ofstream ofs(plotfilename, std::ofstream::out);
+    //    for (MFIter mfi(ld.velocity_o); mfi.isValid(); ++mfi) {
+    //        ofs<<std::setprecision(16)<< (ld.velocity_o[mfi])<<std::endl;
+    //    }
+    //    ofs.close();
+    //}
+    //{
+    //    std::string plotfilename = "eta1";
+    //    std::ofstream ofs(plotfilename, std::ofstream::out);
+    //    for (MFIter mfi(vel_eta[0]); mfi.isValid(); ++mfi) {
+    //        ofs<<std::setprecision(16)<< (vel_eta[0][mfi])<<std::endl;
+    //    }
+    //    ofs.close();
+    //}
     // To obtain vel_eta2 corresponding to eta2
     if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2) or (m_fluid_model == FluidModel::powerlaw2))
     {
         compute_viscosity(GetVecOfPtrs(vel_eta2),
                         get_density_old(), get_velocity_old(),
                         m_cur_time, 1, 2);
+        //{
+        //    std::string plotfilename = "eta2";
+        //    std::ofstream ofs(plotfilename, std::ofstream::out);
+        //    for (MFIter mfi(vel_eta2[0]); mfi.isValid(); ++mfi) {
+        //        ofs<<std::setprecision(16)<< (vel_eta2[0][mfi])<<std::endl;
+        //    }
+        //    ofs.close();
+        //}
     }
 
     compute_tracer_diff_coeff(GetVecOfPtrs(tra_eta),1);
@@ -153,12 +178,30 @@ void incflo::ApplyPredictor (bool incremental_projection)
     {
         compute_divtau1(get_divtau_old1(),get_velocity_old_const(),
                         get_density_old_const(),GetVecOfConstPtrs(vel_eta));
+        //{
+        //    auto& ld = *m_leveldata[0];
+        //    std::string plotfilename = "divtau1";
+        //    std::ofstream ofs(plotfilename, std::ofstream::out);
+        //    for (MFIter mfi(ld.divtau_o1); mfi.isValid(); ++mfi) {
+        //        ofs<<std::setprecision(16)<< (ld.divtau_o1[mfi])<<std::endl;
+        //    }
+        //    ofs.close();
+        //}
     }
     if ((m_fluid_model == FluidModel::Granular) or (m_fluid_model == FluidModel::SecondOrder) or (m_fluid_model == FluidModel::HerschelBulkley2) or (m_fluid_model == FluidModel::powerlaw2)) {
         if (need_divtau2() || use_tensor_correction)
         {
             compute_divtau2(get_divtau_old2(),get_velocity_old_const(),
                             get_density_old_const(),GetVecOfConstPtrs(vel_eta2));
+            //{
+            //    auto& ld = *m_leveldata[0];
+            //    std::string plotfilename = "divtau2";
+            //    std::ofstream ofs(plotfilename, std::ofstream::out);
+            //    for (MFIter mfi(ld.divtau_o2); mfi.isValid(); ++mfi) {
+            //        ofs<<std::setprecision(16)<< (ld.divtau_o2[mfi])<<std::endl;
+            //    }
+            //    ofs.close();
+            //}
         }
     }
 
