@@ -519,6 +519,9 @@ private:
     int m_plt_error_w     = 0;
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
+    
+    //EY: Additional flag for dynamic viscosity
+    int m_plt_mu         = 1;
 
     struct LevelData {
         LevelData () = default;

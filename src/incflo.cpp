@@ -56,6 +56,7 @@ void incflo::InitData ()
         InitFromScratch(m_cur_time);
 
 #ifdef AMREX_USE_EB
+        amrex::Print() << "Initializing EB" << "\n";
         InitialRedistribution();
 #endif
 
@@ -157,6 +158,7 @@ void incflo::Evolve()
         }
 
         // Mechanism to terminate incflo normally.
+        amrex::Print() << "STEADY STATE? "<< m_steady_state << "\n";
         do_not_evolve = (m_steady_state && SteadyStateReached()) ||
                         ((m_stop_time > 0. && (m_cur_time >= m_stop_time - 1.e-12 * m_dt)) ||
                          (m_max_step >= 0 && m_nstep >= m_max_step));

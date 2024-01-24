@@ -236,6 +236,8 @@ void incflo::ReadIOParameters()
         m_plt_strainrate = 0;
         m_plt_divu       = 0;
         m_plt_vfrac      = 0;
+        //EY: Additional viscosity plot flie
+        int m_plt_mu     = 0;
     }
 
     // Which variables to write to plotfile
@@ -265,6 +267,9 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_w",    m_plt_error_w );
     pp.query("plt_error_p",    m_plt_error_p );
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
+
+    //EY:
+    pp.query("plt_mu",         m_plt_mu   );
 }
 
 //

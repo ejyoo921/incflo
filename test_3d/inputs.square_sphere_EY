@@ -2,8 +2,8 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   -1          # Max number of time steps
-steady_state            =   1          # Steady-state solver? 
+max_step                =   10         # Max number of time steps
+steady_state            =   0          # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -14,45 +14,46 @@ incflo.cfl              =   0.40        # CFL factor
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   1         # Steps between plot files
+amr.plot_int            =   10         # Steps between plot files
 amr.check_int           =   -1        # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plot_p              =   1
-# amr.KE_int              =   1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
 incflo.gravity          =   0.  0.  0.  # Gravitational force (3D)
-incflo.ro_0             =   1.          # Reference density 
+incflo.ro_0             =   1.          # Reference density (g/cm3)
 
-incflo.fluid_model      =   "newtonian"   # Fluid model (rheology)
-incflo.mu               =   10000.0       # Dynamic viscosity coefficient
-# incflo.tau_0            =   1.0         # Yield stress
-# incflo.papa_reg         =   1.0e-4      # Regularisation parameter
+incflo.fluid_model      =  "bingham"  # Fluid model (rheology)
+incflo.mu               =   1.0e3       # Dynamic viscosity (g/cm*s)
+incflo.tau_0            =   1.0         # Yield stress
+incflo.papa_reg         =   1.0e-4      # Regularisation parameter
+incflo.n                =   3
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   16   16   16 # Grid cells at coarsest AMRlevel
+amr.n_cell              =   16   40   16 # Grid cells at coarsest AMRlevel
 amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
 geometry.prob_lo        =   0.  0.  0.  # Lo corner coordinates
-geometry.prob_hi        =   4.  4.  4.  # Hi corner coordinates
-geometry.is_periodic    =   0   0   1   # Periodicity x y z (0/1)
+geometry.prob_hi        =   4.  10.  4.  # Hi corner coordinates
+geometry.is_periodic    =   0   1   0   # Periodicity x y z (0/1)
+incflo.write_eb_surface =   1
 
 # Boundary conditions
 xlo.type                =   "nsw"
-xlo.velocity            =   0.  0.  0.001
+xlo.velocity            =   0.  10.  0.
 xhi.type                =   "nsw"
-xhi.velocity            =   0.  0.  0.001
-ylo.type                =   "nsw"
-ylo.velocity            =   0.  0.  0.001
-yhi.type                =   "nsw"
-yhi.velocity            =   0.  0.  0.001
+xhi.velocity            =   0.  10.  0.
+zlo.type                =   "nsw"
+zlo.velocity            =   0.  10.  0.
+zhi.type                =   "nsw"
+zhi.velocity            =   0.  10.  0.
 
 # Add sphere 
 incflo.geometry         =   "sphere"
@@ -65,14 +66,14 @@ sphere.center           =   2.  2.  2.
 #.......................................#
 # incflo.probtype         =   5
 incflo.ic_u             =   0.0         #
-incflo.ic_v             =   0.0         #
-incflo.ic_w             =   0.001         #
+incflo.ic_v             =   10         #
+incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
 #.......................................#
-incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
+# incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 # incflo.advection_type   = "Godunov"
 #incflo.diffusion_type   = 0             # Defualt is 1 (CN)?

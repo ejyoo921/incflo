@@ -393,6 +393,9 @@ void incflo::WritePlotFile()
     // Divergence of velocity field
     if(m_plt_divu) ++ncomp;
 
+    //EY: Additional flag for dynamic viscosity
+    if(m_plt_mu) ++ncomp;
+
 #ifdef AMREX_USE_EB
     // Cut cell volume fraction
     if(m_plt_vfrac) ++ncomp;
@@ -457,6 +460,13 @@ void incflo::WritePlotFile()
         pltscaVarsName.push_back("density");
         ++icomp;
     }
+    //EY
+    // if (m_plt_mu) {
+    //     for (int lev = 0; lev <= finest_level; ++lev)
+    //         MultiFab::Copy(mf[lev], m_leveldata[lev]->density, 0, icomp, 1, 0);
+    //     pltscaVarsName.push_back("density");
+    //     ++icomp;
+    // }
     if (m_plt_tracer) {
         for (int lev = 0; lev <= finest_level; ++lev)
             MultiFab::Copy(mf[lev], m_leveldata[lev]->tracer, 0, icomp, m_ntrac, 0);

@@ -56,3 +56,17 @@ test/tmp_build_dir/
 test/Backtrace.*
 test/*plt*/
 test/chk*/
+
+# EY update
+**/*.ex
+**/tmp_build_dir/
+**/Backtrace.*
+**/plt*/
+**/chk*/
+**/movie.visit
+**/*.vtp
+**/*.pvtp
+**/*plt*/
+**/chk*/
+**/**.vtr
+**/box_zoom.*
