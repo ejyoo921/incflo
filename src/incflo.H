@@ -518,10 +518,10 @@ private:
     int m_plt_gpy         = 1;
     int m_plt_gpz         = 1;
     int m_plt_rho         = 1;
-    int m_plt_tracer      = 1;
+    int m_plt_tracer      = 0;
     int m_plt_p_nd        = 0;
     int m_plt_macphi      = 0;
-    int m_plt_eta         = 1;
+    int m_plt_eta         = 0;
     int m_plt_vort        = 1;
     int m_plt_forcing     = 0;
     int m_plt_strainrate  = 0;

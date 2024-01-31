@@ -5,6 +5,7 @@
 
     //EY: for steel-making
     void init_steel_melt (amrex::Box const& vbx, amrex::Box const& gbx,
+                            amrex::Array4<amrex::Real> const& vel,
                             amrex::Array4<amrex::Real> const& density,
                             amrex::Box const& domain,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,

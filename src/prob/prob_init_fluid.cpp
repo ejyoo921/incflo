@@ -164,6 +164,7 @@ void incflo::prob_init_fluid (int lev)
         else if (201 == m_probtype)
         {
             init_steel_melt(vbx, gbx,
+                                  ld.velocity.array(mfi),
                                   ld.density.array(mfi),
                                   domain, dx, problo, probhi);
 
@@ -189,7 +190,8 @@ void incflo::prob_init_fluid (int lev)
 
 //EY: steel-making 
 void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
-                                  Array4<Real> const& /*density*/,
+                                  Array4<Real> const& vel,
+                                  Array4<Real> const& density,
                                   Box const& /*domain*/,
                                   GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                   GpuArray<Real, AMREX_SPACEDIM> const& problo,
@@ -211,9 +213,9 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
 
     amrex::ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
-        Real x = problo[0] + (0.5+i) * dx[0];
-        Real y = problo[1] + (0.5+i) * dx[1];
-        Real z = problo[2] + (0.5+i) * dx[2];
+        Real x = Real(i+0.5)*dx[0];
+        Real y = Real(j+0.5)*dx[1];
+        Real z = Real(k+0.5)*dx[2];
 
         int inside_pellet = 0;
         for(int np = 0; np < npellets; np++)
@@ -223,12 +225,16 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                          std::pow(y - centy[np], 2.0)+                
                          std::pow(z - centz[np], 2.0); 
             
-            if(dist2 <= std::pow(rads[np], 2.0))
+            if(dist2 < std::pow(rads[np], 2.0))
             {              
-                // amrex::Print() << "INSIDE = "<< dist2 << "\n";
                 inside_pellet = 1;
                 break;
             }
+        }
+        if (inside_pellet)
+        {
+            // amrex::Print() << "INSIDE = "<< inside_pellet << "\n";
+            density(i,j,k) = 10.;
         }
     });
 }
