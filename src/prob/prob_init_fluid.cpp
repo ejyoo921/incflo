@@ -1,5 +1,7 @@
 #include <incflo.H>
 
+//EY:
+
 using namespace amrex;
 
 void incflo::prob_init_fluid (int lev)
@@ -158,6 +160,16 @@ void incflo::prob_init_fluid (int lev)
                                   ld.tracer.array(mfi),
                                   domain, dx, problo, probhi);
         }
+        //EY: New problem type for steel-making
+        else if (201 == m_probtype)
+        {
+            init_steel_melt(vbx, gbx,
+                                  ld.density.array(mfi),
+                                  domain, dx, problo, probhi);
+
+            amrex::Print() << "CALL PROB-201" << "\n";
+            
+        }
 #if 0
         else if (500 == m_probtype)
         {
@@ -173,6 +185,52 @@ void incflo::prob_init_fluid (int lev)
             amrex::Abort("prob_init_fluid: unknown m_probtype");
         };
     }
+}
+
+//EY: steel-making 
+void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
+                                  Array4<Real> const& /*density*/,
+                                  Box const& /*domain*/,
+                                  GpuArray<Real, AMREX_SPACEDIM> const& dx,
+                                  GpuArray<Real, AMREX_SPACEDIM> const& problo,
+                                  GpuArray<Real, AMREX_SPACEDIM> const& /*probhi*/)
+{
+    amrex::ParmParse pp("prob");
+    // Extract position and velocities
+    amrex::Vector<amrex::Real> rads;
+    amrex::Vector<amrex::Real> centx;
+    amrex::Vector<amrex::Real> centy;
+    amrex::Vector<amrex::Real> centz;
+
+    int npellets = 0;
+    pp.get("npellets", npellets);
+    pp.getarr("pellet_rads",  rads);    
+    pp.getarr("pellet_centx", centx);
+    pp.getarr("pellet_centy", centy);
+    pp.getarr("pellet_centz", centz);
+
+    amrex::ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+    {
+        Real x = problo[0] + (0.5+i) * dx[0];
+        Real y = problo[1] + (0.5+i) * dx[1];
+        Real z = problo[2] + (0.5+i) * dx[2];
+
+        int inside_pellet = 0;
+        for(int np = 0; np < npellets; np++)
+        {
+
+            Real dist2 = std::pow(x - centx[np], 2.0)+                
+                         std::pow(y - centy[np], 2.0)+                
+                         std::pow(z - centz[np], 2.0); 
+            
+            if(dist2 <= std::pow(rads[np], 2.0))
+            {              
+                // amrex::Print() << "INSIDE = "<< dist2 << "\n";
+                inside_pellet = 1;
+                break;
+            }
+        }
+    });
 }
 
 void incflo::init_taylor_green (Box const& vbx, Box const& /*gbx*/,
@@ -993,3 +1051,4 @@ void incflo::init_burggraf (Box const& vbx, Box const& /*gbx*/,
 #endif
     });
 }
+

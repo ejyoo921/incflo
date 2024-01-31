@@ -23,7 +23,7 @@ void incflo::ReadParameters ()
 #ifdef AMREX_USE_EB
         pp.query("refine_cutcells", m_refine_cutcells);
 #endif
-        pp.query("KE_int", m_KE_int);
+        pp.query("KE_int", m_KE_int); //EY: Is this working?
 
     } // end prefix amr
 
@@ -269,7 +269,7 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
 
     //EY:
-    pp.query("plt_mu",         m_plt_mu   );
+    // pp.query("plt_mu",         m_plt_mu   );
 }
 
 //

@@ -15,14 +15,14 @@ DEBUG      = FALSE
 
 COMP	   = gnu
 
-USE_MPI    = FALSE
+USE_MPI    = FALSE #EY: for my machine - not working
 USE_OMP    = FALSE
 USE_CUDA   = FALSE
 
 USE_HYPRE = FALSE
 BL_NO_FORT = TRUE
 
-USE_EB = FALSE
+USE_EB = TRUE
 
 USE_CSG = FALSE
 

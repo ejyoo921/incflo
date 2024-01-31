@@ -16,6 +16,14 @@
 #include <DiffusionTensorOp.H>
 #include <DiffusionScalarOp.H>
 
+// //EY: steel-making
+// #include <ProbParm.H>
+// #include <Prob.H>
+// #include <string>
+// #include <limits>
+// #include <memory>
+// #include <Constants.H>
+
 class incflo : public amrex::AmrCore
 {
 public:
@@ -24,7 +32,7 @@ public:
     friend DiffusionScalarOp;
 
     enum struct FluidModel {
-        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra
+        Newtonian, powerlaw, Bingham, HerschelBulkley, deSouzaMendesDutra, TwoMu
     };
 
     incflo ();
@@ -276,6 +284,11 @@ public:
 
     static bool SteadyStateReached ();
 
+    // //EY: additional pointers for steel-making
+    // static ProbParm* h_prob_parm;
+    // static ProbParm* d_prob_parm;
+    // amrex::Vector<std::string> allvarnames;
+
 
 private:
 
@@ -508,7 +521,7 @@ private:
     int m_plt_tracer      = 1;
     int m_plt_p_nd        = 0;
     int m_plt_macphi      = 0;
-    int m_plt_eta         = 0;
+    int m_plt_eta         = 1;
     int m_plt_vort        = 1;
     int m_plt_forcing     = 0;
     int m_plt_strainrate  = 0;
@@ -519,9 +532,9 @@ private:
     int m_plt_error_w     = 0;
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
-    
+
     //EY: Additional flag for dynamic viscosity
-    int m_plt_mu         = 1;
+    // int m_plt_mu         = 1;
 
     struct LevelData {
         LevelData () = default;

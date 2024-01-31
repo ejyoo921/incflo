@@ -63,6 +63,6 @@ int main(int argc, char* argv[])
         amrex::Print() << "Time spent in InitData():    " << init_time << std::endl;
         amrex::Print() << "Time spent in Evolve():      " << end_time - init_time << std::endl;
     }
-    amrex::Print() << "EY: right before amrex::Finalize()" << "\n";
+    amrex::Print() << "EY: MPI not working -> Finalize" << "\n";
     amrex::Finalize();
 }

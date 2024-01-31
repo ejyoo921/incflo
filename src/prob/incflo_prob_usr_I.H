@@ -3,6 +3,14 @@
 
 // This header is include by incflo.H.  These functions are members of incflo class.
 
+    //EY: for steel-making
+    void init_steel_melt (amrex::Box const& vbx, amrex::Box const& gbx,
+                            amrex::Array4<amrex::Real> const& density,
+                            amrex::Box const& domain,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& probhi);
+
     void init_heated_ground (amrex::Box const& vbx, amrex::Box const& gbx,
                              amrex::Array4<amrex::Real> const& p,
                              amrex::Array4<amrex::Real> const& vel,
@@ -131,4 +139,5 @@
                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo,
                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& probhi);
+
 #endif

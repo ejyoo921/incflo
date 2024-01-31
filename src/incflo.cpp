@@ -1,4 +1,7 @@
 #include <incflo.H>
+// //EY
+// #include <ProbParm.H>
+// #include <Prob.H>
 
 // Need this for TagCutCells
 #ifdef AMREX_USE_EB
@@ -21,7 +24,8 @@ incflo::incflo ()
 
 #ifdef AMREX_USE_EB
     // This is needed before initializing level MultiFab
-    MakeEBGeometry();
+    MakeEBGeometry(); 
+    // -> a regular mesh if you did not speficy EB geometry
 #endif
 
     // Initialize memory for data-array internals

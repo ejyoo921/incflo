@@ -37,6 +37,10 @@ struct NonNewtonianViscosity
         {
             return (mu*std::pow(sr,n_flow)+tau_0)*expterm(sr*(eta_0/tau_0))*(eta_0/tau_0);
         }
+        case incflo::FluidModel::TwoMu:
+        {
+            return mu*pow(10, n_flow);
+        }
         default:
         {
             return mu;
@@ -126,8 +130,22 @@ void incflo::compute_viscosity_at_level (int /*lev*/,
                 {
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                     {
-                        Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);
-                        eta_arr(i,j,k) = non_newtonian_viscosity(sr);
+                        if (m_fluid_model == FluidModel::TwoMu)
+                        {
+                            eta_arr(i,j,k) = m_mu;
+                            if (j == 2)
+                            {
+                                //EY: When you want to have a different vicosity 
+                                //Bring a sphere here 
+                                amrex::Print() << "idy/2=" << idy/2 << "\n";
+                                eta_arr(i,j,k) = non_newtonian_viscosity(1.);
+                            }
+                        } 
+                        else
+                        {
+                            Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);
+                            eta_arr(i,j,k) = non_newtonian_viscosity(sr);
+                        }
                     });
                 }
         }
