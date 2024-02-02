@@ -99,6 +99,6 @@ void incflo::ReadRheologyParameters()
      }
      else
      {
-         amrex::Abort("Unknown fluid_model! Choose either newtonian, powerlaw, bingham, hb, smd");
+         amrex::Abort("Unknown fluid_model! Choose either newtonian, powerlaw, bingham, hb, smd, twoMu");
      }
 }

@@ -106,6 +106,10 @@ void incflo::compute_viscosity_at_level (int /*lev*/,
                 Box const& bx = mfi.growntilebox(nghost);
                 Array4<Real> const& eta_arr = vel_eta->array(mfi);
                 Array4<Real const> const& vel_arr = vel->const_array(mfi);
+                //EY
+                auto const& problo = lev_geom.ProbLoArray();
+                auto const& dx = lev_geom.CellSizeArray();
+                // amrex::Print() << "Problo = "<< problo[0] << "\n";
 #ifdef AMREX_USE_EB
                 auto const& flag_fab = flags[mfi];
                 auto typ = flag_fab.getType(bx);
@@ -129,18 +133,52 @@ void incflo::compute_viscosity_at_level (int /*lev*/,
 #endif
                 {
                     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
+                    {   
+                        // EY: steel-making setting 
                         if (m_fluid_model == FluidModel::TwoMu)
                         {
                             eta_arr(i,j,k) = m_mu;
-                            if (j == 2)
+                            
+                            Real x = problo[0] + Real(i+0.5)*dx[0];
+                            Real y = problo[1] + Real(j+0.5)*dx[1];
+                            Real z = problo[2] + Real(k+0.5)*dx[2];
+
+                            int inside_pellet = 0;
+
+                            amrex::ParmParse pp("prob");
+                            // Extract position and velocities
+                            amrex::Vector<amrex::Real> rads;
+                            amrex::Vector<amrex::Real> centx;
+                            amrex::Vector<amrex::Real> centy;
+                            amrex::Vector<amrex::Real> centz;
+
+                            int npellets = 0;
+                            pp.get("npellets", npellets);
+                            pp.getarr("pellet_rads",  rads);    
+                            pp.getarr("pellet_centx", centx);
+                            pp.getarr("pellet_centy", centy);
+                            pp.getarr("pellet_centz", centz);
+
+                            for(int np = 0; np < npellets; np++)
                             {
-                                //EY: When you want to have a different vicosity 
-                                //Bring a sphere here 
-                                amrex::Print() << "idy/2=" << idy/2 << "\n";
+
+                                Real dist2 = std::pow(x - centx[np], 2.0)+                
+                                            std::pow(y - centy[np], 2.0)+                
+                                            std::pow(z - centz[np], 2.0); 
+                                
+                                if(dist2 < std::pow(rads[np], 2.0))
+                                {              
+                                    inside_pellet = 1;
+                                    break;
+                                }
+                            }
+                            if (inside_pellet)
+                            {
+                                // amrex::Print() << "INSIDE = "<< inside_pellet << "\n";
+                                //non_newtonian_viscosity(1.)
                                 eta_arr(i,j,k) = non_newtonian_viscosity(1.);
                             }
-                        } 
+                        }
                         else
                         {
                             Real sr = incflo_strainrate(i,j,k,AMREX_D_DECL(idx,idy,idz),vel_arr);

@@ -2,13 +2,13 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   2         # Max number of time steps
+max_step                =   100         # Max number of time steps
 steady_state            =   0           # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   -1        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-3        # Use this constant dt if > 0
 incflo.cfl              =   0.45        # CFL factor
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -18,53 +18,59 @@ amr.plot_int            =   10         # Steps between plot files
 amr.check_int           =   -1          # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
-incflo.fluid_model      =   "newtonian"   # Rheological model
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#               PHYSICS                 #
+#.......................................#
+incflo.gravity          =   0.  0.  0.  # Gravitational force (3D)
+incflo.ro_0             =   1.          # Reference density 
+
+incflo.fluid_model      =   "twoMu"   # Rheological model
 incflo.mu               =   1          # Dynamic viscosity coefficient
-incflo.n                =   2
+incflo.n                =   5
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            Pellet properties          #
 #.......................................#
 prob.npellets           =   1
 prob.pellet_rads        =   1.
-prob.pellet_centx       =   2.
-prob.pellet_centy       =   2.
-prob.pellet_centz       =   2.
-#prob.Tinit_liq=2000.0
+prob.pellet_centx       =   5.
+prob.pellet_centy       =   5.
+prob.pellet_centz       =   5.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
-geometry.prob_lo        =   0.  0.  0.  # Lo corner coordinates
-geometry.prob_hi        =   4.  4.  4.  # Hi corner coordinates
-geometry.is_periodic    =   0   0   1   # Periodicity x y z (0/1)
-geometry.coord_sys      =   0           # 0 => cart
+geometry.prob_lo        =   0.   0.   0.  # Lo corner coordinates
+geometry.prob_hi        =   10.  10.  10.  # Hi corner coordinates
+geometry.is_periodic    =   0    0    1   # Periodicity x y z (0/1)
+# geometry.coord_sys      =   0           # 0 => cart
 
 # Boundary conditions
 ylo.type                =   "nsw"
-ylo.velocity            =   0.  0.  0.
+ylo.velocity            =   0.  0.  0.5
 yhi.type                =   "nsw"
-yhi.velocity            =   0.  0.  0.
+yhi.velocity            =   0.  0.  0.5
 
 xlo.type                =   "nsw"
-xlo.velocity            =   0.  0.  0.
+xlo.velocity            =   0.  0.  0.5
 xhi.type                =   "nsw"
-xhi.velocity            =   0.  0.  0.
+xhi.velocity            =   0.  0.  0.5
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
 #.......................................#
-incflo.probtype         =   201         # Steel-Making
+# incflo.probtype         =   5           # 
 incflo.ic_u             =   0.0         #
 incflo.ic_v             =   0.0         #
 incflo.ic_w             =   0.0         #
-incflo.ic_p             =   0.0         #
+# incflo.ic_p             =   0.0         #
 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =  16  16  16    # Grid cells at coarsest AMRlevel
+amr.n_cell              =  32   32   32    # Grid cells at coarsest AMRlevel
 # amr.blocking_factor     =   8           # block factor in grid generation
 amr.max_level           =   0           # maximum level number allowed
 # amr.max_grid_size       =   16

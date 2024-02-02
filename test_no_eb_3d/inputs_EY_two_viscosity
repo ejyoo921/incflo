@@ -24,7 +24,7 @@ amr.restart             =   ""          # Checkpoint to restart from
 incflo.gravity          =   0.  0.  0.  # Gravitational force (3D)
 incflo.ro_0             =   1.          # Reference density 
 
-incflo.fluid_model      =   "twoMu"   # Rheological model
+incflo.fluid_model      =   "newtonian"   # Rheological model
 incflo.mu               =   1          # Dynamic viscosity coefficient
 incflo.n                =   1
 
@@ -56,10 +56,10 @@ xhi.velocity            =   0.  0.  0.1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
 #.......................................#
-# incflo.probtype         =   5
+incflo.probtype         =   5
 incflo.ic_u             =   0.0         #
-incflo.ic_v             =   0.1        #
-incflo.ic_w             =   0.0         #
+incflo.ic_v             =   0.0        #
+incflo.ic_w             =   0.1         #
 incflo.ic_p             =   0.0         #
 
 
