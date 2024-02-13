@@ -205,11 +205,16 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
     amrex::Vector<amrex::Real> centz;
 
     int npellets = 0;
+    Real density_p = 0.;
+
     pp.get("npellets", npellets);
+    pp.get("density_p", density_p);
+
     pp.getarr("pellet_rads",  rads);    
     pp.getarr("pellet_centx", centx);
     pp.getarr("pellet_centy", centy);
     pp.getarr("pellet_centz", centz);
+    
 
     amrex::ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
@@ -225,7 +230,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                          std::pow(y - centy[np], 2.0)+                
                          std::pow(z - centz[np], 2.0); 
             
-            if(dist2 < std::pow(rads[np], 2.0))
+            if(dist2 <= std::pow(rads[np], 2.0))
             {              
                 inside_pellet = 1;
                 break;
@@ -234,7 +239,11 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
         if (inside_pellet)
         {
             // amrex::Print() << "INSIDE = "<< inside_pellet << "\n";
-            density(i,j,k) = 10.;
+            density(i,j,k) = density_p;
+            // no internal flow
+            vel(i,j,k,0) = Real(0.0);
+            vel(i,j,k,1) = Real(0.0);
+            vel(i,j,k,2) = Real(0.0);
         }
     });
 }

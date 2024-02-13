@@ -88,9 +88,6 @@ void incflo::ReadRheologyParameters()
          m_fluid_model = FluidModel::TwoMu;
 
          pp.query("n", m_n_0);
-         AMREX_ALWAYS_ASSERT(m_n_0 > 0.0);
-            AMREX_ALWAYS_ASSERT_WITH_MESSAGE(m_n_0 != 0.0,
-                 "No point in using Two Viscosity rheology with n = 0");
 
          amrex::Print() << "Two dynamic viscosity fluid with"
                         << " mu = " << m_mu

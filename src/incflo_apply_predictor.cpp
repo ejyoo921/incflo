@@ -503,6 +503,7 @@ void incflo::ApplyPredictor (bool incremental_projection)
         diffuse_velocity(get_velocity_new(), get_density_new(), GetVecOfConstPtrs(vel_eta), dt_diff);
     }
 
+
     // **********************************************************************************************
     //
     // Project velocity field, update pressure

@@ -3,38 +3,36 @@
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
 max_step                =   1000         # Max number of time steps
-amrex.fpe_trap_invalid  =   1           # Trap NaNs
+steady_state            =   0          # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-4        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-4     # Use this constant dt if > 0
 incflo.cfl              =   0.40        # CFL factor
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
 amr.plot_int            =   100         # Steps between plot files
-amr.check_int           =   -1          # Steps between checkpoint files
+amr.check_int           =   -1        # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
-amr.plt_eta             =   1           # plot file for eta
+amr.plot_p              =   1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
 incflo.gravity          =   0.  0.  0.  # Gravitational force (3D)
-incflo.ro_0             =   1.          # Reference density 
+incflo.ro_0             =   1.          # Reference density (g/cm3)
 
-incflo.fluid_model      =   "twoMu"     # Rheological model
-incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
+incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
+incflo.mu               =   1.0         # Dynamic viscosity (g/cm*s)
 
-incflo.advect_momentum  = true
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =  16  16  16   # Grid cells at coarsest AMRlevel
-amr.max_level           =   0           # maximum level number allowed
-
+amr.n_cell              =   16   16   16 # Grid cells at coarsest AMRlevel
+amr.max_level           =   0           # Max AMR level in hierarchy 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -42,7 +40,7 @@ amr.max_level           =   0           # maximum level number allowed
 geometry.prob_lo        =   0.  0.  0.  # Lo corner coordinates
 geometry.prob_hi        =   10.  10.  10.  # Hi corner coordinates
 geometry.is_periodic    =   0   1   0   # Periodicity x y z (0/1)
-
+incflo.write_eb_surface =   1
 
 # Boundary conditions
 xlo.type                =   "nsw"
@@ -54,24 +52,15 @@ zlo.velocity            =   0.  5.  0.
 zhi.type                =   "nsw"
 zhi.velocity            =   0.  5.  0.
 
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
-#            Pellet properties          #
-#.......................................#
-prob.npellets           =   1
-prob.pellet_rads        =   2.
-prob.pellet_centx       =   5.
-prob.pellet_centy       =   5.
-prob.pellet_centz       =   5.
-# for twoMu model, incflo.n (n_flow) is used to set viscosity inside pellet
-# it returns mu*pow(10, n_flow);
-incflo.n                =   5     
-prob.density_p          =   1.  
-
+# Add sphere 
+incflo.geometry         =   "sphere"
+sphere.internal_flow    =   false
+sphere.radius           =   2 
+sphere.center           =   5.   5.   5.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
 #.......................................#
-incflo.probtype         =   201
 incflo.ic_u             =   0.0         #
 incflo.ic_v             =   5.0         #
 incflo.ic_w             =   0.0         #
@@ -80,43 +69,16 @@ incflo.ic_p             =   0.0         #
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
 #.......................................#
-#incflo.diffusion_type   =   0           # Defualt is 1 (CN)?
+# incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
+amrex.fpe_trap_invalid  =   1           # Trap NaNs
+# incflo.advection_type   = "Godunov"
+incflo.diffusion_type   =   1           # Defualt is 1 (CN)?
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
 #.......................................#
-incflo.verbose          =   1           # incflo_level
-mac_proj.verbose        =   0           # MAC Projector
-nodal_proj.verbose      =   0           # Nodal Projector
+incflo.verbose           =  1           # incflo_level
+mac_proj.verbose         =  0           # MAC Projector
+nodal_proj.verbose       =  0           # Nodal Projector
 scalar_diffusion.verbose =  0           # Scalar Diffusion
 tensor_diffusion.verbose =  0           # Tensor Diffusion
-
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
-#                EXTRA                  #
-#.......................................#
-# steady_state            =   0           # Steady-state solver? 
-# incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
-# incflo.advection_type   = "Godunov"
-# incflo.diffusion_type   = 0             # Defualt is 1 (CN)?
-#amr.max_grid_size       =   16
-#amr.regrid_int          = 2             # how often to regrid
-#amr.blocking_factor     =   8           # block factor in grid generation
-
-# # Tagging
-# steelmelt.tagged_vars = Specific_heat Temperature
-# steelmelt.Specific_heat_refine = 1e20
-# steelmelt.Specific_heat_refinegrad = 1000
-# steelmelt.Temperature_refine = 1e20
-# steelmelt.Temperature_refinegrad = 100
-
-#0 - periodic
-#1 - Dirichlet
-#2 - Homogenous Neumann
-#3 - Inhomogenous Neumann
-#4 - Robin
-
-# steelmelt.bc_lo = 0 0 0
-# steelmelt.bc_hi = 0 0 0
-
-
-
