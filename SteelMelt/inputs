@@ -2,19 +2,19 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   1000         # Max number of time steps
+max_step                =   1e2         # Max number of time steps
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-4        # Use this constant dt if > 0
-incflo.cfl              =   0.40        # CFL factor
+incflo.fixed_dt         =   1e-8        # Use this constant dt if > 0
+incflo.cfl              =   0.90        # CFL factor
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100         # Steps between plot files
+amr.plot_int            =   10         # Steps between plot files
 amr.check_int           =   -1          # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
@@ -27,14 +27,16 @@ incflo.ro_0             =   1.          # Reference density
 
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
+incflo.n                =   10           # For twoMu, this is eta mu*pow(10, incflo.n)
+# incflo.advect_momentum  = true
 
-incflo.advect_momentum  = true
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
 amr.n_cell              =  16  16  16   # Grid cells at coarsest AMRlevel
+# amr.max_grid_size       =  128
+# amr.regrid_int          =  2             # how often to regrid
 amr.max_level           =   0           # maximum level number allowed
-
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -49,24 +51,16 @@ xlo.type                =   "nsw"
 xlo.velocity            =   0.  5.  0.
 xhi.type                =   "nsw"
 xhi.velocity            =   0.  5.  0.
+
 zlo.type                =   "nsw"
 zlo.velocity            =   0.  5.  0.
 zhi.type                =   "nsw"
 zhi.velocity            =   0.  5.  0.
 
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
-#            Pellet properties          #
-#.......................................#
-prob.npellets           =   1
-prob.pellet_rads        =   2.
-prob.pellet_centx       =   5.
-prob.pellet_centy       =   5.
-prob.pellet_centz       =   5.
-# for twoMu model, incflo.n (n_flow) is used to set viscosity inside pellet
-# it returns mu*pow(10, n_flow);
-incflo.n                =   5     
-prob.density_p          =   1.  
-
+# ylo.type                =   "sw"
+# ylo.velocity            =   0.  0.  0.
+# yhi.type                =   "sw"
+# yhi.velocity            =   0.  0.  0.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
@@ -76,6 +70,20 @@ incflo.ic_u             =   0.0         #
 incflo.ic_v             =   5.0         #
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#            Pellet properties          #
+#.......................................#
+prob.npellets           =   1
+prob.pellet_rads        =   1.
+prob.pellet_centx       =   5.
+prob.pellet_centy       =   5.
+prob.pellet_centz       =   5.
+# for twoMu model, incflo.n (n_flow) is used to set viscosity inside pellet
+# it returns mu*pow(10, n_flow); 
+prob.density_p          =   1.  
+
+
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
@@ -97,9 +105,8 @@ tensor_diffusion.verbose =  0           # Tensor Diffusion
 # steady_state            =   0           # Steady-state solver? 
 # incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
 # incflo.advection_type   = "Godunov"
-# incflo.diffusion_type   = 0             # Defualt is 1 (CN)?
-#amr.max_grid_size       =   16
-#amr.regrid_int          = 2             # how often to regrid
+incflo.diffusion_type    = 1             # Defualt is 1 (CN); 0 is exp. & 2 is impl.
+
 #amr.blocking_factor     =   8           # block factor in grid generation
 
 # # Tagging
