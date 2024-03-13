@@ -2,14 +2,14 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   1e2         # Max number of time steps
+max_step                =   10         # Max number of time steps
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-8        # Use this constant dt if > 0
-incflo.cfl              =   0.90        # CFL factor
+incflo.fixed_dt         =   1e-6        # Use this constant dt if > 0
+incflo.cfl              =   0.40        # CFL factor
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
@@ -27,7 +27,7 @@ incflo.ro_0             =   1.          # Reference density
 
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
-incflo.n                =   10           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.n                =   7           # For twoMu, this is eta mu*pow(10, incflo.n)
 # incflo.advect_momentum  = true
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -36,7 +36,7 @@ incflo.n                =   10           # For twoMu, this is eta mu*pow(10, inc
 amr.n_cell              =  16  16  16   # Grid cells at coarsest AMRlevel
 # amr.max_grid_size       =  128
 # amr.regrid_int          =  2             # how often to regrid
-amr.max_level           =   0           # maximum level number allowed
+amr.max_level           =   2           # maximum level number allowed
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -89,6 +89,7 @@ prob.density_p          =   1.
 #          NUMERICAL PARAMETERS         #
 #.......................................#
 #incflo.diffusion_type   =   0           # Defualt is 1 (CN)?
+amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #

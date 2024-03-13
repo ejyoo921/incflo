@@ -2,19 +2,19 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   1000         # Max number of time steps
+max_step                =   10         # Max number of time steps
 steady_state            =   0          # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-4     # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-6     # Use this constant dt if > 0
 incflo.cfl              =   0.40        # CFL factor
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100         # Steps between plot files
+amr.plot_int            =   10         # Steps between plot files
 amr.check_int           =   -1        # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plot_p              =   1
@@ -31,8 +31,9 @@ incflo.mu               =   1.0         # Dynamic viscosity (g/cm*s)
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   16   16   16 # Grid cells at coarsest AMRlevel
-amr.max_level           =   0           # Max AMR level in hierarchy 
+amr.n_cell              =   16   16  16 # Grid cells at coarsest AMRlevel
+amr.max_level           =   2           # Max AMR level in hierarchy
+amr.regrid_int          =  2            # how often to regrid 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -47,15 +48,17 @@ xlo.type                =   "nsw"
 xlo.velocity            =   0.  5.  0.
 xhi.type                =   "nsw"
 xhi.velocity            =   0.  5.  0.
+
 zlo.type                =   "nsw"
 zlo.velocity            =   0.  5.  0.
 zhi.type                =   "nsw"
 zhi.velocity            =   0.  5.  0.
 
+
 # Add sphere 
 incflo.geometry         =   "sphere"
 sphere.internal_flow    =   false
-sphere.radius           =   2 
+sphere.radius           =   1 
 sphere.center           =   5.   5.   5.
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -72,7 +75,7 @@ incflo.ic_p             =   0.0         #
 # incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 # incflo.advection_type   = "Godunov"
-incflo.diffusion_type   =   1           # Defualt is 1 (CN)?
+$incflo.diffusion_type   =   1           # Defualt is 1 (CN)?
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
