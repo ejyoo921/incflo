@@ -352,7 +352,17 @@ Vector<MultiFab*> incflo::get_density_new () noexcept
     }
     return r;
 }
-
+// EY: store eta (viscosity)
+Vector<MultiFab*> incflo::get_viscosity () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->viscosity));
+    }
+    return r;
+}
+// EY ---------
 Vector<MultiFab*> incflo::get_tracer_old () noexcept
 {
     Vector<MultiFab*> r;
@@ -519,6 +529,17 @@ Vector<MultiFab const*> incflo::get_density_new_const () const noexcept
     r.reserve(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         r.push_back(&(m_leveldata[lev]->density));
+    }
+    return r;
+}
+
+// EY: store eta (viscosity)
+Vector<MultiFab const*> incflo::get_viscosity_const () const noexcept
+{
+    Vector<MultiFab const*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->viscosity));
     }
     return r;
 }

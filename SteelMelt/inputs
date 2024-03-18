@@ -41,7 +41,7 @@ amr.max_grid_size_x     =   128
 amr.max_grid_size_y     =   128
 amr.max_grid_size_z     =   128
 
-incflo.gradetaerr       = 0.1
+incflo.etaerr       = 0.1
 
 # amr.blocking_factor     = 1             #  a power of 2
 

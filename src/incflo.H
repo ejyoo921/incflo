@@ -709,6 +709,9 @@ private:
     amrex::Vector<amrex::MultiFab*> get_tracer_eb () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_new () noexcept;
+    //EY: eta viscosity
+    amrex::Vector<amrex::MultiFab*> get_viscosity () noexcept;
+    //---EY
     amrex::Vector<amrex::MultiFab*> get_tracer_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_new () noexcept;
     amrex::Vector<amrex::MultiFab*> get_mac_phi () noexcept;
@@ -732,6 +735,9 @@ private:
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_eb () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_density_old_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_density_new_const () const noexcept;
+    //EY: eta viscosity
+    [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_viscosity_const () const noexcept;
+    // EY -----
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_old_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_new_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_vel_forces_const () const noexcept;
