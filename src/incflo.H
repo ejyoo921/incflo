@@ -574,6 +574,10 @@ private:
         amrex::MultiFab divtau_o;
         amrex::MultiFab laps;
         amrex::MultiFab laps_o;
+
+        // EY: I ned eta to be stored
+        amrex::MultiFab viscosity;
+
     };
 
     amrex::Vector<std::unique_ptr<LevelData> > m_leveldata;

@@ -569,6 +569,7 @@ void incflo::WritePlotFile()
                                        &m_leveldata[lev]->velocity,
                                        Geom(lev),
                                        m_cur_time, 0);
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->viscosity, 0, icomp, 1, 0);
         }
         pltscaVarsName.push_back("eta");
         ++icomp;

@@ -15,8 +15,12 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
     static bool first = true;
     static Vector<Real> rhoerr_v, gradrhoerr_v;
 
+    // EY: tagging for Steelmake - jump viscosity
+    static Vector<Real> gradetaerr_v;
+
     static bool tag_region;
 
+    // only do this during the first call to ErrorEst
     if (first) {
         first = false;
         ParmParse pp("incflo");
@@ -33,6 +37,13 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
             gradrhoerr_v.resize(max_level+1, last);
         }
 
+        // EY: tagging for Steelmake - jump viscosity
+        pp.queryarr("gradetaerr", gradetaerr_v);
+        if (!gradetaerr_v.empty()) {
+            Real last = gradetaerr_v.back();
+            gradetaerr_v.resize(max_level+1, last);
+        }
+
         tag_region_lo.resize(3);
         tag_region_hi.resize(3);
 
@@ -47,6 +58,8 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
 
     bool tag_rho = lev < rhoerr_v.size();
     bool tag_gradrho = lev < gradrhoerr_v.size();
+    // EY: tagging for Steelmake - jump viscosity
+    bool tag_gradeta = lev < gradetaerr_v.size();
 
     if (tag_gradrho) {
         fillpatch_density(lev, time, m_leveldata[lev]->density, 1);
@@ -64,11 +77,18 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
         Box const& bx = mfi.tilebox();
         auto const& tag = tags.array(mfi);
 
-        if (tag_rho || tag_gradrho)
+        // EY: we may need one more tag here for Steelmaking (|| tag_)
+        if (tag_rho || tag_gradrho || tag_gradeta) 
         {
             Array4<Real const> const& rho = m_leveldata[lev]->density.const_array(mfi);
             Real rhoerr = tag_rho ? rhoerr_v[lev]: std::numeric_limits<Real>::max();
             Real gradrhoerr = tag_gradrho ? gradrhoerr_v[lev] : std::numeric_limits<Real>::max();
+
+            //EY: 
+            Array4<Real const> const& eta = m_leveldata[lev]->viscosity.const_array(mfi);
+            Real gradetaerr = tag_gradeta ? gradetaerr_v[lev] : std::numeric_limits<Real>::max();
+            // EY: Need to implement leveldata for Eta (viscosity) -> done
+            
             amrex::ParallelFor(bx,
             [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
@@ -88,6 +108,23 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
                     Real az = amrex::Math::abs(rho(i,j,k+1) - rho(i,j,k));
                     az = amrex::max(az,amrex::Math::abs(rho(i,j,k) - rho(i,j,k-1)));
                     if (amrex::max(ax,ay,az) >= gradrhoerr) {
+                        tag(i,j,k) = tagval;
+                    }
+#endif
+                }
+                if (tag_gradeta) {
+                    Real ax = amrex::Math::abs(eta(i+1,j,k) - eta(i,j,k));
+                    Real ay = amrex::Math::abs(eta(i,j+1,k) - eta(i,j,k));
+                    ax = amrex::max(ax,amrex::Math::abs(eta(i,j,k) - eta(i-1,j,k)));
+                    ay = amrex::max(ay,amrex::Math::abs(eta(i,j,k) - eta(i,j-1,k)));
+#if (AMREX_SPACEDIM == 2)
+                    if (amrex::max(ax,ay) >= gradetaerr) {
+                        tag(i,j,k) = tagval;
+                    }
+#elif (AMREX_SPACEDIM == 3)
+                    Real az = amrex::Math::abs(rho(i,j,k+1) - rho(i,j,k));
+                    az = amrex::max(az,amrex::Math::abs(rho(i,j,k) - rho(i,j,k-1)));
+                    if (amrex::max(ax,ay,az) >= gradetaerr) {
                         tag(i,j,k) = tagval;
                     }
 #endif
