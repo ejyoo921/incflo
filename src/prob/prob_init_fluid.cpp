@@ -18,6 +18,8 @@ void incflo::prob_init_fluid (int lev)
     ld.density.setVal(m_ro_0);
     ld.density_o.setVal(m_ro_0);
 
+    ld.viscosity.setVal(m_mu);
+
     AMREX_D_TERM(ld.velocity.setVal(m_ic_u, 0, 1);,
                  ld.velocity.setVal(m_ic_v, 1, 1);,
                  ld.velocity.setVal(m_ic_w, 2, 1););
@@ -165,7 +167,7 @@ void incflo::prob_init_fluid (int lev)
         {
             init_steel_melt(vbx, gbx,
                                   ld.velocity.array(mfi),
-                                  ld.density.array(mfi),
+                                  ld.viscosity.array(mfi),
                                   domain, dx, problo, probhi);
 
             amrex::Print() << "CALL PROB-201" << "\n";
@@ -191,7 +193,7 @@ void incflo::prob_init_fluid (int lev)
 //EY: steel-making 
 void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                                   Array4<Real> const& vel,
-                                  Array4<Real> const& density,
+                                  Array4<Real> const& viscosity,
                                   Box const& /*domain*/,
                                   GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                   GpuArray<Real, AMREX_SPACEDIM> const& problo,
@@ -205,10 +207,10 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
     amrex::Vector<amrex::Real> centz;
 
     int npellets = 0;
-    Real density_p = 0.;
+    // Real density_p = 0.;
 
     pp.get("npellets", npellets);
-    pp.get("density_p", density_p);
+    // pp.get("density_p", density_p);
 
     pp.getarr("pellet_rads",  rads);    
     pp.getarr("pellet_centx", centx);
@@ -239,11 +241,17 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
         if (inside_pellet)
         {
             // amrex::Print() << "INSIDE = "<< inside_pellet << "\n";
-            density(i,j,k) = density_p;
+            // density(i,j,k) = density_p;
+            
             // no internal flow
             vel(i,j,k,0) = Real(0.0);
             vel(i,j,k,1) = Real(0.0);
             vel(i,j,k,2) = Real(0.0);
+
+            //Two viscosity
+            viscosity(i,j,k) = m_mu*pow(10, m_n_0);
+            amrex::Print() << "viscosity = " <<viscosity(i,j,k)<< "\n"; 
+
         }
     });
 }

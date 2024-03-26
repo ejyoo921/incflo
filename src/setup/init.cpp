@@ -123,6 +123,7 @@ void incflo::ReadParameters ()
 
         // Viscosity (if constant)
         pp.query("mu", m_mu);
+        pp.query("n", m_n_0);
 
         // Density (if constant)
         pp.query("ro_0", m_ro_0);
@@ -267,9 +268,6 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_w",    m_plt_error_w );
     pp.query("plt_error_p",    m_plt_error_p );
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
-
-    //EY:
-    // pp.query("plt_mu",         m_plt_mu   );
 }
 
 //

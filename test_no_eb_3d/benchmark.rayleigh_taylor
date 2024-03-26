@@ -1,5 +1,5 @@
 
-max_step                = 12
+max_step                = 1
 
 incflo.cfl              = 0.9           # CFL factor
 incflo.init_shrink      = 1.0

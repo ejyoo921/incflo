@@ -2,7 +2,7 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   1000         # Max number of time steps
+max_step                =   100         # Max number of time steps
 steady_state            =   0          # Steady-state solver? 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -32,8 +32,8 @@ incflo.mu               =   1.0         # Dynamic viscosity (g/cm*s)
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
 amr.n_cell              =   16   16  16 # Grid cells at coarsest AMRlevel
-amr.max_level           =  0            # Max AMR level in hierarchy
-amr.regrid_int          =  0            # how often to regrid 
+amr.max_level           =  2            # Max AMR level in hierarchy
+amr.regrid_int          =  2            # how often to regrid 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -53,7 +53,6 @@ zlo.type                =   "nsw"
 zlo.velocity            =   0.  5.  0.
 zhi.type                =   "nsw"
 zhi.velocity            =   0.  5.  0.
-
 
 # Add sphere 
 incflo.geometry         =   "sphere"

@@ -78,6 +78,7 @@ void incflo::fillpatch_density (int lev, Real time, MultiFab& density, int ng)
     }
 }
 
+
 void incflo::fillpatch_tracer (int lev, Real time, MultiFab& tracer, int ng)
 {
     if (m_ntrac <= 0) return;

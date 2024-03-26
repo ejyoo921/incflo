@@ -2,19 +2,19 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   1000         # Max number of time steps
+max_step                =   100         # Max number of time steps
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-6        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-5        # Use this constant dt if > 0
 incflo.cfl              =   0.40        # CFL factor
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100         # Steps between plot files
+amr.plot_int            =   10         # Steps between plot files
 amr.check_int           =   -1          # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
@@ -27,7 +27,7 @@ incflo.ro_0             =   1.          # Reference density
 
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
-incflo.n                =   7           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.n                =   5           # For twoMu, this is eta mu*pow(10, incflo.n)
 # incflo.advect_momentum  = true
 
 
@@ -35,13 +35,12 @@ incflo.n                =   7           # For twoMu, this is eta mu*pow(10, incf
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
 amr.n_cell              =   16  16  16  # Grid cells at coarsest AMRlevel
-amr.max_level           =   1           # Max AMR level in hierarchy 
-amr.grid_eff            =   0.7         # what constitutes an efficient grid
-amr.max_grid_size_x     =   128
-amr.max_grid_size_y     =   128
-amr.max_grid_size_z     =   128
+amr.max_level           =   2           # Max AMR level in hierarchy 
+# amr.grid_eff            =   0.7         # what constitutes an efficient grid
+amr.max_grid_size       =   32
 
-incflo.etaerr       = 0.1
+incflo.etaerr           =  10
+amr.regrid_int          =  2             # how often to regrid
 
 # amr.blocking_factor     = 1             #  a power of 2
 
@@ -50,7 +49,6 @@ incflo.etaerr       = 0.1
 # incflo.tag_region_hi = 0.5 2.
 
 # amr.max_grid_size       =  128
-# amr.regrid_int          =  2             # how often to regrid
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -102,7 +100,7 @@ prob.density_p          =   1.
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
 #.......................................#
-incflo.diffusion_type   =   1           # Defualt is 1 (CN)?
+incflo.diffusion_type   = 1             # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#

@@ -197,7 +197,7 @@ void incflo::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& new_gr
 
     if (m_verbose > 0)
     {
-        amrex::Print() << "Making new level " << lev << " from scratch" << std::endl;
+        amrex::Print() << "incflo: Making new level " << lev << " from scratch" << std::endl;
         if (m_verbose > 2) {
             amrex::Print() << "with BoxArray " << new_grids << std::endl;
         }

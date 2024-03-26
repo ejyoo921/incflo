@@ -12,6 +12,7 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
       velocity_o(ba, dm, AMREX_SPACEDIM, ng_state, MFInfo(), fact),
       velocity_eb(ba, dm, AMREX_SPACEDIM, ng_state, MFInfo(), fact),
       density   (ba, dm, 1             , ng_state, MFInfo(), fact),
+      viscosity (ba, dm, 1             , ng_state, MFInfo(), fact), // EY added
       density_eb(ba, dm, 1             , ng_state, MFInfo(), fact),
       density_o (ba, dm, 1             , ng_state, MFInfo(), fact),
       tracer    (ba, dm, ntrac         , ng_state, MFInfo(), fact),

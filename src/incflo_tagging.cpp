@@ -9,7 +9,8 @@ using namespace amrex;
 // tag cells for refinement
 // overrides the pure virtual function in AmrCore
 void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
-{
+{   
+    amrex::Print() << "EY: ErrorEst begins - INSIDE" << "\n";
     BL_PROFILE("incflo::ErrorEst()");
 
     static bool first = true;
@@ -38,7 +39,7 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
         }
 
         // EY: tagging for Steelmake - jump viscosity---
-                pp.queryarr("etaerr", etaerr_v);
+        pp.queryarr("etaerr", etaerr_v);
         if (!etaerr_v.empty()) {
             Real last = etaerr_v.back();
             etaerr_v.resize(max_level+1, last);
@@ -84,11 +85,12 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
 #ifdef _OPENMP
 #pragma omp parallel if (Gpu::notInLaunchRegion())
 #endif
+
     for (MFIter mfi(m_leveldata[lev]->density,TilingIfNotGPU()); mfi.isValid(); ++mfi)
     {
         Box const& bx = mfi.tilebox();
         auto const& tag = tags.array(mfi);
-
+        
         if (tag_rho || tag_gradrho) 
         {
             Array4<Real const> const& rho = m_leveldata[lev]->density.const_array(mfi);
@@ -165,7 +167,7 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
         }
     }
 
-    // EY: Tagging Eta (viscosity)
+    // // EY: Tagging Eta (viscosity)
     for (MFIter mfi(m_leveldata[lev]->viscosity,TilingIfNotGPU()); mfi.isValid(); ++mfi)
     {
         Box const& bx = mfi.tilebox();
@@ -176,16 +178,18 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
         {
             // //EY: 
             Array4<Real const> const& eta = m_leveldata[lev]->viscosity.const_array(mfi);
-            Real etaerr = tag_rho ? etaerr_v[lev]: std::numeric_limits<Real>::max();
-            Real gradetaerr = tag_gradeta ? gradetaerr_v[lev] : std::numeric_limits<Real>::max();
+            Real etaerr = etaerr_v[lev];
+            // Real gradetaerr = tag_gradeta ? gradetaerr_v[lev] : std::numeric_limits<Real>::max();
             // EY: Need to implement leveldata for Eta (viscosity) -> done
             
             amrex::ParallelFor(bx,
             [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
-                if (tag_gradeta && eta(i,j,k) > etaerr) {
+                if (tag_eta && eta(i,j,k) > etaerr) {
+                    amrex::Print() << "TAGS" << "\n";
                     tag(i,j,k) = tagval;
                 }
+                // Following Todo
 //                 if (tag_gradeta) {
 //                     Real ax = amrex::Math::abs(eta(i+1,j,k) - eta(i,j,k));
 //                     Real ay = amrex::Math::abs(eta(i,j+1,k) - eta(i,j,k));

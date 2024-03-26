@@ -460,58 +460,58 @@ void incflo::ApplyPredictor (bool incremental_projection)
                     });
                 }
                 // EY: Impose zero velocity for inside of pellet
-                if (m_fluid_model == FluidModel::TwoMu)
-                {
-                    amrex::Print() << "Let's impose zero velocity" << "\n";
+                // if (m_fluid_model == FluidModel::TwoMu)
+                // {
+                //     amrex::Print() << "Let's impose zero velocity" << "\n";
 
-                    auto const& dx = geom[lev].CellSizeArray();
-                    amrex::ParmParse pp("prob");
-                    // Extract position and velocities
-                    amrex::Vector<amrex::Real> rads;
-                    amrex::Vector<amrex::Real> centx;
-                    amrex::Vector<amrex::Real> centy;
-                    amrex::Vector<amrex::Real> centz;
+                //     auto const& dx = geom[lev].CellSizeArray();
+                //     amrex::ParmParse pp("prob");
+                //     // Extract position and velocities
+                //     amrex::Vector<amrex::Real> rads;
+                //     amrex::Vector<amrex::Real> centx;
+                //     amrex::Vector<amrex::Real> centy;
+                //     amrex::Vector<amrex::Real> centz;
 
-                    int npellets = 0;
-                    Real density_p = 0.;
+                //     int npellets = 0;
+                //     Real density_p = 0.;
 
-                    pp.get("npellets", npellets);
-                    pp.get("density_p", density_p);
+                //     pp.get("npellets", npellets);
+                //     pp.get("density_p", density_p);
 
-                    pp.getarr("pellet_rads",  rads);    
-                    pp.getarr("pellet_centx", centx);
-                    pp.getarr("pellet_centy", centy);
-                    pp.getarr("pellet_centz", centz);
+                //     pp.getarr("pellet_rads",  rads);    
+                //     pp.getarr("pellet_centx", centx);
+                //     pp.getarr("pellet_centy", centy);
+                //     pp.getarr("pellet_centz", centz);
 
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
-                        Real x = Real(i+0.5)*dx[0];
-                        Real y = Real(j+0.5)*dx[1];
-                        Real z = Real(k+0.5)*dx[2];
+                //     amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                //     {
+                //         Real x = Real(i+0.5)*dx[0];
+                //         Real y = Real(j+0.5)*dx[1];
+                //         Real z = Real(k+0.5)*dx[2];
 
-                        int inside_pellet = 0;
-                        for(int np = 0; np < npellets; np++)
-                        {
+                //         int inside_pellet = 0;
+                //         for(int np = 0; np < npellets; np++)
+                //         {
 
-                            Real dist2 = std::pow(x - centx[np], 2.0)+                
-                                        std::pow(y - centy[np], 2.0)+                
-                                        std::pow(z - centz[np], 2.0); 
+                //             Real dist2 = std::pow(x - centx[np], 2.0)+                
+                //                         std::pow(y - centy[np], 2.0)+                
+                //                         std::pow(z - centz[np], 2.0); 
                             
-                            if(dist2 <= std::pow(rads[np], 2.0))
-                            {              
-                                inside_pellet = 1;
-                                break;
-                            }
-                        }
-                        if (inside_pellet)
-                        {
-                            // no internal flow
-                            vel(i,j,k,0) = Real(0.0);
-                            vel(i,j,k,1) = Real(0.0);
-                            vel(i,j,k,2) = Real(0.0);
-                        }
-                    });
-                }
+                //             if(dist2 <= std::pow(rads[np], 2.0))
+                //             {              
+                //                 inside_pellet = 1;
+                //                 break;
+                //             }
+                //         }
+                //         if (inside_pellet)
+                //         {
+                //             // no internal flow
+                //             vel(i,j,k,0) = Real(0.0);
+                //             vel(i,j,k,1) = Real(0.0);
+                //             vel(i,j,k,2) = Real(0.0);
+                //         }
+                //     });
+                // }
             }
             else if (m_diff_type == DiffusionType::Explicit)
             {
