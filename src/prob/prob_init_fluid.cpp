@@ -168,10 +168,7 @@ void incflo::prob_init_fluid (int lev)
             init_steel_melt(vbx, gbx,
                                   ld.velocity.array(mfi),
                                   ld.viscosity.array(mfi),
-                                  domain, dx, problo, probhi);
-
-            amrex::Print() << "CALL PROB-201" << "\n";
-            
+                                  domain, dx, problo, probhi);            
         }
 #if 0
         else if (500 == m_probtype)
@@ -216,13 +213,14 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
     pp.getarr("pellet_centx", centx);
     pp.getarr("pellet_centy", centy);
     pp.getarr("pellet_centz", centz);
+  
     
 
     amrex::ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
-        Real x = Real(i+0.5)*dx[0];
-        Real y = Real(j+0.5)*dx[1];
-        Real z = Real(k+0.5)*dx[2];
+        Real x = problo[0] + Real(i+0.5)*dx[0];
+        Real y = problo[1] + Real(j+0.5)*dx[1];
+        Real z = problo[2] + Real(k+0.5)*dx[2];
 
         int inside_pellet = 0;
         for(int np = 0; np < npellets; np++)
@@ -232,7 +230,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                          std::pow(y - centy[np], 2.0)+                
                          std::pow(z - centz[np], 2.0); 
             
-            if(dist2 <= std::pow(rads[np], 2.0))
+            if(dist2 < std::pow(rads[np], 2.0))
             {              
                 inside_pellet = 1;
                 break;
@@ -250,7 +248,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
 
             //Two viscosity
             viscosity(i,j,k) = m_mu*pow(10, m_n_0);
-            amrex::Print() << "viscosity = " <<viscosity(i,j,k)<< "\n"; 
+            // amrex::Print() << "viscosity = " <<viscosity(i,j,k)<< "\n"; 
 
         }
     });

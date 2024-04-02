@@ -1,5 +1,5 @@
 #include <incflo.H>
-// //EY
+// EY: We don't have these?
 // #include <ProbParm.H>
 // #include <Prob.H>
 
@@ -141,6 +141,7 @@ void incflo::Evolve()
 
         // Advance to time t + dt
         Advance();
+
         m_nstep++;
         m_cur_time += m_dt;
 

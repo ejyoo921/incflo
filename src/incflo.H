@@ -605,6 +605,10 @@ private:
     amrex::Gpu::DeviceVector<amrex::BCRec> m_bcrec_velocity_d;
     amrex::Vector<amrex::BCRec> m_bcrec_density;
     amrex::Gpu::DeviceVector<amrex::BCRec> m_bcrec_density_d;
+    // EY: viscosity
+    amrex::Vector<amrex::BCRec> m_bcrec_viscosity;
+    amrex::Gpu::DeviceVector<amrex::BCRec> m_bcrec_viscosity_d;
+
     amrex::Vector<amrex::BCRec> m_bcrec_tracer;
     amrex::Gpu::DeviceVector<amrex::BCRec> m_bcrec_tracer_d;
     amrex::Vector<amrex::BCRec> m_bcrec_force;
@@ -756,6 +760,9 @@ private:
 
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_velocity_bcrec () const noexcept { return m_bcrec_velocity; }
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_density_bcrec () const noexcept { return m_bcrec_density; }
+    //EY: Vioscosikkty
+    [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_viscosity_bcrec () const noexcept { return m_bcrec_viscosity; }
+    // --end--EY
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_tracer_bcrec () const noexcept { return m_bcrec_tracer; }
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_force_bcrec () const noexcept { return m_bcrec_force; }
     //
@@ -763,6 +770,10 @@ private:
         return m_bcrec_velocity_d.data(); }
     [[nodiscard]] amrex::BCRec const* get_density_bcrec_device_ptr () const noexcept {
         return m_bcrec_density_d.data(); }
+    // EY viscosity 
+    [[nodiscard]] amrex::BCRec const* get_viscosity_bcrec_device_ptr () const noexcept {
+        return m_bcrec_viscosity_d.data(); }
+    // -end--EY
     [[nodiscard]] amrex::BCRec const* get_tracer_bcrec_device_ptr () const noexcept {
         return m_bcrec_tracer_d.data(); }
     [[nodiscard]] amrex::BCRec const* get_force_bcrec_device_ptr () const noexcept {

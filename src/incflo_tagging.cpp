@@ -10,7 +10,6 @@ using namespace amrex;
 // overrides the pure virtual function in AmrCore
 void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
 {   
-    amrex::Print() << "EY: ErrorEst begins - INSIDE" << "\n";
     BL_PROFILE("incflo::ErrorEst()");
 
     static bool first = true;
@@ -50,8 +49,8 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
             Real last = gradetaerr_v.back();
             gradetaerr_v.resize(max_level+1, last);
         }
-        // ----EY
 
+        // ----EY: More TODO
         tag_region_lo.resize(3);
         tag_region_hi.resize(3);
 
@@ -66,16 +65,15 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
 
     bool tag_rho = lev < rhoerr_v.size();
     bool tag_gradrho = lev < gradrhoerr_v.size();
+    if (tag_gradrho) {
+        fillpatch_density(lev, time, m_leveldata[lev]->density, 1);
+    }
 
     // EY: tagging for Steelmake - jump viscosity
     bool tag_eta = lev < etaerr_v.size();
     bool tag_gradeta = lev < gradetaerr_v.size();
-
-    if (tag_gradrho) {
-        fillpatch_density(lev, time, m_leveldata[lev]->density, 1);
-    }
     // if (tag_gradeta) {
-    //     fillpatch_density(lev, time, m_leveldata[lev]->viscosity, 1);
+    //     fillpatch_viscosity(lev, time, m_leveldata[lev]->viscosity, 1);
     // }
 
     AMREX_D_TERM(const Real l_dx = geom[lev].CellSize(0);,
@@ -177,36 +175,35 @@ void incflo::ErrorEst (int lev, TagBoxArray& tags, Real time, int /*ngrow*/)
         if (tag_eta || tag_gradeta) 
         {
             // //EY: 
-            Array4<Real const> const& eta = m_leveldata[lev]->viscosity.const_array(mfi);
-            Real etaerr = etaerr_v[lev];
-            // Real gradetaerr = tag_gradeta ? gradetaerr_v[lev] : std::numeric_limits<Real>::max();
+            Array4<Real const> eta = m_leveldata[lev]->viscosity.const_array(mfi);
+            Real etaerr = tag_eta ? etaerr_v[lev]: std::numeric_limits<Real>::max();
+            Real gradetaerr = tag_gradeta ? gradetaerr_v[lev] : std::numeric_limits<Real>::max();
             // EY: Need to implement leveldata for Eta (viscosity) -> done
-            
             amrex::ParallelFor(bx,
             [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
                 if (tag_eta && eta(i,j,k) > etaerr) {
-                    amrex::Print() << "TAGS" << "\n";
                     tag(i,j,k) = tagval;
                 }
-                // Following Todo
-//                 if (tag_gradeta) {
-//                     Real ax = amrex::Math::abs(eta(i+1,j,k) - eta(i,j,k));
-//                     Real ay = amrex::Math::abs(eta(i,j+1,k) - eta(i,j,k));
-//                     ax = amrex::max(ax,amrex::Math::abs(eta(i,j,k) - eta(i-1,j,k)));
-//                     ay = amrex::max(ay,amrex::Math::abs(eta(i,j,k) - eta(i,j-1,k)));
-// #if (AMREX_SPACEDIM == 2)
-//                     if (amrex::max(ax,ay) >= gradetaerr) {
-//                         tag(i,j,k) = tagval;
-//                     }
-// #elif (AMREX_SPACEDIM == 3)
-//                     Real az = amrex::Math::abs(eta(i,j,k+1) - eta(i,j,k));
-//                     az = amrex::max(az,amrex::Math::abs(eta(i,j,k) - eta(i,j,k-1)));
-//                     if (amrex::max(ax,ay,az) >= gradetaerr) {
-//                         tag(i,j,k) = tagval;
-//                     }
-// #endif
-//                 }
+                if (tag_gradeta) {
+                    Real ax = amrex::Math::abs(eta(i+1,j,k) - eta(i,j,k));
+                    Real ay = amrex::Math::abs(eta(i,j+1,k) - eta(i,j,k));
+                    ax = amrex::max(ax,amrex::Math::abs(eta(i,j,k) - eta(i-1,j,k)));
+                    ay = amrex::max(ay,amrex::Math::abs(eta(i,j,k) - eta(i,j-1,k)));
+#if (AMREX_SPACEDIM == 2)
+                    if (amrex::max(ax,ay) >= gradetaerr) {
+                        tag(i,j,k) = tagval;
+                    }
+#elif (AMREX_SPACEDIM == 3)
+                    Real az = amrex::Math::abs(eta(i,j,k+1) - eta(i,j,k));
+                    az = amrex::max(az,amrex::Math::abs(eta(i,j,k) - eta(i,j,k-1)));
+                    
+                    if (amrex::max(ax,ay,az) >= gradetaerr)
+                    {
+                        tag(i,j,k) = tagval;
+                    }
+#endif
+                }
             });
         }
 
