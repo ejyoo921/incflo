@@ -2,7 +2,7 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   100         # Max number of time steps
+max_step                =   1000000         # Max number of time steps
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
