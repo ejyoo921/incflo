@@ -70,3 +70,5 @@ test/chk*/
 **/chk*/
 **/**.vtr
 **/box_zoom.*
+**/*.pvsm
+**/paraview_data*

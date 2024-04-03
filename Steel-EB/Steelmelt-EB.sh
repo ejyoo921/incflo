@@ -6,7 +6,7 @@ mpi_ranks=8
 
 # pelec_nompi="${paren}/incflo3d.gnu.EB.ex"
 
-res=( 32 ) # Select the res == n_cell you want
+res=( 64 ) # Select the res == n_cell you want
 for i in "${res[@]}"
 do
     rm -rf "${i}"

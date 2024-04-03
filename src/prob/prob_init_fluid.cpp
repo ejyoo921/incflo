@@ -230,7 +230,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                          std::pow(y - centy[np], 2.0)+                
                          std::pow(z - centz[np], 2.0); 
             
-            if(dist2 < std::pow(rads[np], 2.0))
+            if(dist2 <= std::pow(rads[np], 2.0))
             {              
                 inside_pellet = 1;
                 break;
