@@ -2,7 +2,7 @@
 #            SIMULATION STOP            #
 #.......................................#
 stop_time               =   -1          # Max (simulated) time to evolve
-max_step                =   2000000     # Max number of time steps
+max_step                =   1000000     # Max number of time steps
 amrex.fpe_trap_invalid  =   1           # Trap NaNs
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -14,7 +14,7 @@ incflo.cfl              =   0.40        # CFL factor
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100        # Steps between plot files
+amr.plot_int            =   10000       # Steps between plot files
 amr.check_int           =   -1          # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
@@ -27,7 +27,7 @@ incflo.ro_0             =   1.          # Reference density
 
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
-incflo.n                =   6           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.n                =   5           # For twoMu, this is eta mu*pow(10, incflo.n)
 incflo.zero_vel         =   1           # 0: no / 1: yes
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -85,7 +85,6 @@ prob.density_p          =   1.
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
 #.......................................#
-amrex.fpe_trap_invalid  =   1           # Trap NaNs
 incflo.diffusion_type   =   1           # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -103,7 +102,7 @@ tensor_diffusion.verbose =  0           # Tensor Diffusion
 # steady_state            =   0           # Steady-state solver? 
 # incflo.steady_state_tol =   1.e-8       # Tolerance for steady-state
 # incflo.advection_type   = "Godunov"
-#incflo.diffusion_type    = 1             # Defualt is 1 (CN); 0 is exp. & 2 is impl.
+# incflo.diffusion_type    = 2             # Defualt is 1 (CN); 0 is exp. & 2 is impl.
 # incflo.advect_momentum  = true
 # amr.grid_eff            =   0.7         # what constitutes an efficient grid
 
