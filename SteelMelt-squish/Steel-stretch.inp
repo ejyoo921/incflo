@@ -14,7 +14,7 @@ incflo.cfl              =   0.40        # CFL factor
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100       # Steps between plot files
+amr.plot_int            =   10        # Steps between plot files
 amr.check_int           =   100          # Steps between checkpoint files
 #amr.restart             =   "chk09000"  # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
@@ -28,7 +28,7 @@ incflo.ro_0             =   1.          # Reference density
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
 incflo.n                =   5           # For twoMu, this is eta mu*pow(10, incflo.n)
-incflo.zero_vel         =   1           # 0: no / 1: yes
+incflo.zero_vel         =   0           # 0: no / 1: yes
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
@@ -49,7 +49,7 @@ incflo.gradetaerr       =  100
 #.......................................#
 geometry.prob_lo        =  -5. -5. -5.  # Lo corner coordinates
 geometry.prob_hi        =   5.  5.  5.  # Hi corner coordinates
-geometry.is_periodic    =   0   1   0   # Periodicity x y z (0/1)
+geometry.is_periodic    =   0   0   0   # Periodicity x y z (0/1)
 
 
 # Boundary conditions
@@ -57,6 +57,11 @@ xlo.type                =   "sw"
 xlo.velocity            =   0.  5.  0.
 xhi.type                =   "sw"
 xhi.velocity            =   0.  -5.  0. 
+
+ylo.type                =   "sw"
+ylo.velocity            =   0.  5.  0.
+yhi.type                =   "sw"
+yhi.velocity            =   0.  -5.  0. 
 
 zlo.type                =   "sw"
 zlo.velocity            =   0.  5.  0.
