@@ -1,4 +1,5 @@
 #ifndef INCFLO_H_
+#define INCFLO_H_
 
 #include <AMReX_AmrCore.H>
 #include <AMReX_MultiFabUtil.H>
@@ -13,16 +14,16 @@
 #include <AMReX_EBMultiFabUtil.H>
 #endif
 
+#ifdef INCFLO_USE_PARTICLES
+#include "ParticleData.H"
+#endif
+
 #include <DiffusionTensorOp.H>
 #include <DiffusionScalarOp.H>
 
-// //EY: steel-making
-// #include <ProbParm.H>
-// #include <Prob.H>
-// #include <string>
-// #include <limits>
-// #include <memory>
-// #include <Constants.H>
+enum struct StepType {
+    Predictor, Corrector
+};
 
 class incflo : public amrex::AmrCore
 {
@@ -89,8 +90,6 @@ public:
     // Delete level data
     void ClearLevel (int lev) override;
 
-// for cuda
-
     void ComputeDt (int initialization, bool explicit_diffusion);
 
     amrex::Real vol_wgt_sum (amrex::Vector<amrex::MultiFab*> const& mf, int icomp);
@@ -118,7 +117,12 @@ public:
     //
     ///////////////////////////////////////////////////////////////////////////
 
-    void set_inflow_velocity (int lev, amrex::Real time, amrex::MultiFab& vel, int nghost);
+    std::unique_ptr<amrex::iMultiFab> make_BC_MF (int lev,
+                                                  amrex::Gpu::DeviceVector<amrex::BCRec> const& bcs,
+                                                  std::string const& field);
+    amrex::iMultiFab make_nodalBC_mask (int lev);
+    amrex::Vector<amrex::MultiFab> make_robinBC_MFs(int lev, amrex::MultiFab* state = nullptr);
+
 #ifdef AMREX_USE_EB
     void set_eb_velocity (int lev, amrex::Real time, amrex::MultiFab& eb_vel, int nghost);
     void set_eb_density (int lev, amrex::Real time, amrex::MultiFab& eb_density, int nghost);
@@ -131,8 +135,8 @@ public:
     //
     ///////////////////////////////////////////////////////////////////////////
 
-    void ApplyPredictor(bool incremental_projection = false);
-    void ApplyCorrector();
+    void ApplyPredictor (bool incremental_projection = false);
+    void ApplyCorrector ();
     void compute_convective_term (amrex::Vector<amrex::MultiFab*> const& conv_u,
                                   amrex::Vector<amrex::MultiFab*> const& conv_r,
                                   amrex::Vector<amrex::MultiFab*> const& conv_t,
@@ -155,17 +159,29 @@ public:
                                   amrex::Vector<amrex::MultiFab*> const& vel_forces,
                                   amrex::Real time);
 
+    void tracer_explicit_update(amrex::Vector<amrex::MultiFab> const& tra_forces);
+    void tracer_explicit_update_corrector(amrex::Vector<amrex::MultiFab> const& tra_forces);
+
+    void update_density  (StepType step_type);
+    void update_tracer   (StepType step_type, amrex::Vector<amrex::MultiFab>& tra_eta,
+                                              amrex::Vector<amrex::MultiFab>& tra_forces);
+    void update_velocity (StepType step_type, amrex::Vector<amrex::MultiFab>& vel_eta,
+                                              amrex::Vector<amrex::MultiFab>& vel_forces);
+
     ///////////////////////////////////////////////////////////////////////////
     //
     // derive
     //
     ///////////////////////////////////////////////////////////////////////////
 
-    void ComputeVorticity (int lev, amrex::Real time, amrex::MultiFab& vort,
-                           amrex::MultiFab const& vel);
+#ifndef AMREX_USE_EB
+    static
+#endif
+    void ComputeMagVel    (int lev, amrex::Real time, amrex::MultiFab& magvel, amrex::MultiFab const& vel);
+    void ComputeVorticity (int lev, amrex::Real time, amrex::MultiFab&   vort, amrex::MultiFab const& vel);
     void ComputeDivU (amrex::Real time);
     void ComputeDrag ();
-    [[nodiscard]] static amrex::Real ComputeKineticEnergy () ;
+    [[nodiscard]] static amrex::Real ComputeKineticEnergy ();
 
     void DiffFromExact (int lev, amrex::Geometry& lev_geom, amrex::Real time, amrex::Real dt,
                         amrex::MultiFab& error, int soln_comp, int err_comp) const;
@@ -200,7 +216,6 @@ public:
 
     void compute_laps (amrex::Vector<amrex::MultiFab      *> const& laps,
                        amrex::Vector<amrex::MultiFab const*> const& scalar,
-                       amrex::Vector<amrex::MultiFab const*> const& density,
                        amrex::Vector<amrex::MultiFab const*> const& eta);
 
     void diffuse_scalar (amrex::Vector<amrex::MultiFab      *> const& scalar,
@@ -219,8 +234,20 @@ public:
     ///////////////////////////////////////////////////////////////////////////
 
     void prob_init_fluid (int lev);
-    void prob_set_inflow_velocity (int grid_id, amrex::Orientation ori, amrex::Box const& bx,
-                                   amrex::Array4<amrex::Real> const& v, int lev, amrex::Real time);
+    void prob_set_BC_MF (amrex::Orientation const& ori, amrex::Box const& bx,
+                         amrex::Array4<int> const& mask, int lev,
+                         int inflow_val, int outflow_val, std::string const& field);
+    void prob_set_MAC_robinBCs (amrex::Orientation const& ori, amrex::Box const& bx,
+                                amrex::Array4<amrex::Real> const& robin_a,
+                                amrex::Array4<amrex::Real> const& robin_b,
+                                amrex::Array4<amrex::Real> const& robin_f,
+                                int lev);
+    void prob_set_diffusion_robinBCs (amrex::Orientation const& ori, amrex::Box const& bx,
+                                      amrex::Array4<amrex::Real> const& robin_a,
+                                      amrex::Array4<amrex::Real> const& robin_b,
+                                      amrex::Array4<amrex::Real> const& robin_f,
+                                      amrex::Array4<amrex::Real const> const& bcval,
+                                      int lev);
 
 #include "incflo_prob_I.H"
 #include "incflo_prob_usr_I.H"
@@ -235,6 +262,11 @@ public:
                          amrex::Real time, amrex::Real scaling_factor, bool incremental);
     void ApplyNodalProjection(amrex::Vector<amrex::MultiFab const*> density,
                               amrex::Real time, amrex::Real scaling_factor, bool incremental);
+    void ApplyNodalProjection(amrex::Vector<amrex::MultiFab const*> const& density,
+                              amrex::Vector<amrex::MultiFab      *>        vel,
+                              amrex::Vector<amrex::MultiFab      *> const& divu_Source,
+                              amrex::Real time, amrex::Real scaling_factor, bool incremental,
+                              bool set_inflow_bc);
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -284,11 +316,7 @@ public:
 
     static bool SteadyStateReached ();
 
-    // //EY: additional pointers for steel-making
-    // static ProbParm* h_prob_parm;
-    // static ProbParm* d_prob_parm;
-    // amrex::Vector<std::string> allvarnames;
-
+    void InitialPressureProjection ();
 
 private:
 
@@ -330,9 +358,11 @@ private:
     amrex::Real m_cfl = amrex::Real(0.5);
     amrex::Real m_fixed_dt = amrex::Real(-1.);
     amrex::Real m_init_shrink = amrex::Real(0.1);
+    amrex::Real m_dt_change_max = amrex::Real(1.1);
 
     // Initial projection / iterations
-    bool m_do_initial_proj    = true;
+    bool m_do_initial_proj          = true;
+    bool m_do_initial_pressure_proj = false;
     int  m_initial_iterations = 3;
 
     // Use Boussinesq approximation for buoyancy?
@@ -345,6 +375,7 @@ private:
     bool use_tensor_correction = false;
 
     // AMR / refinement settings
+    int m_refine_particles = 1;
     int m_refine_cutcells = 1;
     int m_regrid_int = -1;
 
@@ -506,6 +537,7 @@ private:
     std::string m_tag_file;
 
     bool m_plotfile_on_restart = false;
+    bool m_regrid_on_restart = false;
 
     amrex::Vector<amrex::Real> tag_region_lo;
     amrex::Vector<amrex::Real> tag_region_hi;
@@ -522,6 +554,7 @@ private:
     int m_plt_p_nd        = 0;
     int m_plt_macphi      = 0;
     int m_plt_eta         = 0;
+    int m_plt_magvel      = 1;
     int m_plt_vort        = 1;
     int m_plt_forcing     = 0;
     int m_plt_strainrate  = 0;
@@ -535,15 +568,38 @@ private:
 
     //EY: Additional flag for dynamic viscosity
     // int m_plt_mu         = 1;
+#ifdef INCFLO_USE_PARTICLES
+    int m_plt_particle_count = 0;
+
+    // Particle container with all particle species
+    ParticleData particleData;
+
+    // variables and functions for tracers particles
+    bool  m_use_tracer_particles; /*!< tracer particles that advect with flow */
+
+    /*! Read tracer particles parameters */
+    void readTracerParticlesParams ();
+
+    /*! Initialize tracer particles */
+    void initializeTracerParticles (amrex::ParGDBBase* gdb
+#ifdef AMREX_USE_EB
+                                   ,amrex::EBFArrayBoxFactory const& ebfact
+#endif
+                                   );
+
+    /*! Evolve tracers and hydro particles */
+    void evolveTracerParticles (AMREX_D_DECL(amrex::Vector<amrex::MultiFab const*> const& u_mac,
+                                             amrex::Vector<amrex::MultiFab const*> const& v_mac,
+                                             amrex::Vector<amrex::MultiFab const*> const& w_mac));
+
+#endif
 
     struct LevelData {
         LevelData () = default;
         LevelData (amrex::BoxArray const& ba,
                    amrex::DistributionMapping const& dm,
                    amrex::FabFactory<amrex::FArrayBox> const& fact,
-                   int ntrac, int ng_state,
-                   const std::string& advection_type, bool implicit_diffusion,
-                   bool use_tensor_correction, bool advect_tracer);
+                   incflo* my_incflo);
         // cell-centered multifabs
         amrex::MultiFab velocity;
         amrex::MultiFab velocity_o;
@@ -551,6 +607,7 @@ private:
         amrex::MultiFab density;
         amrex::MultiFab density_eb;
         amrex::MultiFab density_o;
+        amrex::MultiFab density_nph;
         amrex::MultiFab tracer;
         amrex::MultiFab tracer_eb;
         amrex::MultiFab tracer_o;
@@ -586,8 +643,10 @@ private:
 
     enum struct BC {
         pressure_inflow, pressure_outflow, mass_inflow, no_slip_wall, slip_wall,
-        periodic, undefined
+        periodic, mixed, undefined
     };
+
+    bool m_has_mixedBC = false;
 
     amrex::GpuArray<BC                         , AMREX_SPACEDIM*2> m_bc_type;
     amrex::GpuArray<amrex::Real                , AMREX_SPACEDIM*2> m_bc_pressure;
@@ -716,6 +775,7 @@ private:
     //EY: eta viscosity
     amrex::Vector<amrex::MultiFab*> get_viscosity () noexcept;
     //---EY
+    amrex::Vector<amrex::MultiFab*> get_density_nph () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_new () noexcept;
     amrex::Vector<amrex::MultiFab*> get_mac_phi () noexcept;
@@ -742,6 +802,7 @@ private:
     //EY: eta viscosity
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_viscosity_const () const noexcept;
     // EY -----
+    [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_density_nph_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_old_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_new_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_vel_forces_const () const noexcept;

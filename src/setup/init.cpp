@@ -23,18 +23,22 @@ void incflo::ReadParameters ()
 #ifdef AMREX_USE_EB
         pp.query("refine_cutcells", m_refine_cutcells);
 #endif
-        pp.query("KE_int", m_KE_int); //EY: Is this working?
+#ifdef INCFLO_USE_PARTICLES
+        pp.query("refine_particles", m_refine_particles);
+#endif
+        pp.query("KE_int", m_KE_int);
 
     } // end prefix amr
 
     { // Prefix incflo
-    ParmParse pp("incflo");
+        ParmParse pp("incflo");
 
         pp.query("verbose", m_verbose);
 
         pp.query("steady_state_tol", m_steady_state_tol);
         pp.query("initial_iterations", m_initial_iterations);
         pp.query("do_initial_proj", m_do_initial_proj);
+        pp.query("do_initial_pressure_proj", m_do_initial_pressure_proj);
 
         pp.query("fixed_dt", m_fixed_dt);
         pp.query("cfl", m_cfl);
@@ -43,6 +47,12 @@ void incflo::ReadParameters ()
         pp.query("init_shrink", m_init_shrink);
         if (m_init_shrink > 1.0) {
             amrex::Abort("We require m_init_shrink <= 1.0");
+        }
+
+        // This limits dt growth per time step
+        pp.query("dt_change_max", m_dt_change_max);
+        if ( m_dt_change_max < 1.0 || m_dt_change_max > 1.1 ) {
+            amrex::Abort("We require 1. < dt_change_max <= 1.1");
         }
 
         // Physics
@@ -192,6 +202,10 @@ void incflo::ReadParameters ()
        }
     } // end prefix eb_flow
 #endif
+
+#ifdef INCFLO_USE_PARTICLES
+    readTracerParticlesParams();
+#endif
 }
 
 void incflo::ReadIOParameters()
@@ -204,6 +218,7 @@ void incflo::ReadIOParameters()
     pp.query("restart", m_restart_file);
 
     pp.query("plotfile_on_restart", m_plotfile_on_restart);
+    pp.query("regrid_on_restart", m_regrid_on_restart);
 
     pp.query("plot_file", m_plot_file);
     pp.query("plot_int"       , m_plot_int);
@@ -234,11 +249,15 @@ void incflo::ReadIOParameters()
         m_plt_macphi     = 0;
         m_plt_eta        = 0;
         m_plt_vort       = 0;
+        m_plt_magvel     = 0;
         m_plt_strainrate = 0;
         m_plt_divu       = 0;
         m_plt_vfrac      = 0;
         //EY: Additional viscosity plot flie
         int m_plt_mu     = 0;
+#ifdef INCFLO_USE_PARTICLES
+        m_plt_particle_count = 1;
+#endif
     }
 
     // Which variables to write to plotfile
@@ -256,6 +275,7 @@ void incflo::ReadIOParameters()
     pp.query("plt_p_nd",       m_plt_p_nd  );
     pp.query("plt_macphi",     m_plt_macphi);
     pp.query("plt_eta",        m_plt_eta   );
+    pp.query("plt_magvel",     m_plt_magvel);
     pp.query("plt_vort",       m_plt_vort  );
     pp.query("plt_strainrate", m_plt_strainrate);
     pp.query("plt_divu",       m_plt_divu  );
@@ -268,6 +288,10 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_w",    m_plt_error_w );
     pp.query("plt_error_p",    m_plt_error_p );
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
+
+#ifdef INCFLO_USE_PARTICLES
+    pp.query("plt_particle_count", m_plt_particle_count );
+#endif
 }
 
 //
@@ -325,26 +349,6 @@ void incflo::InitialProjection()
 {
     BL_PROFILE("incflo::InitialProjection()");
 
-    // *************************************************************************************
-    // Allocate space for the temporary MAC velocities
-    // *************************************************************************************
-    Vector<MultiFab> u_mac_tmp(finest_level+1), v_mac_tmp(finest_level+1), w_mac_tmp(finest_level+1);
-    int ngmac = nghost_mac();
-
-    for (int lev = 0; lev <= finest_level; ++lev) {
-        AMREX_D_TERM(u_mac_tmp[lev].define(amrex::convert(grids[lev],IntVect::TheDimensionVector(0)), dmap[lev],
-                          1, ngmac, MFInfo(), Factory(lev));,
-                     v_mac_tmp[lev].define(amrex::convert(grids[lev],IntVect::TheDimensionVector(1)), dmap[lev],
-                          1, ngmac, MFInfo(), Factory(lev));,
-                     w_mac_tmp[lev].define(amrex::convert(grids[lev],IntVect::TheDimensionVector(2)), dmap[lev],
-                          1, ngmac, MFInfo(), Factory(lev)););
-        if (ngmac > 0) {
-            AMREX_D_TERM(u_mac_tmp[lev].setBndry(0.0);,
-                         v_mac_tmp[lev].setBndry(0.0);,
-                         w_mac_tmp[lev].setBndry(0.0););
-        }
-    }
-
     Real dummy_dt = 1.0;
     bool incremental = false;
     for (int lev = 0; lev <= finest_level; lev++)
@@ -359,6 +363,63 @@ void incflo::InitialProjection()
         m_leveldata[lev]->p_nd.setVal(0.0);
         m_leveldata[lev]->gp.setVal(0.0);
     }
+}
+
+// Project to enforce hydrostatic equilibrium
+void incflo::InitialPressureProjection()
+{
+    BL_PROFILE("incflo::InitialPressureProjection()");
+
+    if (m_verbose > 0) { Print() << " Initial pressure projection \n"; }
+
+    Real dummy_dt = 1.0;
+    int  nGhost = 1;
+
+    // fixme??? are density ghosts fill already???
+    //I think we only need to worry about this if doing outflow bcs...
+    for (int lev = 0; lev <= finest_level; lev++)
+    {
+        m_leveldata[lev]->density.FillBoundary(geom[lev].periodicity());
+    }
+
+    // Set the velocity to the gravity field
+    Vector<MultiFab> vel(finest_level + 1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        vel[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, nGhost,
+                        MFInfo(), *m_factory[lev]);
+
+        for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
+            vel[lev].setVal(m_gravity[idim], idim, 1, 1);
+        }
+
+        auto& ld = *m_leveldata[lev];
+
+        Real rho0 = m_ro_0;
+        if (rho0 > 0.0) {
+            for (MFIter mfi(ld.density,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+            {
+                Box const& bx = mfi.growntilebox(1);
+                Array4<Real const> const& rho_arr = ld.density.const_array(mfi);
+                Array4<Real      > const& vel_arr = vel[lev].array(mfi);
+
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                {
+                    Real rhofac = (rho_arr(i,j,k) - rho0) / rho_arr(i,j,k);
+                    AMREX_D_TERM(vel_arr(i,j,k,0) *= rhofac;,
+                                 vel_arr(i,j,k,1) *= rhofac;,
+                                 vel_arr(i,j,k,2) *= rhofac;);
+                });
+            } // mfi
+        } // rho0
+    } // lev
+
+    // Cell-centered divergence condition source term
+    // Always zero this here
+    Vector<MultiFab*> Source(finest_level+1, nullptr);
+
+    ApplyNodalProjection(get_density_new_const(), GetVecOfPtrs(vel), Source,
+                         m_cur_time, dummy_dt, false /*incremental*/,
+                         true /*set_inflow_bc*/);
 }
 
 #ifdef AMREX_USE_EB
@@ -378,23 +439,20 @@ incflo::InitialRedistribution ()
         // We also need any physical boundary conditions imposed if we are
         //    calling state redistribution (because that calls the slope routine)
 
-        EB_set_covered(ld.velocity, 0, AMREX_SPACEDIM, ld.velocity.nGrow(), 0.0);
         ld.velocity.FillBoundary(geom[lev].periodicity());
         MultiFab::Copy(ld.velocity_o, ld.velocity, 0, 0, AMREX_SPACEDIM, ld.velocity.nGrow());
         fillpatch_velocity(lev, m_t_new[lev], ld.velocity_o, 3);
 
         if (!m_constant_density)
         {
-            EB_set_covered(ld.density, 0, 1, ld.density.nGrow(), 0.0);
             ld.density.FillBoundary(geom[lev].periodicity());
             MultiFab::Copy(ld.density_o, ld.density, 0, 0, 1, ld.density.nGrow());
             fillpatch_density(lev, m_t_new[lev], ld.density_o, 3);
         }
         if (m_advect_tracer)
         {
-            EB_set_covered(ld.tracer, 0, m_ntrac, ld.tracer.nGrow(), 0.0);
             ld.tracer.FillBoundary(geom[lev].periodicity());
-            MultiFab::Copy(ld.tracer_o, ld.tracer, 0, 0, 1, ld.tracer.nGrow());
+            MultiFab::Copy(ld.tracer_o, ld.tracer, 0, 0, m_ntrac, ld.tracer.nGrow());
             fillpatch_tracer(lev, m_t_new[lev], ld.tracer_o, 3);
         }
 

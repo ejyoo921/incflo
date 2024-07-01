@@ -57,10 +57,9 @@ incflo::compute_divtau(Vector<MultiFab      *> const& divtau,
 void
 incflo::compute_laps(Vector<MultiFab      *> const& laps,
                      Vector<MultiFab const*> const& scalar,
-                     Vector<MultiFab const*> const& density,
                      Vector<MultiFab const*> const& eta)
 {
-    get_diffusion_scalar_op()->compute_laps(laps, scalar, density, eta);
+    get_diffusion_scalar_op()->compute_laps(laps, scalar, eta);
 }
 
 void
@@ -193,6 +192,13 @@ incflo::get_diffuse_velocity_bc (Orientation::Side side, int comp) const noexcep
                 r[dir][dir] = LinOpBCType::Dirichlet;
                 break;
             }
+            case BC::mixed:
+            {
+                AMREX_D_TERM(r[0][dir] = LinOpBCType::Robin;,
+                             r[1][dir] = LinOpBCType::Robin;,
+                             r[2][dir] = LinOpBCType::Robin;);
+                break;
+            }
             default:
                 amrex::Abort("get_diffuse_tensor_bc: undefined BC type");
             };
@@ -235,6 +241,11 @@ incflo::get_diffuse_scalar_bc (Orientation::Side side) const noexcept
             case BC::mass_inflow:
             {
                 r[dir] = LinOpBCType::Dirichlet;
+                break;
+            }
+            case BC::mixed:
+            {
+                r[dir] = LinOpBCType::Robin;
                 break;
             }
             default:
@@ -314,14 +325,14 @@ incflo::fixup_eta_on_domain_faces (int lev, Array<MultiFab,AMREX_SPACEDIM>& fc,
         if (!gm.isPeriodic(idim)) {
             Array4<Real> const& fca = fc[idim].array(mfi);
             if (bx.smallEnd(idim) == domain.smallEnd(idim)) {
-                amrex::ParallelFor(amrex::bdryLo(bx, idim),
+                ParallelFor(amrex::bdryLo(bx, idim),
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     fca(i,j,k) = cca(i,j,k);
                 });
             }
             if (bx.bigEnd(idim) == domain.bigEnd(idim)) {
-                amrex::ParallelFor(amrex::bdryHi(bx, idim),
+                ParallelFor(amrex::bdryHi(bx, idim),
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     fca(i,j,k) = cca(i-1,j,k);
@@ -333,14 +344,14 @@ incflo::fixup_eta_on_domain_faces (int lev, Array<MultiFab,AMREX_SPACEDIM>& fc,
         if (!gm.isPeriodic(idim)) {
             Array4<Real> const& fca = fc[idim].array(mfi);
             if (bx.smallEnd(idim) == domain.smallEnd(idim)) {
-                amrex::ParallelFor(amrex::bdryLo(bx, idim),
+                ParallelFor(amrex::bdryLo(bx, idim),
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     fca(i,j,k) = cca(i,j,k);
                 });
             }
             if (bx.bigEnd(idim) == domain.bigEnd(idim)) {
-                amrex::ParallelFor(amrex::bdryHi(bx, idim),
+                ParallelFor(amrex::bdryHi(bx, idim),
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     fca(i,j,k) = cca(i,j-1,k);
@@ -353,14 +364,14 @@ incflo::fixup_eta_on_domain_faces (int lev, Array<MultiFab,AMREX_SPACEDIM>& fc,
         if (!gm.isPeriodic(idim)) {
             Array4<Real> const& fca = fc[idim].array(mfi);
             if (bx.smallEnd(idim) == domain.smallEnd(idim)) {
-                amrex::ParallelFor(amrex::bdryLo(bx, idim),
+                ParallelFor(amrex::bdryLo(bx, idim),
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     fca(i,j,k) = cca(i,j,k);
                 });
             }
             if (bx.bigEnd(idim) == domain.bigEnd(idim)) {
-                amrex::ParallelFor(amrex::bdryHi(bx, idim),
+                ParallelFor(amrex::bdryHi(bx, idim),
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
                     fca(i,j,k) = cca(i,j,k-1);
