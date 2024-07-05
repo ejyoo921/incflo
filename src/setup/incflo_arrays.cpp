@@ -11,7 +11,7 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
       velocity_eb (ba, dm, AMREX_SPACEDIM, my_incflo->nghost_state(), MFInfo(), fact),
 
       density     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
-      viscosity (ba, dm, 1             , ng_state, MFInfo(), fact), // EY added
+      viscosity   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
       density_eb  (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_o   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_nph (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),

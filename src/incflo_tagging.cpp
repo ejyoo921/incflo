@@ -74,7 +74,7 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
     bool tag_eta = levc < etaerr_v.size();
     bool tag_gradeta = levc < gradetaerr_v.size();
     // if (tag_gradeta) {
-    //     fillpatch_viscosity(lev, time, m_leveldata[lev]->viscosity, 1);
+    //     fillpatch_viscosity(lev, time, m_leveldata[levc]->viscosity, 1);
     // }
 
     AMREX_D_TERM(const Real l_dx = geom[levc].CellSize(0);,
@@ -162,7 +162,7 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
     } // mfi
 
     // // EY: Tagging Eta (viscosity)
-    for (MFIter mfi(m_leveldata[lev]->viscosity,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+    for (MFIter mfi(m_leveldata[levc]->viscosity,TilingIfNotGPU()); mfi.isValid(); ++mfi)
     {
         Box const& bx = mfi.tilebox();
         auto const& tag = tags.array(mfi);
@@ -171,9 +171,9 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
         if (tag_eta || tag_gradeta) 
         {
             // //EY: 
-            Array4<Real const> eta = m_leveldata[lev]->viscosity.const_array(mfi);
-            Real etaerr = tag_eta ? etaerr_v[lev]: std::numeric_limits<Real>::max();
-            Real gradetaerr = tag_gradeta ? gradetaerr_v[lev] : std::numeric_limits<Real>::max();
+            Array4<Real const> eta = m_leveldata[levc]->viscosity.const_array(mfi);
+            Real etaerr = tag_eta ? etaerr_v[levc]: std::numeric_limits<Real>::max();
+            Real gradetaerr = tag_gradeta ? gradetaerr_v[levc] : std::numeric_limits<Real>::max();
             // EY: Need to implement leveldata for Eta (viscosity) -> done
             amrex::ParallelFor(bx,
             [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
@@ -209,7 +209,7 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
             Real ylo = tag_region_lo[1];
             Real xhi = tag_region_hi[0];
             Real yhi = tag_region_hi[1];
-            auto const& problo = geom[lev].ProbLoArray();
+            auto const& problo = geom[levc].ProbLoArray();
 
 #if (AMREX_SPACEDIM == 2)
 
