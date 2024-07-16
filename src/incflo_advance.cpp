@@ -71,10 +71,10 @@ void incflo::Advance()
     if (m_fluid_model == FluidModel::TwoMu)
     {
         ParmParse pp("incflo");
-        int m_zero_vel = 0;
-        pp.get("zero_vel", m_zero_vel);
+        bool m_zero_vel = false;
+        pp.queryAdd("zero_vel", m_zero_vel);
 
-        if (m_zero_vel == 1) // Make zero velocity 
+        if (m_zero_vel) // Make zero velocity 
         {
             amrex::Print() << "Let's impose zero velocity" << "\n";
             for (int lev = 0; lev <= finest_level; ++lev)
@@ -88,7 +88,7 @@ void incflo::Advance()
                 amrex::Vector<amrex::Real> centz;
 
                 int npellets = 0;
-                Real density_p = 0.;
+                Real density_p = 1.;
 
                 pp.get("npellets", npellets);
                 pp.get("density_p", density_p);

@@ -1,7 +1,5 @@
 #include <incflo.H>
 
-//EY:
-
 using namespace amrex;
 
 void incflo::prob_init_fluid (int lev)
@@ -176,6 +174,7 @@ void incflo::prob_init_fluid (int lev)
             init_steel_melt(vbx, gbx,
                                   ld.velocity.array(mfi),
                                   ld.viscosity.array(mfi),
+                                  ld.tracer.array(mfi),
                                   domain, dx, problo, probhi);            
         }
 #if 0
@@ -252,6 +251,7 @@ void incflo::init_rotating_flow (Box const& vbx, Box const& /*gbx*/,
 void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                                   Array4<Real> const& vel,
                                   Array4<Real> const& viscosity,
+                                  Array4<Real> const& tracer,
                                   Box const& /*domain*/,
                                   GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                   GpuArray<Real, AMREX_SPACEDIM> const& problo,
@@ -283,6 +283,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
         Real y = problo[1] + Real(j+0.5)*dx[1];
         Real z = problo[2] + Real(k+0.5)*dx[2];
 
+        tracer(i,j,k) = Real(1540.0+273.0); //K; //slag temperature
+
         int inside_pellet = 0;
         for(int np = 0; np < npellets; np++)
         {
@@ -309,7 +311,9 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
 
             //Two viscosity
             viscosity(i,j,k) = m_mu*pow(10, m_n_0);
-            // amrex::Print() << "viscosity = " <<viscosity(i,j,k)<< "\n"; 
+            
+            // Initial Fe temperature
+            tracer(i,j,k) = Real(80.0+273.0); //K; 
 
         }
     });

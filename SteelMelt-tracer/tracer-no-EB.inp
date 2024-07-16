@@ -1,0 +1,104 @@
+# This input file is based on benchmark.rayleigh_taylor (no eb 3d)
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#            SIMULATION STOP            #
+#.......................................#
+max_step                =   10          # Max number of time steps
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#         TIME STEP COMPUTATION         #
+#.......................................#
+incflo.fixed_dt         =   1e-6        # Use this constant dt if > 0
+incflo.cfl              =   0.45        # CFL factor
+# incflo.init_shrink      = 1.0           # EY: What is this for?
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#            INPUT AND OUTPUT           #
+#.......................................#
+amr.plot_int            =   10          # Steps between plot files
+# amr.check_int           =   1000        # Steps between checkpoint files
+amr.restart             =   ""          # Checkpoint to restart from 
+amr.plt_eta             =   1           # plot file for eta
+amr.plt_tracer          =   1           # plot file for eta
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#               PHYSICS                 #
+#.......................................#
+incflo.gravity          =  0. 0. 0.     # Gravitational force (3D)
+incflo.ro_0             =  1.0          # Turn off background state
+
+# incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
+incflo.fluid_model      =   "twoMu"     # Rheological model
+incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
+incflo.n                =   5           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.zero_vel         =   true        
+
+incflo.constant_density =  false        #
+incflo.advect_tracer    =  true         #
+incflo.mu_s             =  0.1          # EY: conductivity for us
+
+incflo.do_initial_pressure_proj = 1     # to enforce hydrostatic equilibrium
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#        ADAPTIVE MESH REFINEMENT       #
+#.......................................#
+amr.n_cell              =   16  16  16    # Grid cells at coarsest AMRlevel
+#amr.max_grid_size       =   16 16 16    # Max grid size at AMR levels
+amr.blocking_factor     =   16          # Blocking factor for grids
+amr.max_level           =   0           # Max AMR level in hierarchy 
+amr.regrid_int          =   2
+
+incflo.gradrhoerr       = 0.1
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#              GEOMETRY                 #
+#.......................................#
+geometry.prob_lo        = -1.  -1.  -1.   # Lo corner coordinates
+geometry.prob_hi        =  1.  1.  1.    # Hi corner coordinates
+geometry.is_periodic    =   0   1   0   # Periodicity x y z (0/1)
+
+# Boundary conditions
+xlo.type                =   "nsw"
+xhi.type                =   "nsw"
+zlo.type                =   "nsw"
+zhi.type                =   "nsw"
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#            Pellet properties          #
+#.......................................#
+prob.npellets           =   1
+prob.pellet_rads        =   0.2
+prob.pellet_centx       =   0.
+prob.pellet_centy       =   0.
+prob.pellet_centz       =   0.
+prob.density_p          =   1.  
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#           INITIAL CONDITIONS          #
+#.......................................#
+incflo.probtype         =   201
+# incflo.test_tracer_conservation = true
+incflo.ic_u             =   0.0         #
+incflo.ic_v             =   0.2         #
+incflo.ic_w             =   0.0         #
+incflo.ic_p             =   0.0         #
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#                NUMERICS               #
+#.......................................#
+incflo.advection_type        = "Godunov"
+incflo.diffusion_type        = 1             # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#              VERBOSITY                #
+#.......................................#
+incflo.verbose           =  2           # incflo itself
+mac_proj.verbose         =  0           # MAC Projector
+nodal_proj.verbose       =  0           # Nodal Projector
+scalar_diffusion.verbose =  1           # Scalar Diffusion
+tensor_diffusion.verbose =  1           # Tensor Diffusion
+
+# What are those?
+# tensor_diffusion.verbose     =   1           # Diffusion
+# tensor_diffusion.mg_verbose  =   1           # Diffusion
+
+# mac_proj.mg_rtol             = 1.e-12
