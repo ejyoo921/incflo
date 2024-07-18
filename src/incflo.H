@@ -248,6 +248,8 @@ public:
                                       amrex::Array4<amrex::Real> const& robin_f,
                                       amrex::Array4<amrex::Real const> const& bcval,
                                       int lev);
+    // EY
+    void update_properties(int lev, amrex::MultiFab& t_prop);
 
 #include "incflo_prob_I.H"
 #include "incflo_prob_usr_I.H"
@@ -337,6 +339,10 @@ private:
 
     amrex::Vector<amrex::Real> m_t_old;
     amrex::Vector<amrex::Real> m_t_new;
+
+    //EY: temp data  
+    amrex::Vector<amrex::MultiFab> t_prop; 
+    amrex::Vector<amrex::MultiFab> t_prop_o; 
 
     // Times
     amrex::Real m_cur_time     = amrex::Real( 0.0);
@@ -565,9 +571,8 @@ private:
     int m_plt_error_w     = 0;
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
+    int m_plt_cp          = 0; // EY
 
-    //EY: Additional flag for dynamic viscosity
-    // int m_plt_mu         = 1;
 #ifdef INCFLO_USE_PARTICLES
     int m_plt_particle_count = 0;
 
@@ -634,7 +639,9 @@ private:
 
         // EY: I ned eta to be stored
         amrex::MultiFab viscosity;
-
+        amrex::MultiFab cp; // Specific heat
+        amrex::MultiFab t_prop; // properties with temperature
+        amrex::MultiFab t_prop_o; // old time
     };
 
     amrex::Vector<std::unique_ptr<LevelData> > m_leveldata;
@@ -772,9 +779,12 @@ private:
     amrex::Vector<amrex::MultiFab*> get_tracer_eb () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_new () noexcept;
-    //EY: eta viscosity
+    //EY: eta viscosity----------------------------------------
     amrex::Vector<amrex::MultiFab*> get_viscosity () noexcept;
-    //---EY
+    amrex::Vector<amrex::MultiFab*> get_cp () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_t_prop_old () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_t_prop_new () noexcept;
+    //--------------------------------------------------------- 
     amrex::Vector<amrex::MultiFab*> get_density_nph () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_new () noexcept;
@@ -877,6 +887,9 @@ private:
     void copy_from_new_to_old_density  (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
     void copy_from_new_to_old_tracer   (         amrex::IntVect const& ng = amrex::IntVect{0});
     void copy_from_new_to_old_tracer   (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
+    // EY: temp properties
+    void copy_from_new_to_old_t_prop   (         amrex::IntVect const& ng = amrex::IntVect{0});
+    void copy_from_new_to_old_t_prop   (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
     //
     void copy_from_old_to_new_velocity (         amrex::IntVect const& ng = amrex::IntVect{0});
     void copy_from_old_to_new_velocity (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
@@ -884,6 +897,9 @@ private:
     void copy_from_old_to_new_density  (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
     void copy_from_old_to_new_tracer   (         amrex::IntVect const& ng = amrex::IntVect{0});
     void copy_from_old_to_new_tracer   (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
+    //EY
+    void copy_from_old_to_new_t_prop   (         amrex::IntVect const& ng = amrex::IntVect{0});
+    void copy_from_old_to_new_t_prop   (int lev, amrex::IntVect const& ng = amrex::IntVect{0});
 
     void Advance ();
     bool writeNow ();

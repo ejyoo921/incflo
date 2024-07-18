@@ -361,6 +361,9 @@ void incflo::WritePlotFile()
     if (m_plt_gpz) ++ncomp;
 #endif
 
+    // Specific heat
+    if (m_plt_cp) ++ncomp; // EY
+
     // Density
     if (m_plt_rho) ++ncomp;
 
@@ -474,6 +477,13 @@ void incflo::WritePlotFile()
         ++icomp;
     }
 #endif
+    //EY specific heat -----------------------------
+    if (m_plt_cp) { 
+        for (int lev = 0; lev <= finest_level; ++lev)
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->cp, 0, icomp, 1, 0);
+        pltscaVarsName.push_back("cp");
+        ++icomp;
+    } //---------------------------------------------
     if (m_plt_rho) {
         for (int lev = 0; lev <= finest_level; ++lev)
             MultiFab::Copy(mf[lev], m_leveldata[lev]->density, 0, icomp, 1, 0);

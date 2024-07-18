@@ -363,6 +363,32 @@ void incflo::copy_from_old_to_new_tracer (int lev, IntVect const& ng)
                        m_leveldata[lev]->tracer_o, 0, 0, m_ntrac, ng);
     }
 }
+// EY: temp properties
+void incflo::copy_from_new_to_old_t_prop (IntVect const& ng)
+{
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        copy_from_new_to_old_t_prop(lev, ng);
+    }
+}
+
+void incflo::copy_from_new_to_old_t_prop (int lev, IntVect const& ng)
+{
+    MultiFab::Copy(m_leveldata[lev]->t_prop_o,
+                   m_leveldata[lev]->t_prop, 0, 0, 1, ng);
+}
+
+void incflo::copy_from_old_to_new_t_prop (IntVect const& ng)
+{
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        copy_from_old_to_new_t_prop(lev, ng);
+    }
+}
+
+void incflo::copy_from_old_to_new_t_prop (int lev, IntVect const& ng)
+{
+    MultiFab::Copy(m_leveldata[lev]->t_prop,
+                   m_leveldata[lev]->t_prop_o, 0, 0, 1, ng);
+}
 
 // EY: store eta (viscosity)-----------------------------------------
 Vector<MultiFab*> incflo::get_viscosity () noexcept
@@ -381,6 +407,16 @@ Vector<MultiFab const*> incflo::get_viscosity_const () const noexcept
     r.reserve(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         r.push_back(&(m_leveldata[lev]->viscosity));
+    }
+    return r;
+}
+// EY: store cp (specific heat)-----------------------------------------
+Vector<MultiFab*> incflo::get_cp () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->cp));
     }
     return r;
 }

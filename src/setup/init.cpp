@@ -253,8 +253,7 @@ void incflo::ReadIOParameters()
         m_plt_strainrate = 0;
         m_plt_divu       = 0;
         m_plt_vfrac      = 0;
-        //EY: Additional viscosity plot flie
-        int m_plt_mu     = 0;
+        m_plt_cp        = 0; // EY
 #ifdef INCFLO_USE_PARTICLES
         m_plt_particle_count = 1;
 #endif
@@ -289,6 +288,8 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_p",    m_plt_error_p );
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
 
+    pp.query("plt_cp",        m_plt_cp   ); // EY
+
 #ifdef INCFLO_USE_PARTICLES
     pp.query("plt_particle_count", m_plt_particle_count );
 #endif
@@ -304,6 +305,8 @@ void incflo::InitialIterations ()
     copy_from_new_to_old_velocity();
     copy_from_new_to_old_density();
     copy_from_new_to_old_tracer();
+    //EY
+    copy_from_new_to_old_t_prop();
 
     int initialisation = 1;
     bool explicit_diffusion = (m_diff_type == DiffusionType::Explicit);
@@ -337,6 +340,8 @@ void incflo::InitialIterations ()
         copy_from_old_to_new_velocity();
         copy_from_old_to_new_density();
         copy_from_old_to_new_tracer();
+        //EY
+        // copy_from_old_to_new_t_prop();
     }
 
     // Reset dt to get initial step as specified, otherwise we can see increase to dt

@@ -2,12 +2,15 @@
 #define INCFLO_PROB_USR_I_H_
 
 // This header is include by incflo.H.  These functions are members of incflo class.
-
+    // EY: SteelSlag case 
+    void update_thermal_properties_and_phases(int i, int j, int k,
+                                   amrex::Array4<amrex::Real> const& t_prop_arr);
     //EY: for steel-making
     void init_steel_melt (amrex::Box const& vbx, amrex::Box const& gbx,
                             amrex::Array4<amrex::Real> const& vel,
                             amrex::Array4<amrex::Real> const& density,
                             amrex::Array4<amrex::Real> const& tracer,
+                            amrex::Array4<amrex::Real> const& cp,
                             amrex::Box const& domain,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo,

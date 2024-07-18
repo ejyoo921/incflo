@@ -24,6 +24,7 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
             Array4<Real const> const& rho     = ld.density.const_array(mfi);
             Array4<Real const> const& dtdt_o  = ld.conv_tracer_o.const_array(mfi);
             Array4<Real const> const& tra_f   = tra_forces[lev].const_array(mfi);
+            Array4<Real const> const& cp      = ld.cp.const_array(mfi); //EY
 
             auto const* iconserv = get_tracer_iconserv_device_ptr();
 
@@ -65,8 +66,14 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                                 ( dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
                             tra(i,j,k,n) = tra_new/rho(i,j,k);
                         } else {
-                            tra(i,j,k,n) = tra_o(i,j,k,n) + l_dt *
+                            if (m_fluid_model == FluidModel::TwoMu) {
+                                tra(i,j,k,n) = tra_o(i,j,k,n) + rho_o(i,j,k)*cp(i,j,k,n)*l_dt *
                                 ( dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
+                            }
+                            else {
+                                tra(i,j,k,n) = tra_o(i,j,k,n) + l_dt *
+                                ( dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
+                            }
                         }
                     }
                 });

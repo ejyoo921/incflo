@@ -175,6 +175,7 @@ void incflo::prob_init_fluid (int lev)
                                   ld.velocity.array(mfi),
                                   ld.viscosity.array(mfi),
                                   ld.tracer.array(mfi),
+                                  ld.cp.array(mfi), //Specific heat
                                   domain, dx, problo, probhi);            
         }
 #if 0
@@ -252,6 +253,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
                                   Array4<Real> const& vel,
                                   Array4<Real> const& viscosity,
                                   Array4<Real> const& tracer,
+                                  Array4<Real> const& cp,
                                   Box const& /*domain*/,
                                   GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                   GpuArray<Real, AMREX_SPACEDIM> const& problo,
@@ -265,25 +267,25 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
     amrex::Vector<amrex::Real> centz;
 
     int npellets = 0;
+    Real m_cp = 1.0;
     // Real density_p = 0.;
 
     pp.get("npellets", npellets);
+    pp.get("cp", m_cp);
     // pp.get("density_p", density_p);
-
     pp.getarr("pellet_rads",  rads);    
     pp.getarr("pellet_centx", centx);
     pp.getarr("pellet_centy", centy);
     pp.getarr("pellet_centz", centz);
   
-    
-
     amrex::ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
+        tracer(i,j,k) = Real(1540.0+273.0); //K; //slag temperature
+        cp(i,j,k) = m_cp; // Initial specific heat
+
         Real x = problo[0] + Real(i+0.5)*dx[0];
         Real y = problo[1] + Real(j+0.5)*dx[1];
         Real z = problo[2] + Real(k+0.5)*dx[2];
-
-        tracer(i,j,k) = Real(1540.0+273.0); //K; //slag temperature
 
         int inside_pellet = 0;
         for(int np = 0; np < npellets; np++)
@@ -301,9 +303,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
         }
         if (inside_pellet)
         {
-            // amrex::Print() << "INSIDE = "<< inside_pellet << "\n";
-            // density(i,j,k) = density_p;
-            
+            // density(i,j,k) = density_p;            
             // no internal flow
             vel(i,j,k,0) = Real(0.0);
             vel(i,j,k,1) = Real(0.0);

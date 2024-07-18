@@ -17,6 +17,8 @@ void incflo::Advance()
     // Set new and old time to correctly use in fillpatching
     for(int lev = 0; lev <= finest_level; lev++)
     {
+        amrex::MultiFab::Copy(t_prop_o[lev], t_prop[lev], 
+                                  0, 0, t_prop[lev].nComp(), 0);
         m_t_old[lev] = m_cur_time;
         m_t_new[lev] = m_cur_time + m_dt;
     }
@@ -32,6 +34,8 @@ void incflo::Advance()
     copy_from_new_to_old_velocity();
     copy_from_new_to_old_density();
     copy_from_new_to_old_tracer();
+    //EY
+    // copy_from_new_to_old_t_prop();
 
     int ng = nghost_state();
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -66,10 +70,15 @@ void incflo::Advance()
         amrex::Print() << "After Predictor - Befor Corrector" << "\n";
         ApplyCorrector();
     }
-
     // EY: Impose zero velocity for inside of pellet
     if (m_fluid_model == FluidModel::TwoMu)
     {
+        // Update properties first 
+        for(int lev = 0; lev <= finest_level; ++lev)
+        {
+           update_properties(lev, t_prop[lev]);
+        }
+
         ParmParse pp("incflo");
         bool m_zero_vel = false;
         pp.queryAdd("zero_vel", m_zero_vel);
@@ -158,6 +167,25 @@ void incflo::Advance()
     if (m_verbose > 0)
     {
         amrex::Print() << "Time per step " << end_step << std::endl;
+    }
+}
+
+void incflo::update_properties(int lev, MultiFab& t_prop)
+{
+    const auto dx = geom[lev].CellSizeArray();
+    auto prob_lo = geom[lev].ProbLoArray();
+    auto prob_hi = geom[lev].ProbHiArray();
+
+    int ncomp = t_prop.nComp();
+
+    for (MFIter mfi(t_prop); mfi.isValid(); ++mfi)
+    {
+        const Box& bx = mfi.tilebox();
+        Array4<Real> t_prop_arr = t_prop.array(mfi);
+
+        amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+            incflo::update_thermal_properties_and_phases(i, j, k, t_prop_arr);
+        });
     }
 }
 

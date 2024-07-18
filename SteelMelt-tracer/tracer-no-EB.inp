@@ -7,47 +7,49 @@ max_step                =   10          # Max number of time steps
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-6        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-4        # Use this constant dt if > 0
 incflo.cfl              =   0.45        # CFL factor
 # incflo.init_shrink      = 1.0           # EY: What is this for?
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   10          # Steps between plot files
+amr.plot_int            =   100          # Steps between plot files
 # amr.check_int           =   1000        # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
-amr.plt_tracer          =   1           # plot file for eta
+amr.plt_tracer          =   1           # 
+amr.plt_cp              =   1           # 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
 incflo.gravity          =  0. 0. 0.     # Gravitational force (3D)
-incflo.ro_0             =  1.0          # Turn off background state
+incflo.ro_0             =  7500.0          # Turn off background state
 
 # incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
-incflo.n                =   5           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.n                =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
 incflo.zero_vel         =   true        
 
 incflo.constant_density =  false        #
 incflo.advect_tracer    =  true         #
-incflo.mu_s             =  0.1          # EY: conductivity for us
+incflo.mu_s             =  0.01          # EY: conductivity for us
+incflo.trac_is_conservative  = 0        # conservative?
 
 incflo.do_initial_pressure_proj = 1     # to enforce hydrostatic equilibrium
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   16  16  16    # Grid cells at coarsest AMRlevel
-#amr.max_grid_size       =   16 16 16    # Max grid size at AMR levels
-amr.blocking_factor     =   16          # Blocking factor for grids
+amr.n_cell              =   16  16  16  # Grid cells at coarsest AMRlevel
+amr.max_grid_size       =   16  16  16  # Max grid size at AMR levels
+amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
 amr.regrid_int          =   2
 
-incflo.gradrhoerr       = 0.1
+incflo.gradrhoerr       = 0.01
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -71,6 +73,7 @@ prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
 prob.density_p          =   1.  
+prob.cp                 =   740.0      #J/K/kg 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
@@ -78,7 +81,7 @@ prob.density_p          =   1.
 incflo.probtype         =   201
 # incflo.test_tracer_conservation = true
 incflo.ic_u             =   0.0         #
-incflo.ic_v             =   0.2         #
+incflo.ic_v             =   0.1         #
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
 

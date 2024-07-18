@@ -191,12 +191,12 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
     else
 #endif
     {
-        m_reg_scal_solve_op->setScalars(1.0, dt);
+        m_reg_scal_solve_op->setScalars(1.0, dt); //EY: 1 = alpha, dt = beta
         for (int lev = 0; lev <= finest_level; ++lev) {
             if ( iconserv[0] ) {
                 m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
             } else {
-                m_reg_scal_solve_op->setACoeffs(lev, 1.0);
+                m_reg_scal_solve_op->setACoeffs(lev, 1.0); 
             }
         }
     }
@@ -387,7 +387,7 @@ DiffusionScalarOp::diffuse_vel_components (Vector<MultiFab*> const& vel,
             m_reg_vel_solve_op->setDomainBC(m_incflo->get_diffuse_velocity_bc(Orientation::low ,comp),
                                             m_incflo->get_diffuse_velocity_bc(Orientation::high,comp));
 
-            m_reg_vel_solve_op->setScalars(1.0, dt);
+            m_reg_vel_solve_op->setScalars(1.0, dt); 
             for (int lev = 0; lev <= finest_level; ++lev) {
                 m_reg_vel_solve_op->setACoeffs(lev, *density[lev]);
             }
