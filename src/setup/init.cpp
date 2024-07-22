@@ -335,13 +335,13 @@ void incflo::InitialIterations ()
     {
         if (m_verbose) amrex::Print() << "\n In initial_iterations: iter = " << iter << "\n";
 
-     ApplyPredictor(true);
+        ApplyPredictor(true);
 
         copy_from_old_to_new_velocity();
         copy_from_old_to_new_density();
         copy_from_old_to_new_tracer();
         //EY
-        // copy_from_old_to_new_t_prop();
+        copy_from_old_to_new_t_prop();
     }
 
     // Reset dt to get initial step as specified, otherwise we can see increase to dt

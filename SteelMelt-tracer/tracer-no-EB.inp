@@ -2,7 +2,7 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   10          # Max number of time steps
+max_step                =   1000          # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -73,7 +73,10 @@ prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
 prob.density_p          =   1.  
-prob.cp                 =   740.0      #J/K/kg 
+prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
+prob.cp_slg             =   1004.0      # J/K/kg 
+prob.Tinit_fe           =   353.0       # (80.0+273.0) K (solid)
+prob.Tinit_slg          =   1813.0      # (1540.0+273.0) K
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #

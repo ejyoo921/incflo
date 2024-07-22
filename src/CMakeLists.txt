@@ -18,6 +18,8 @@ target_sources(incflo
    incflo_update_velocity.cpp
    incflo_utils.cpp
    main.cpp
+   #EY
+   incflo_update_properties.cpp
    )
 
 add_subdirectory(boundary_conditions)

@@ -1,7 +1,4 @@
 #include <incflo.H>
-// EY: We don't have these?
-// #include <ProbParm.H>
-// #include <Prob.H>
 
 // Need this for TagCutCells
 #ifdef AMREX_USE_EB

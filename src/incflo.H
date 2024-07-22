@@ -134,6 +134,8 @@ public:
     // convection
     //
     ///////////////////////////////////////////////////////////////////////////
+    //EY: update properties with temperature
+    void update_properties ();
 
     void ApplyPredictor (bool incremental_projection = false);
     void ApplyCorrector ();
@@ -167,6 +169,7 @@ public:
                                               amrex::Vector<amrex::MultiFab>& tra_forces);
     void update_velocity (StepType step_type, amrex::Vector<amrex::MultiFab>& vel_eta,
                                               amrex::Vector<amrex::MultiFab>& vel_forces);
+
 
     ///////////////////////////////////////////////////////////////////////////
     //
@@ -248,8 +251,6 @@ public:
                                       amrex::Array4<amrex::Real> const& robin_f,
                                       amrex::Array4<amrex::Real const> const& bcval,
                                       int lev);
-    // EY
-    void update_properties(int lev, amrex::MultiFab& t_prop);
 
 #include "incflo_prob_I.H"
 #include "incflo_prob_usr_I.H"
@@ -341,8 +342,8 @@ private:
     amrex::Vector<amrex::Real> m_t_new;
 
     //EY: temp data  
-    amrex::Vector<amrex::MultiFab> t_prop; 
-    amrex::Vector<amrex::MultiFab> t_prop_o; 
+    // amrex::Vector<amrex::MultiFab> t_prop; 
+    // amrex::Vector<amrex::MultiFab> t_prop_o; 
 
     // Times
     amrex::Real m_cur_time     = amrex::Real( 0.0);

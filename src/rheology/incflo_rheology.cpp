@@ -195,6 +195,7 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
     for (auto *mf : tra_eta) {
         for (int n = 0; n < m_ntrac; ++n) {
             mf->setVal(m_mu_s[n], n, 1, nghost);
+            // EY TODO: we need a different value - no constant - see Hari's code
         }
     }
 }

@@ -267,11 +267,16 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
     amrex::Vector<amrex::Real> centz;
 
     int npellets = 0;
-    Real m_cp = 1.0;
+    Real m_cp_fe = 740.0;
+    Real m_cp_slg = 1004.0;
+    Real m_Tinit_fe = 80.0+273.0;
+    Real m_Tinit_slg = 1540.0+273.0;
     // Real density_p = 0.;
-
     pp.get("npellets", npellets);
-    pp.get("cp", m_cp);
+    pp.get("cp_fe", m_cp_fe);
+    pp.get("cp_slg", m_cp_slg);
+    pp.get("Tinit_fe", m_Tinit_fe);
+    pp.get("Tinit_slg", m_Tinit_slg);
     // pp.get("density_p", density_p);
     pp.getarr("pellet_rads",  rads);    
     pp.getarr("pellet_centx", centx);
@@ -280,8 +285,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
   
     amrex::ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
-        tracer(i,j,k) = Real(1540.0+273.0); //K; //slag temperature
-        cp(i,j,k) = m_cp; // Initial specific heat
+        tracer(i,j,k) = m_Tinit_slg; //K; //slag temperature
+        cp(i,j,k) = m_cp_slg; // Initial specific heat for slag
 
         Real x = problo[0] + Real(i+0.5)*dx[0];
         Real y = problo[1] + Real(j+0.5)*dx[1];
@@ -313,7 +318,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& /*gbx*/,
             viscosity(i,j,k) = m_mu*pow(10, m_n_0);
             
             // Initial Fe temperature
-            tracer(i,j,k) = Real(80.0+273.0); //K; 
+            tracer(i,j,k) = m_Tinit_fe; //K; 
+            cp(i,j,k) = m_cp_fe; // Initial specific heat for Fe
 
         }
     });
