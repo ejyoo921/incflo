@@ -420,4 +420,14 @@ Vector<MultiFab*> incflo::get_cp () noexcept
     }
     return r;
 }
+// EY: store conductivity (specific heat)-----------------------------------------
+Vector<MultiFab*> incflo::get_conductivity () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->conductivity));
+    }
+    return r;
+}
 // end :)----------------------------------------------------------------

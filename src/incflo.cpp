@@ -18,7 +18,6 @@ incflo::incflo ()
 
     // Read inputs file using ParmParse
     ReadParameters();
-
 #ifdef AMREX_USE_EB
     // This is needed before initializing level MultiFab
     MakeEBGeometry(); 
@@ -214,7 +213,7 @@ void incflo::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& new_gr
                                       const DistributionMapping& new_dmap)
 {
     BL_PROFILE("incflo::MakeNewLevelFromScratch()");
-
+    
     if (m_verbose > 0)
     {
         amrex::Print() << "incflo: Making new level " << lev << " from scratch" << std::endl;
@@ -243,7 +242,9 @@ void incflo::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& new_gr
     m_t_old[lev] = time - Real(1.e200);
 
     if (m_restart_file.empty()) {
+        amrex::Print() << "Before prob init" << "\n";
         prob_init_fluid(lev);
+        amrex::Print() << "After prob init" << "\n";
     }
     //make_mixedBC_mask(lev, grids[lev], dmap[lev]);
 

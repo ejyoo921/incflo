@@ -134,9 +134,9 @@ public:
     // convection
     //
     ///////////////////////////////////////////////////////////////////////////
-    //EY: update properties with temperature
+    //EY: update properties with temperature ----------------------------------
     void update_properties ();
-
+    //-------------------------------------------------------------------------
     void ApplyPredictor (bool incremental_projection = false);
     void ApplyCorrector ();
     void compute_convective_term (amrex::Vector<amrex::MultiFab*> const& conv_u,
@@ -573,6 +573,7 @@ private:
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
     int m_plt_cp          = 0; // EY
+    int m_plt_tra_eta     = 0; // EY: conductivit/cp or mu_s
 
 #ifdef INCFLO_USE_PARTICLES
     int m_plt_particle_count = 0;
@@ -643,6 +644,7 @@ private:
         amrex::MultiFab cp; // Specific heat
         amrex::MultiFab t_prop; // properties with temperature
         amrex::MultiFab t_prop_o; // old time
+        amrex::MultiFab conductivity; // conductivity
     };
 
     amrex::Vector<std::unique_ptr<LevelData> > m_leveldata;
@@ -785,6 +787,7 @@ private:
     amrex::Vector<amrex::MultiFab*> get_cp () noexcept;
     amrex::Vector<amrex::MultiFab*> get_t_prop_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_t_prop_new () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_conductivity () noexcept;
     //--------------------------------------------------------- 
     amrex::Vector<amrex::MultiFab*> get_density_nph () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_old () noexcept;
@@ -867,7 +870,7 @@ private:
 
     void fillpatch_velocity (int lev, amrex::Real time, amrex::MultiFab& vel, int ng);
     void fillpatch_density (int lev, amrex::Real time, amrex::MultiFab& density, int ng);
-    // EY: Viscosity
+    // EY: Viscosity & thermal properties
     void fillpatch_viscosity (int lev, amrex::Real time, amrex::MultiFab& viscosity, int ng);
     void fillpatch_tracer (int lev, amrex::Real time, amrex::MultiFab& tracer, int ng);
     void fillpatch_gradp (int lev, amrex::Real time, amrex::MultiFab& gp, int ng);

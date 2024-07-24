@@ -360,6 +360,8 @@ void incflo::WritePlotFile()
 #if (AMREX_SPACEDIM == 3)
     if (m_plt_gpz) ++ncomp;
 #endif
+    // conductivity/cp or mu_s
+    if (m_plt_tra_eta) ++ncomp; // EY
 
     // Specific heat
     if (m_plt_cp) ++ncomp; // EY
@@ -477,7 +479,13 @@ void incflo::WritePlotFile()
         ++icomp;
     }
 #endif
-    //EY specific heat -----------------------------
+    //EY: Steelmelt properties -----------------------------
+    if (m_plt_tra_eta) { 
+        for (int lev = 0; lev <= finest_level; ++lev)
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->conductivity, 0, icomp, 1, 0);
+        pltscaVarsName.push_back("conductivity");
+        ++icomp;
+    }
     if (m_plt_cp) { 
         for (int lev = 0; lev <= finest_level; ++lev)
             MultiFab::Copy(mf[lev], m_leveldata[lev]->cp, 0, icomp, 1, 0);

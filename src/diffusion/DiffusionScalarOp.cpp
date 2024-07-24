@@ -196,7 +196,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
             if ( iconserv[0] ) {
                 m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
             } else {
-                m_reg_scal_solve_op->setACoeffs(lev, 1.0); 
+                m_reg_scal_solve_op->setACoeffs(lev, 1.0); //EY: We need rho*cp for A
             }
         }
     }
@@ -234,10 +234,10 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                     if ( iconserv[comp] ) {
                         m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
                     } else {
-                        m_reg_scal_solve_op->setACoeffs(lev, 1.0);
+                        m_reg_scal_solve_op->setACoeffs(lev, 1.0); //EY: We need rho*cp for A
                     }
                 }
-
+                // EY: this is a big B
                 Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_scalar_eta_to_faces(lev, comp, *eta[lev]);
                 m_reg_scal_solve_op->setBCoeffs(lev, GetArrOfConstPtrs(b));
             }
