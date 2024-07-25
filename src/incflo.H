@@ -572,8 +572,9 @@ private:
     int m_plt_error_w     = 0;
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
-    int m_plt_cp          = 0; // EY
-    int m_plt_tra_eta     = 0; // EY: conductivit/cp or mu_s
+    int m_plt_cp_steel     = 0; // EY
+    int m_plt_k_steel     = 0; // EY: conductivit
+    int m_plt_rho_steel   = 0; // EY: Steel density
 
 #ifdef INCFLO_USE_PARTICLES
     int m_plt_particle_count = 0;
@@ -641,10 +642,12 @@ private:
 
         // EY: I ned eta to be stored
         amrex::MultiFab viscosity;
-        amrex::MultiFab cp; // Specific heat
+        amrex::MultiFab cp_steel; // Specific heat
+        amrex::MultiFab k_steel; // conductivity
+        amrex::MultiFab rho_steel; // density
+        // These are not sure how to use
         amrex::MultiFab t_prop; // properties with temperature
         amrex::MultiFab t_prop_o; // old time
-        amrex::MultiFab conductivity; // conductivity
     };
 
     amrex::Vector<std::unique_ptr<LevelData> > m_leveldata;
@@ -784,10 +787,11 @@ private:
     amrex::Vector<amrex::MultiFab*> get_density_new () noexcept;
     //EY: eta viscosity----------------------------------------
     amrex::Vector<amrex::MultiFab*> get_viscosity () noexcept;
-    amrex::Vector<amrex::MultiFab*> get_cp () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_cp_steel () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_k_steel () noexcept;
+    amrex::Vector<amrex::MultiFab*> get_rho_steel () noexcept;
     amrex::Vector<amrex::MultiFab*> get_t_prop_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_t_prop_new () noexcept;
-    amrex::Vector<amrex::MultiFab*> get_conductivity () noexcept;
     //--------------------------------------------------------- 
     amrex::Vector<amrex::MultiFab*> get_density_nph () noexcept;
     amrex::Vector<amrex::MultiFab*> get_tracer_old () noexcept;

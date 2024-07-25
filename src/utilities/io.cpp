@@ -360,11 +360,14 @@ void incflo::WritePlotFile()
 #if (AMREX_SPACEDIM == 3)
     if (m_plt_gpz) ++ncomp;
 #endif
-    // conductivity/cp or mu_s
-    if (m_plt_tra_eta) ++ncomp; // EY
+    // density by temp
+    if (m_plt_rho_steel) ++ncomp; // EY
+
+    // conductivity
+    if (m_plt_k_steel) ++ncomp; // EY
 
     // Specific heat
-    if (m_plt_cp) ++ncomp; // EY
+    if (m_plt_cp_steel) ++ncomp; // EY
 
     // Density
     if (m_plt_rho) ++ncomp;
@@ -480,18 +483,25 @@ void incflo::WritePlotFile()
     }
 #endif
     //EY: Steelmelt properties -----------------------------
-    if (m_plt_tra_eta) { 
+    if (m_plt_rho_steel) { 
         for (int lev = 0; lev <= finest_level; ++lev)
-            MultiFab::Copy(mf[lev], m_leveldata[lev]->conductivity, 0, icomp, 1, 0);
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->rho_steel, 0, icomp, 1, 0);
+        pltscaVarsName.push_back("density_steel");
+        ++icomp;
+    }
+    if (m_plt_k_steel) { 
+        for (int lev = 0; lev <= finest_level; ++lev)
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->k_steel, 0, icomp, 1, 0);
         pltscaVarsName.push_back("conductivity");
         ++icomp;
     }
-    if (m_plt_cp) { 
+    if (m_plt_cp_steel) { 
         for (int lev = 0; lev <= finest_level; ++lev)
-            MultiFab::Copy(mf[lev], m_leveldata[lev]->cp, 0, icomp, 1, 0);
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->cp_steel, 0, icomp, 1, 0);
         pltscaVarsName.push_back("cp");
         ++icomp;
-    } //---------------------------------------------
+    } 
+    //------------------------------------------------------
     if (m_plt_rho) {
         for (int lev = 0; lev <= finest_level; ++lev)
             MultiFab::Copy(mf[lev], m_leveldata[lev]->density, 0, icomp, 1, 0);

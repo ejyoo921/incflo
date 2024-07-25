@@ -5,10 +5,11 @@
     // //EY: for steel-making                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> dx);
     void init_steel_melt (amrex::Box const& vbx, amrex::Box const& gbx,
                             amrex::Array4<amrex::Real> const& vel,
-                            amrex::Array4<amrex::Real> const& density,
+                            amrex::Array4<amrex::Real> const& viscosity,
                             amrex::Array4<amrex::Real> const& tracer,
                             amrex::Array4<amrex::Real> const& cp,
                             amrex::Array4<amrex::Real> const& conductivity,
+                            amrex::Array4<amrex::Real> const& rho_steel,
                             amrex::Box const& domain,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo,

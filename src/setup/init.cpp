@@ -253,8 +253,10 @@ void incflo::ReadIOParameters()
         m_plt_strainrate = 0;
         m_plt_divu       = 0;
         m_plt_vfrac      = 0;
-        m_plt_cp        = 0; // EY
-        m_plt_tra_eta        = 0; // EY
+        m_plt_cp_steel   = 0; // EY
+        m_plt_k_steel    = 0; // EY
+        m_plt_rho_steel  = 0; // EY
+
 #ifdef INCFLO_USE_PARTICLES
         m_plt_particle_count = 1;
 #endif
@@ -289,8 +291,9 @@ void incflo::ReadIOParameters()
     pp.query("plt_error_p",    m_plt_error_p );
     pp.query("plt_error_mac_p",m_plt_error_mac_p );
 
-    pp.query("plt_cp",         m_plt_cp      ); // EY
-    pp.query("plt_tra_eta",    m_plt_tra_eta ); // EY mu_s or cond/cp
+    pp.query("plt_cp_steel",   m_plt_cp_steel      ); // EY
+    pp.query("plt_k_steel",    m_plt_k_steel ); // EY conductivity
+    pp.query("plt_rho_steel",  m_plt_rho_steel ); // EY density
 
 #ifdef INCFLO_USE_PARTICLES
     pp.query("plt_particle_count", m_plt_particle_count );

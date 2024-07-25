@@ -175,8 +175,9 @@ void incflo::prob_init_fluid (int lev)
                                   ld.velocity.array(mfi),
                                   ld.viscosity.array(mfi),
                                   ld.tracer.array(mfi),
-                                  ld.cp.array(mfi), //Specific heat
-                                  ld.conductivity.array(mfi), //conductivity
+                                  ld.cp_steel.array(mfi), //Specific heat
+                                  ld.k_steel.array(mfi), //conductivity
+                                  ld.rho_steel.array(mfi), //density
                                   domain, dx, problo, probhi);            
         }
 #if 0
@@ -256,6 +257,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
                                   Array4<Real> const& tracer,
                                   Array4<Real> const& cp,
                                   Array4<Real> const& conductivity,
+                                  amrex::Array4<amrex::Real> const& rho_steel,
                                   Box const& /*domain*/,
                                   GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                   GpuArray<Real, AMREX_SPACEDIM> const& problo,
@@ -273,6 +275,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     Real m_cp_slg = 1004.0;
     Real m_cond_fe = 4.5;
     Real m_cond_slg = 1.1715;
+    Real m_dens_fe = 7500.0;
+    Real m_dens_slg = 2550.0;
     Real m_Tinit_fe = 80.0+273.0;
     Real m_Tinit_slg = 1540.0+273.0;
     // Real density_p = 0.;
@@ -281,6 +285,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     pp.get("cp_slg", m_cp_slg);
     pp.get("cond_fe", m_cond_fe);
     pp.get("cond_slg", m_cond_slg);
+    pp.get("dens_fe", m_dens_fe);
+    pp.get("dens_slg", m_dens_slg);
     pp.get("Tinit_fe", m_Tinit_fe);
     pp.get("Tinit_slg", m_Tinit_slg);
     // pp.get("density_p", density_p);
@@ -292,8 +298,9 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
         tracer(i,j,k) = m_Tinit_slg; //K; //slag temperature
-        cp(i,j,k) = m_cp_slg; // Initial specific heat for slag
-        conductivity(i,j,k) = m_cond_slg;
+        cp(i,j,k) = m_cp_slg; // J/K/kg; Initial specific heat for slag
+        conductivity(i,j,k) = m_cond_slg; //W/m/K ; conductivity
+        rho_steel(i,j,k) = m_dens_slg; // kg/m3; density
 
         Real x = problo[0] + Real(i+0.5)*dx[0];
         Real y = problo[1] + Real(j+0.5)*dx[1];
@@ -328,6 +335,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
             tracer(i,j,k) = m_Tinit_fe; //K; 
             cp(i,j,k) = m_cp_fe; // Initial specific heat for Fe
             conductivity(i,j,k) = m_cond_fe;
+            rho_steel(i,j,k) = m_dens_fe; // kg/m3; density
 
         }
     });

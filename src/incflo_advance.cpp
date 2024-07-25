@@ -68,6 +68,8 @@ void incflo::Advance()
         amrex::Print() << "After Predictor - Befor Corrector" << "\n";
         ApplyCorrector();
     }
+
+    // EY: update thermal properties here
     if (m_fluid_model == FluidModel::TwoMu){
         amrex::Print() << "Update properties here" << "\n";
         update_properties();

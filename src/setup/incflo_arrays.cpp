@@ -12,8 +12,9 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
 
       density     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       viscosity   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
-      cp          (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
-      conductivity(ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
+      cp_steel    (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
+      k_steel     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
+      rho_steel   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
       density_eb  (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_o   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_nph (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),

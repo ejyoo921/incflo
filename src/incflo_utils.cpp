@@ -411,22 +411,32 @@ Vector<MultiFab const*> incflo::get_viscosity_const () const noexcept
     return r;
 }
 // EY: store cp (specific heat)-----------------------------------------
-Vector<MultiFab*> incflo::get_cp () noexcept
+Vector<MultiFab*> incflo::get_cp_steel () noexcept
 {
     Vector<MultiFab*> r;
     r.reserve(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-        r.push_back(&(m_leveldata[lev]->cp));
+        r.push_back(&(m_leveldata[lev]->cp_steel));
     }
     return r;
 }
-// EY: store conductivity (specific heat)-----------------------------------------
-Vector<MultiFab*> incflo::get_conductivity () noexcept
+// EY: store conductivity (specific heat)---------------------------------
+Vector<MultiFab*> incflo::get_k_steel () noexcept
 {
     Vector<MultiFab*> r;
     r.reserve(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-        r.push_back(&(m_leveldata[lev]->conductivity));
+        r.push_back(&(m_leveldata[lev]->k_steel));
+    }
+    return r;
+}
+// EY: store density (calculated by temperature)----------------------------
+Vector<MultiFab*> incflo::get_rho_steel () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->rho_steel));
     }
     return r;
 }

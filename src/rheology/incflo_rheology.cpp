@@ -194,18 +194,19 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
 {
     for (auto *mf : tra_eta) {
         if (m_fluid_model == FluidModel::TwoMu){
-            amrex::Print() << "cp here" << "\n";
+            // amrex::Print() << "cp here" << "\n";
             for(int lev = 0; lev <= finest_level; ++lev){      
                 auto& ld = *m_leveldata[lev];
                 for (MFIter mfi(*mf,TilingIfNotGPU()); mfi.isValid(); ++mfi)
                 {
                     Box const& bx = mfi.growntilebox(nghost);
                     Array4<Real> const& tra_eta_arr = mf->array(mfi);
-                    Array4<Real> cp_arr = ld.cp.array(mfi); 
-                    Array4<Real> cond_arr = ld.conductivity.array(mfi); 
+                    Array4<Real> cp_arr = ld.cp_steel.array(mfi); 
+                    Array4<Real> cond_arr = ld.k_steel.array(mfi); 
+                    Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
                     ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
-                        tra_eta_arr(i,j,k) = cond_arr(i,j,k)/cp_arr(i,j,k); // I think this should be A
+                    {   // EY: put everything on Bcoeff
+                        tra_eta_arr(i,j,k) = cond_arr(i,j,k)/(dens_arr(i,j,k)*cp_arr(i,j,k)); 
                     });
                 }
             }

@@ -4,7 +4,7 @@ using namespace amrex;
 
 namespace {
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-Real bound01(const Real q0)
+amrex::Real bound01(const amrex::Real q0)
 {   //bounds a quantity between 0 and 1
     amrex::Real q1 = q0;
     if (q0<0.0)
@@ -184,9 +184,94 @@ amrex::Real cp_5(const amrex::Real Temp)
     return 1000.0*cp_5a;
 }
 
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real k_3(const amrex::Real Temp)
+{   //k calc for 1 % C bath
+    amrex::Real k3a = 30.0;
+    amrex::Real MeltTemp = 1669.0;
+    if (Temp >= MeltTemp)
+    { k3a = 30.0;
+    }
+    else
+    { k3a =39.0;
+    }
+    return k3a;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real k_4(const amrex::Real Temp) 
+{   //k calc for 3% carbon bath 
+    amrex::Real k_4a = 39.0;
+    amrex::Real MeltTemp = 1477.0;
+    if (Temp >= MeltTemp)
+    { k_4a =30.0;
+    }
+    else
+    { k_4a = 39.0;
+    }
+    return k_4a;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real k_5(const amrex::Real Temp)
+{   //k calc for slag  
+    amrex::Real k_5a = 1.0;
+    amrex::Real MeltTemp = 1574.0;
+    if (Temp >= MeltTemp)
+    { k_5a = 0.1;
+    }
+    else
+    { k_5a = 1.0;
+    }
+    return k_5a;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real rho_3(const amrex::Real Temp)
+{   //rho calc for 1 % C bath
+    amrex::Real rho3a = 7800;
+    amrex::Real MeltTemp = 1669.0;
+    if (Temp >= MeltTemp)
+    { rho3a = 6900.0;
+    }
+    else
+    { rho3a =7800.0;
+    }
+        return rho3a;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real rho_4(const amrex::Real Temp)
+{   //rho calc for 3% carbon bath  
+    amrex::Real k_4a = 39.0;
+    amrex::Real MeltTemp = 1477.0;
+    if (Temp >= MeltTemp)
+    {   k_4a =30.0;
+    }
+    else
+    {   k_4a = 39.0;
+    }
+    return k_4a;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+Real rho_5(const Real Temp)
+{   //rho calc for slag  
+    amrex::Real rho_5a = 2700.0;
+    amrex::Real MeltTemp = 1574.0;
+    if (Temp >= MeltTemp)
+    {   rho_5a = 2700.0;
+    }
+    else
+    {   rho_5a = 3000.0;
+    }
+    return rho_5a;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
 amrex::Real compute_cp(const amrex::Real Temp, int phase)
-{
-    // calculate cp based on phase and temp 
+{   // calculate cp based on phase and temp
     // unit: J/K/kg
     Real cpcalc = 1000.0;
     switch (phase) {
@@ -207,7 +292,56 @@ amrex::Real compute_cp(const amrex::Real Temp, int phase)
         break;
       }
     return cpcalc;
-} 
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real compute_k(const amrex::Real Temp,int phase)
+{ // calculate rho based on phase and temp
+    Real kcalc = 1000.0; 
+    switch (phase) {
+        case 1:
+           kcalc = 36.5;
+        break;
+        case 2:
+           kcalc = 2.90;
+        break;
+        case 3:
+           kcalc = k_3(Temp);
+        break;
+        case 4:
+           kcalc = k_4(Temp);
+        break;
+        case 5:
+           kcalc = k_5(Temp);
+        break;
+      }
+    return kcalc;
+}
+
+AMREX_GPU_DEVICE AMREX_INLINE
+amrex::Real compute_rho(const amrex::Real Temp,int phase)
+{   // calculate rho based on phase and temp
+    Real rhocalc=1000.0;
+    switch (phase) {
+    case 1:
+        rhocalc = 7900.0;
+    break;
+    case 2:
+        rhocalc = 7700.0;
+    break;
+    case 3:
+        rhocalc = rho_3(Temp);
+    break;
+    case 4:
+        rhocalc = rho_4(Temp);
+    break;
+    case 5:
+        rhocalc = rho_5(Temp);
+    break;
+    }
+    return rhocalc;
+}
+
 }
 
 
@@ -220,32 +354,16 @@ void incflo::update_properties ()
         // you need to deal with ghost cells
         int ng = nghost_state();
         fillpatch_tracer(lev, m_t_new[lev], m_leveldata[lev]->tracer, ng); 
-
-        const auto dx = geom[lev].CellSizeArray();
-        auto prob_lo = geom[lev].ProbLoArray();
-        auto prob_hi = geom[lev].ProbHiArray();
         
-        amrex::ParmParse pp("prob");
-        // Extract position and velocities
-        amrex::Vector<amrex::Real> rads;
-        amrex::Vector<amrex::Real> centx;
-        amrex::Vector<amrex::Real> centy;
-        amrex::Vector<amrex::Real> centz;
-        int npellets = 0;
-
-        pp.getarr("pellet_rads",  rads);    
-        pp.getarr("pellet_centx", centx);
-        pp.getarr("pellet_centy", centy);
-        pp.getarr("pellet_centz", centz);
-        pp.get("npellets", npellets);
-
         auto& ld = *m_leveldata[lev];
         for (MFIter mfi(ld.tracer,TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
             // Box const& bx = mfi.tilebox();
             Box const& bx = mfi.growntilebox(); //bigger box (with ghosts)
             Array4<Real> temp_arr = ld.tracer.array(mfi);
-            Array4<Real> cp_arr = ld.cp.array(mfi); 
+            Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
+            Array4<Real> cond_arr = ld.k_steel.array(mfi); 
+            Array4<Real> dens_arr  = ld.rho_steel.array(mfi); 
 
             ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
@@ -258,12 +376,20 @@ void incflo::update_properties ()
                 amrex::Real vfrac_fe;
 
                 //TODO: Here, we need to update cp et al., based on temperature
-                // Is our tracer always temperature? 
-                cp_fe   = compute_cp(Temp, 2);
-                cp_slg  = compute_cp(Temp, 5);
-                // Q: how can I determine where to put each cp?
-                vfrac_fe = bound01((temp_arr(i,j,k)-dens_slg)/(dens_fe-dens_slg));
-                cp_arr(i,j,k) = cp_slg*(1.0-vfrac_fe)+cp_fe*vfrac_fe;
+                // update rho ----------------------------------------------------
+                dens_fe         = compute_rho(Temp,2);
+                dens_slg        = compute_rho(Temp,5);
+                vfrac_fe        = bound01((temp_arr(i,j,k)-dens_slg)/(dens_fe-dens_slg));
+
+                dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;;
+                // update cp ----------------------------------------------------
+                cp_fe           = compute_cp(Temp, 2);
+                cp_slg          = compute_cp(Temp, 5);
+                cp_arr(i,j,k)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
+                // update conductivity -------------------------------------------
+                cond_fe         = compute_k(Temp,2); // k means conductivity
+                cond_slg        = compute_k(Temp,5);
+                cond_arr(i,j,k) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
             });
         }
     }
