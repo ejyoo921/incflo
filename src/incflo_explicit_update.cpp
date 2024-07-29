@@ -65,14 +65,8 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                                 ( dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
                             tra(i,j,k,n) = tra_new/rho(i,j,k);
                         } else {
-                            if (m_fluid_model == FluidModel::TwoMu) {
-                                tra(i,j,k,n) = tra_o(i,j,k,n) + rho_o(i,j,k)*l_dt *
-                                ( dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
-                            }
-                            else {
                                 tra(i,j,k,n) = tra_o(i,j,k,n) + l_dt *
                                 ( dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
-                            }
                         }
                     }
                 });

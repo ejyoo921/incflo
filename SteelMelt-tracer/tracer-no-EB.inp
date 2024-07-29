@@ -36,7 +36,7 @@ incflo.n                =   3           # For twoMu, this is eta mu*pow(10, incf
 incflo.zero_vel         =   true        
 
 incflo.constant_density =   true        #
-incflo.advect_tracer    =   true        #
+incflo.advect_tracer    =   false        #
 incflo.mu_s             =   1.          # EY: This should not affect
 incflo.trac_is_conservative  = 0        # conservative?
 
@@ -74,7 +74,7 @@ prob.pellet_rads        =   0.2
 prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
-prob.density_p          =   1.  
+prob.density_p          =   1.          # need to remove this
 prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
 prob.cp_slg             =   1004.0      # J/K/kg (liquid)
 prob.cond_fe            =   4.5         # W/m/K (solid)
