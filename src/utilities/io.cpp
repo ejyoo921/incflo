@@ -360,6 +360,9 @@ void incflo::WritePlotFile()
 #if (AMREX_SPACEDIM == 3)
     if (m_plt_gpz) ++ncomp;
 #endif
+    // density by k/rho*cp
+    if (m_plt_tra_eta) ++ncomp; // EY
+
     // density by temp
     if (m_plt_rho_steel) ++ncomp; // EY
 
@@ -483,6 +486,12 @@ void incflo::WritePlotFile()
     }
 #endif
     //EY: Steelmelt properties -----------------------------
+    if (m_plt_tra_eta) { 
+        for (int lev = 0; lev <= finest_level; ++lev)
+            MultiFab::Copy(mf[lev], m_leveldata[lev]->tracer_eta, 0, icomp, 1, 0);
+        pltscaVarsName.push_back("tra_eta");
+        ++icomp;
+    } 
     if (m_plt_rho_steel) { 
         for (int lev = 0; lev <= finest_level; ++lev)
             MultiFab::Copy(mf[lev], m_leveldata[lev]->rho_steel, 0, icomp, 1, 0);

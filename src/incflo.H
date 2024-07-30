@@ -572,9 +572,11 @@ private:
     int m_plt_error_w     = 0;
     int m_plt_error_p     = 0;
     int m_plt_error_mac_p = 0;
-    int m_plt_cp_steel     = 0; // EY
-    int m_plt_k_steel     = 0; // EY: conductivit
-    int m_plt_rho_steel   = 0; // EY: Steel density
+    // EY ---- for steel melt ------------------------
+    int m_plt_cp_steel    = 0; // specific heag
+    int m_plt_k_steel     = 0; // conductivit
+    int m_plt_rho_steel   = 0; // Steel density
+    int m_plt_tra_eta   = 0; // Steel k/rho*cp
 
 #ifdef INCFLO_USE_PARTICLES
     int m_plt_particle_count = 0;
@@ -642,6 +644,7 @@ private:
 
         // EY: I ned eta to be stored
         amrex::MultiFab viscosity;
+        amrex::MultiFab tracer_eta;
         amrex::MultiFab cp_steel; // Specific heat
         amrex::MultiFab k_steel; // conductivity
         amrex::MultiFab rho_steel; // density
@@ -786,6 +789,7 @@ private:
     amrex::Vector<amrex::MultiFab*> get_density_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_new () noexcept;
     //EY: eta viscosity----------------------------------------
+    amrex::Vector<amrex::MultiFab*> get_tracer_eta () noexcept;
     amrex::Vector<amrex::MultiFab*> get_viscosity () noexcept;
     amrex::Vector<amrex::MultiFab*> get_cp_steel () noexcept;
     amrex::Vector<amrex::MultiFab*> get_k_steel () noexcept;
@@ -819,6 +823,7 @@ private:
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_density_new_const () const noexcept;
     //EY: eta viscosity
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_viscosity_const () const noexcept;
+    [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_eta_const () const noexcept;
     // EY -----
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_density_nph_const () const noexcept;
     [[nodiscard]] amrex::Vector<amrex::MultiFab const*> get_tracer_old_const () const noexcept;
@@ -839,7 +844,7 @@ private:
 
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_velocity_bcrec () const noexcept { return m_bcrec_velocity; }
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_density_bcrec () const noexcept { return m_bcrec_density; }
-    //EY: Vioscosikkty
+    //EY: Vioscosity
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_viscosity_bcrec () const noexcept { return m_bcrec_viscosity; }
     // --end--EY
     [[nodiscard]] amrex::Vector<amrex::BCRec> const& get_tracer_bcrec () const noexcept { return m_bcrec_tracer; }

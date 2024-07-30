@@ -71,7 +71,7 @@ void incflo::Advance()
 
     // EY: update thermal properties here
     if (m_fluid_model == FluidModel::TwoMu){
-        amrex::Print() << "Update properties here" << "\n";
+        amrex::Print() << "Update thremal properties" << "\n";
         update_properties();
     }
 

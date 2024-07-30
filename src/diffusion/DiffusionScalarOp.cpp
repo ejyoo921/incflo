@@ -196,7 +196,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
             if ( iconserv[0] ) {
                 m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
             } else {
-                m_reg_scal_solve_op->setACoeffs(lev, 1.0); //EY: We need rho*cp for A
+                m_reg_scal_solve_op->setACoeffs(lev, 1.0); 
             }
         }
     }

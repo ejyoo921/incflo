@@ -9,12 +9,14 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
     : velocity    (ba, dm, AMREX_SPACEDIM, my_incflo->nghost_state(), MFInfo(), fact),
       velocity_o  (ba, dm, AMREX_SPACEDIM, my_incflo->nghost_state(), MFInfo(), fact),
       velocity_eb (ba, dm, AMREX_SPACEDIM, my_incflo->nghost_state(), MFInfo(), fact),
-
       density     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
-      viscosity   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
-      cp_steel    (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
-      k_steel     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
-      rho_steel   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), // EY added
+     // EY added for steel melt -----------------------------------------------------
+      tracer_eta  (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), 
+      viscosity   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), 
+      cp_steel    (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), 
+      k_steel     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), 
+      rho_steel   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
+      // -----------------------------------------------------------------------------
       density_eb  (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_o   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_nph (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),

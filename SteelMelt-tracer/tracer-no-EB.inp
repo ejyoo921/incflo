@@ -2,7 +2,7 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   10          # Max number of time steps
+max_step                =   10000         # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -21,7 +21,8 @@ amr.plt_eta             =   1           # plot file for eta
 amr.plt_tracer          =   1           # 
 amr.plt_cp_steel        =   1           # 
 amr.plt_k_steel         =   1           # conductivity/cp (or mu_s)
-amr.plt_rho_steel       =   1           # conductivity/cp (or mu_s)
+amr.plt_rho_steel       =   1           # density
+amr.plt_tra_eta         =   1           # k/rho*cp
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
@@ -33,10 +34,10 @@ incflo.ro_0             =  1.0          # Turn off background state
 incflo.fluid_model      =   "twoMu"     # Rheological model
 incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
 incflo.n                =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
-incflo.zero_vel         =   true        
+incflo.zero_vel         =   false        
 
-incflo.constant_density =   true        #
-incflo.advect_tracer    =   false        #
+incflo.constant_density =   true        # This density is not depending on Temp
+incflo.advect_tracer    =   true        #
 incflo.mu_s             =   1.          # EY: This should not affect
 incflo.trac_is_conservative  = 0        # conservative?
 

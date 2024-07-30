@@ -193,30 +193,30 @@ void incflo::compute_viscosity_at_level (int /*lev*/,
 void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int nghost)
 {
     for (auto *mf : tra_eta) {
-        if (m_fluid_model == FluidModel::TwoMu){
-            // amrex::Print() << "cp here" << "\n";
-            for(int lev = 0; lev <= finest_level; ++lev){      
-                auto& ld = *m_leveldata[lev];
-                for (MFIter mfi(*mf,TilingIfNotGPU()); mfi.isValid(); ++mfi)
-                {
-                    Box const& bx = mfi.growntilebox(nghost);
-                    Array4<Real> const& tra_eta_arr = mf->array(mfi);
-                    Array4<Real> cp_arr = ld.cp_steel.array(mfi); 
-                    Array4<Real> cond_arr = ld.k_steel.array(mfi); 
-                    Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
-                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {   // EY: put everything on Bcoeff
-                        tra_eta_arr(i,j,k) = cond_arr(i,j,k)/(dens_arr(i,j,k)*cp_arr(i,j,k)); 
-                    });
+        for (int n = 0; n < m_ntrac; ++n) {
+            mf->setVal(m_mu_s[n], n, 1, nghost);
+            amrex::Print() << "[n]" << n << "\n";
+
+            if (m_fluid_model == FluidModel::TwoMu){
+                for(int lev = 0; lev <= finest_level; ++lev){      
+                    auto& ld = *m_leveldata[lev];
+                    for (MFIter mfi(*mf,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+                    {
+                        Box const& bx = mfi.growntilebox(nghost);
+                        Array4<Real> tra_eta_arr = mf->array(mfi);
+                        Array4<Real> tracer_eta_arr = ld.tracer_eta.array(mfi);  // for plots
+                        Array4<Real> cp_arr = ld.cp_steel.array(mfi); 
+                        Array4<Real> cond_arr = ld.k_steel.array(mfi); 
+                        Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
+                        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        {   // EY: put everything on Bcoeff
+                            tra_eta_arr(i,j,k) *= cond_arr(i,j,k)/(dens_arr(i,j,k)*cp_arr(i,j,k)); 
+                            tracer_eta_arr(i,j,k) = tra_eta_arr(i,j,k);
+                        });
+                    }
                 }
             }
-        }
-        else {
-            for (int n = 0; n < m_ntrac; ++n) {
-                mf->setVal(m_mu_s[n], n, 1, nghost);
-                amrex::Print() << "[n]" << n << "\n";
-            }
-        }
+        }   
     }
 }
 

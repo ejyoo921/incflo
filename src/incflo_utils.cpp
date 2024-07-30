@@ -390,6 +390,27 @@ void incflo::copy_from_old_to_new_t_prop (int lev, IntVect const& ng)
                    m_leveldata[lev]->t_prop_o, 0, 0, 1, ng);
 }
 
+// EY: store tra_eta (k/rho*cp)-----------------------------------------
+Vector<MultiFab*> incflo::get_tracer_eta () noexcept
+{
+    Vector<MultiFab*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->tracer_eta));
+    }
+    return r;
+}
+
+Vector<MultiFab const*> incflo::get_tracer_eta_const () const noexcept
+{
+    Vector<MultiFab const*> r;
+    r.reserve(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        r.push_back(&(m_leveldata[lev]->tracer_eta));
+    }
+    return r;
+}
+
 // EY: store eta (viscosity)-----------------------------------------
 Vector<MultiFab*> incflo::get_viscosity () noexcept
 {
