@@ -67,6 +67,9 @@ private:
     int m_num_pre_smooth = 2;
     int m_num_post_smooth = 2;
 
+    //EY 
+    std::string fluid_model_s = "newtonian";
+
 #ifdef AMREX_USE_FLOAT
     amrex::Real m_mg_rtol = amrex::Real(1.0e-4);
     amrex::Real m_mg_atol = amrex::Real(1.0e-7);

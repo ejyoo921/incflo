@@ -667,6 +667,9 @@ private:
     amrex::GpuArray<BC                         , AMREX_SPACEDIM*2> m_bc_type;
     amrex::GpuArray<amrex::Real                , AMREX_SPACEDIM*2> m_bc_pressure;
     amrex::GpuArray<amrex::Real                , AMREX_SPACEDIM*2> m_bc_density;
+    // EY: steelmelt viscosity 
+    amrex::GpuArray<amrex::Real                , AMREX_SPACEDIM*2> m_bc_viscosity;
+    //
     amrex::GpuArray<amrex::GpuArray<amrex::Real, AMREX_SPACEDIM>
                                                , AMREX_SPACEDIM*2> m_bc_velocity;
     amrex::GpuArray<amrex::Vector<amrex::Real> , AMREX_SPACEDIM*2> m_bc_tracer;

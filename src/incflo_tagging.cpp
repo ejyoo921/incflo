@@ -73,9 +73,9 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
     // EY: tagging for Steelmake - jump viscosity
     bool tag_eta = levc < etaerr_v.size();
     bool tag_gradeta = levc < gradetaerr_v.size();
-    // if (tag_gradeta) {
-    //     fillpatch_viscosity(lev, time, m_leveldata[levc]->viscosity, 1);
-    // }
+    if (tag_gradeta) {
+        fillpatch_viscosity(levc, time, m_leveldata[levc]->viscosity, 1);
+    }
 
     AMREX_D_TERM(const Real l_dx = geom[levc].CellSize(0);,
                  const Real l_dy = geom[levc].CellSize(1);,
