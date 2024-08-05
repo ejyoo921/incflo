@@ -22,7 +22,6 @@ amr.plt_tracer          =   1           #
 amr.plt_cp_steel        =   1           # 
 amr.plt_k_steel         =   1           # conductivity/cp (or mu_s)
 amr.plt_rho_steel       =   1           # density
-amr.plt_tra_eta         =   1           # k/rho*cp
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #

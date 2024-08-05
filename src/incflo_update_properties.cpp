@@ -362,8 +362,8 @@ void incflo::update_properties ()
             Box const& bx = mfi.growntilebox(); //bigger box (with ghosts)
             Array4<Real> temp_arr = ld.tracer.array(mfi);
             Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
+            Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
             Array4<Real> cond_arr = ld.k_steel.array(mfi); 
-            Array4<Real> dens_arr  = ld.rho_steel.array(mfi); 
 
             ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {

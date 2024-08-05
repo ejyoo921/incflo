@@ -273,10 +273,13 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     int npellets = 0;
     Real m_cp_fe = 740.0;
     Real m_cp_slg = 1004.0;
+
     Real m_cond_fe = 4.5;
     Real m_cond_slg = 1.1715;
+
     Real m_dens_fe = 7500.0;
     Real m_dens_slg = 2550.0;
+    
     Real m_Tinit_fe = 80.0+273.0;
     Real m_Tinit_slg = 1540.0+273.0;
     // Real density_p = 0.;
