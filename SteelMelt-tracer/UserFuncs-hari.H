@@ -8,20 +8,7 @@
 using namespace amrex;
 namespace sm_userfuncs
 {
-
-
-  //  Start functions to calculate properties
-
-
-
-
-
-
-  //   End of properties calculations subroutines 
-
-  
     AMREX_GPU_DEVICE AMREX_INLINE
-    
     void temperature_bc(int i, int j, int k,
                         int dir, int sgn,
                         Array4<Real> const& phi,
@@ -73,37 +60,73 @@ namespace sm_userfuncs
         amrex::Real cp_slg,cond_slg,dens_slg;
         amrex::Real sol_fe,mol_fe,sol_slg,mol_slg;
 
-	// get iron properties
-	mol_fe = bound01(get_liqfrac(Temp,2));
-		
-        sol_fe = bound01((1.0 - mol_fe));
-				
-	
-	cp_fe  = get_cp(Temp,2);
-	dens_fe = get_rho(Temp,2);
-	cond_fe   = get_k(Temp,2);
-       
+        //for iron
+        if(Temp>prob_parm.Tmelt2_fe)
+        {
+            cp_fe     = prob_parm.cp_liq_fe;
+            cond_fe   = prob_parm.k_liq_fe;
+            dens_fe   = prob_parm.rho_liq_fe;
+            sol_fe    = 0.0;
+            mol_fe    = 1.0;
+        }
+        //solid
+        else if(Temp<prob_parm.Tmelt1_fe)
+        {
+            cp_fe = prob_parm.cp_solid_fe;
+            cond_fe = prob_parm.k_solid_fe;
+            dens_fe = prob_parm.rho_solid_fe;
+            sol_fe = 1.0;
+            mol_fe = 0.0;
+        }
+        //phase change
+        else
+        {
+            cp_fe = prob_parm.Cpmelt_fe;
+            amrex::Real frac = (Temp-prob_parm.Tmelt1_fe)/(prob_parm.Tmelt2_fe-prob_parm.Tmelt1_fe);
+            cond_fe = (1.0-frac)*prob_parm.k_solid_fe+frac*prob_parm.k_liq_fe;
+            dens_fe = (1.0-frac)*prob_parm.rho_solid_fe+frac*prob_parm.rho_liq_fe;
+            sol_fe = 1.0-frac;
+            mol_fe = frac;
+        }
         
-        // get slag properties
-	mol_slg = bound01(get_liqfrac(Temp,5));
-			       
-	sol_slg = bound01(1.0 - mol_slg);
-
-	
-	
-	cp_slg  = get_cp(Temp,5);
-	dens_slg = get_rho(Temp,5);
-	cond_slg   = get_k(Temp,5);
+        //for slag
+        if(Temp>prob_parm.Tmelt2_slg)
+        {
+            cp_slg     = prob_parm.cp_liq_slg;
+            cond_slg   = prob_parm.k_liq_slg;
+            dens_slg   = prob_parm.rho_liq_slg;
+            sol_slg    = 0.0;
+            mol_slg    = 1.0;
+        }
+        //solid
+        else if(Temp<prob_parm.Tmelt1_slg)
+        {
+            cp_slg   = prob_parm.cp_solid_slg;
+            cond_slg = prob_parm.k_solid_slg;
+            dens_slg = prob_parm.rho_solid_slg;
+            sol_slg=1.0;
+            mol_slg=0.0;
+        }
+        //phase change
+        else
+        {
+            cp_slg = prob_parm.Cpmelt_slg;
+            amrex::Real frac=(Temp-prob_parm.Tmelt1_slg)/(prob_parm.Tmelt2_slg-prob_parm.Tmelt1_slg);
+            cond_slg  = (1.0-frac)*prob_parm.k_solid_slg + frac*prob_parm.k_liq_slg;
+            dens_slg  = (1.0-frac)*prob_parm.rho_solid_slg + frac*prob_parm.rho_liq_slg;
+            sol_slg = 1.0-frac;
+            mol_slg = frac;
+        }
         
-        amrex::Real vfrac_fe=bound01((phi(i,j,k,NTHERMVARS+MIXMASS_ID)-dens_slg)
-				     /(dens_fe-dens_slg));
+        amrex::Real vfrac_fe=(phi(i,j,k,NTHERMVARS+MIXMASS_ID)-dens_slg)
+        /(dens_fe-dens_slg);
         phi(i,j,k,DENS_ID)   = dens_slg*(1.0-vfrac_fe)+dens_fe*vfrac_fe;
         phi(i,j,k,COND_ID)   = cond_slg*(1.0-vfrac_fe)+cond_fe*vfrac_fe;
         phi(i,j,k,SPHEAT_ID)   = cp_slg*(1.0-vfrac_fe)+cp_fe*vfrac_fe;
-        phi(i,j,k,NTHERMVARS+SOLFE_ID)   =vfrac_fe*sol_fe;             
-        phi(i,j,k,NTHERMVARS+MOLFE_ID)   =vfrac_fe*mol_fe;             
-        phi(i,j,k,NTHERMVARS+SOLSLG_ID)   = bound01((1.0-vfrac_fe))*sol_slg;             
-        phi(i,j,k,NTHERMVARS+MOLSLG_ID)   = bound01((1.0-vfrac_fe))*mol_slg;             
+        phi(i,j,k,NTHERMVARS+SOLFE_ID)   = sol_fe;             
+        phi(i,j,k,NTHERMVARS+MOLFE_ID)   = mol_fe;             
+        phi(i,j,k,NTHERMVARS+SOLSLG_ID)   = sol_slg;             
+        phi(i,j,k,NTHERMVARS+MOLSLG_ID)   = mol_slg;             
         phi(i,j,k,NTHERMVARS+VFRAC_ID)  = vfrac_fe;
 
         if(phi(i,j,k,SPHEAT_ID)<0.0)
