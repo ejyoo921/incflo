@@ -1,5 +1,5 @@
-amrex.fpe_trap_invalid=1                # hav a trap to catch a bug
-incflo.probtype         =  15
+amrex.fpe_trap_invalid=1                # have a trap to catch a bug
+incflo.probtype         =  14
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
@@ -7,8 +7,14 @@ stop_time               =   1.0         # Max (simulated) time to evolve
 max_step                =   1000         # Max number of time steps
 steady_state            =   0           # Steady-state solver?
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#         TIME STEP COMPUTATION         #
+#.......................................#
+incflo.cfl = 0.9
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
+#amr.plot_per_exact      =   1.0         # Steps between plot files
+amr.plot_int            =    10
 amr.check_int           =   -1          # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -24,30 +30,16 @@ incflo.advection_type   = "BDS"
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-
-amr.n_cell              =   64 64     # Grid cells at coarsest AMRlevel
-amr.max_grid_size       =   32 32     # Max grid size at AMR levels
-incflo.fixed_dt = 0.01
-amr.plot_int            =    100
-
-#amr.n_cell              =   128 128   # Grid cells at coarsest AMRlevel
-#amr.max_grid_size       =   64 64     # Max grid size at AMR levels
-#incflo.fixed_dt = 0.005
-#amr.plot_int            =    200
-
-#amr.n_cell              =   256 256   # Grid cells at coarsest AMRlevel
-#amr.max_grid_size       =   128 128   # Max grid size at AMR levels
-#incflo.fixed_dt = 0.0025
-#amr.plot_int            =    400
-
+amr.n_cell              =   64 64 64    # Grid cells at coarsest AMRlevel
+amr.max_grid_size       =   32 32 32    # Max grid size at AMR levels
 amr.max_level           =   0
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
-geometry.prob_lo        =  0.  0.    # Lo corner coordinates
-geometry.prob_hi        =  1.0 1.0   # Hi corner coordinates
-geometry.is_periodic    =   1   1    # Periodicity x y z (0/1)
+geometry.prob_lo        =  0.  0.  0.   # Lo corner coordinates
+geometry.prob_hi        =  1.0 1.0 1.0  # Hi corner coordinates
+geometry.is_periodic    =   1   1   1   # Periodicity x y z (0/1)
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #          NUMERICAL PARAMETERS         #
 #.......................................#
