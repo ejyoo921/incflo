@@ -615,7 +615,8 @@ void incflo::update_properties ()
                 dens_slg        = compute_rho(Temp,5);
                 vfrac_fe        = bound01((temp_arr(i,j,k)-dens_slg)/(dens_fe-dens_slg));
 
-                dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;;
+                // dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
+                dens_arr(i,j,k)  = 1.0;
 
                 // update cp -----------------------------------------------------
                 cp_fe           = compute_cp(Temp, 2); //zero is temporary

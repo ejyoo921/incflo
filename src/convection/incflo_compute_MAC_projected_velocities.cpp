@@ -17,7 +17,6 @@ incflo::compute_MAC_projected_velocities (
 {
     BL_PROFILE("incflo::compute_MAC_projected_velocities()");
     Real l_dt = m_dt;
-
     auto mac_phi = get_mac_phi();
 
     // We first compute the velocity forcing terms to be used in predicting
