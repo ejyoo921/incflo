@@ -136,6 +136,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////
     //EY: update properties with temperature ----------------------------------
     void update_properties ();
+    // void compute_vfrac (int lev, int i, int j, int k);
     //-------------------------------------------------------------------------
     void ApplyPredictor (bool incremental_projection = false);
     void ApplyCorrector ();

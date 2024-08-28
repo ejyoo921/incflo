@@ -2,7 +2,7 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   10         # Max number of time steps
+max_step                =   100         # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -15,7 +15,7 @@ incflo.initial_iterations = 0
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100          # Steps between plot files
+amr.plot_int            =   10          # Steps between plot files
 # amr.check_int           =   1000        # Steps between checkpoint files
 amr.restart             =   ""          # Checkpoint to restart from 
 amr.plt_eta             =   1           # plot file for eta
@@ -32,14 +32,15 @@ incflo.ro_0             =  1.0          # Turn off background state
 
 # incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
 incflo.fluid_model      =   "twoMu"     # Rheological model
-incflo.mu               =   1.0         # Dynamic viscosity coefficient(g/cm*s)
+incflo.mu               =   0.1         # Dynamic viscosity coefficient(g/cm*s)
 incflo.n                =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
-incflo.zero_vel         =   true        
 
-incflo.constant_density =   true        # This density is not depending on Temp
-incflo.advect_tracer    =   true        #
+incflo.zero_vel              =   true   # imposing zero inside pellet vel.     
+incflo.constant_density      =   true   # This density is not depending on Temp
+incflo.advect_tracer         =   true   #
+incflo.trac_is_conservative  =      0   # conservative?
+
 incflo.mu_s             =   1.          # EY: This should not affect
-incflo.trac_is_conservative  = 0        # conservative?
 
 incflo.do_initial_pressure_proj = 1     # to enforce hydrostatic equilibrium
 
@@ -58,14 +59,14 @@ incflo.gradetaerr       = 10
 #              GEOMETRY                 #
 #.......................................#
 geometry.prob_lo        = -1.  -1.  -1.   # Lo corner coordinates
-geometry.prob_hi        =  1.  1.  1.    # Hi corner coordinates
-geometry.is_periodic    =   1   1   1   # Periodicity x y z (0/1)
+geometry.prob_hi        =  1.   1.   1.    # Hi corner coordinates
+geometry.is_periodic    =  0   1   0   # Periodicity x y z (0/1)
 
 # Boundary conditions
-# xlo.type                =   "nsw"
-# xhi.type                =   "nsw"
-# zlo.type                =   "nsw"
-# zhi.type                =   "nsw"
+xlo.type                =   "nsw"
+xhi.type                =   "nsw"
+zlo.type                =   "nsw"
+zhi.type                =   "nsw"
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            Pellet properties          #
@@ -75,7 +76,7 @@ prob.pellet_rads        =   0.2
 prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
-prob.density_p          =   1.          # need to remove this
+
 prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
 prob.cp_slg             =   1004.0      # J/K/kg (liquid)
 prob.cond_fe            =   4.5         # W/m/K (solid)
@@ -93,7 +94,7 @@ prob.Tinit_slg          =   1813.0      # (1540.0+273.0) K
 incflo.probtype         =   201
 # incflo.test_tracer_conservation = true
 incflo.ic_u             =   0.0         #
-incflo.ic_v             =   0.1         #
+incflo.ic_v             =   1.0         # for now
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
 

@@ -47,10 +47,9 @@ incflo::compute_divtau(Vector<MultiFab      *> const& divtau,
         //                    divtau[0]->norm0(2) << std::endl;
 
     } else if (use_tensor_solve) {
-        amrex::Print() << "TENSOR SOLVE??" << "\n";
+        amrex::Print() << "TENSOR SOLVE - for velocity" << "\n";
         get_diffusion_tensor_op()->compute_divtau(divtau, vel, density, eta);
     } else {
-        amrex::Print() << "SCALAR SOLVE??" << "\n";
         get_diffusion_scalar_op()->compute_divtau(divtau, vel, density, eta);
     }
 }

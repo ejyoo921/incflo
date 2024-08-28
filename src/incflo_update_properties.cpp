@@ -5,6 +5,64 @@ using namespace amrex;
 namespace 
 {
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    amrex::Real compute_vfrac (int lev, int i, int j, int k, 
+                                amrex::GpuArray<double, 3> prob_lo, 
+                                amrex::GpuArray<double, 3> prob_hi, 
+                                amrex::GpuArray<double, 3> dx)
+    {
+        amrex::ParmParse pp("prob");
+        // Extract position and velocities
+        int npellets = 0;
+        amrex::Vector<amrex::Real> rads;
+        amrex::Vector<amrex::Real> centx;
+        amrex::Vector<amrex::Real> centy;
+        amrex::Vector<amrex::Real> centz;
+
+        pp.get("npellets", npellets);
+        pp.getarr("pellet_rads",  rads);    
+        pp.getarr("pellet_centx", centx);
+        pp.getarr("pellet_centy", centy);
+        pp.getarr("pellet_centz", centz);
+
+    #ifdef _OPENMP
+    #pragma omp parallel for collapse(2) if (GPU::notInLaunchRegion)
+    #endif
+
+        Real vfrac_fe = 0.0;
+
+        for(int kk=0;kk<2;kk++)
+        {
+            for(int jj=0;jj<2;jj++)
+            {
+                for(int ii=0;ii<2;ii++)
+                {
+                    Real x = prob_lo[0] + (i+ii) * dx[0];
+                    Real y = prob_lo[1] + (j+jj) * dx[1];
+                    Real z = prob_lo[2] + (k+kk) * dx[2];
+
+                    for(int np = 0; np < npellets; np++)
+                    {
+                        Real dist2 = std::pow(x - centx[np], 2.0)+                
+                            std::pow(y - centy[np], 2.0)+                
+                            std::pow(z - centz[np], 2.0); 
+
+                        // if(dist2 < std::pow(prob_parm->pellet_rads[np],2.0))
+                        if(dist2 < std::pow(rads[np], 2.0))
+                        {              
+                            vfrac_fe+=1.0;
+                            // break;
+                        }
+                    }
+                }
+            }
+        }
+
+        vfrac_fe=vfrac_fe/8.0;
+
+        return vfrac_fe;        
+    }
+
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real bound01(const amrex::Real q0)
     {   //bounds a quantity between 0 and 1
         amrex::Real q1 = q0;
@@ -16,7 +74,7 @@ namespace
         {
             q1 = 1.0;
         }
-            return q1;
+        return q1;
     }
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -592,14 +650,13 @@ void incflo::update_properties ()
         auto& ld = *m_leveldata[lev];
         for (MFIter mfi(ld.tracer,TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
-            // Box const& bx = mfi.tilebox();
-            Box const& bx = mfi.growntilebox(); //bigger box (with ghosts)
+            Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
             Array4<Real> temp_arr = ld.tracer.array(mfi);
             Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
             Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
             Array4<Real> cond_arr = ld.k_steel.array(mfi); 
 
-            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+            ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
                 // incflo::update_thermal_properties_and_phases(i, j, k, t_prop_arr, prob_lo, prob_hi, dx);
                 // For SteelSlag case 
@@ -607,16 +664,32 @@ void incflo::update_properties ()
                 amrex::Real cp_fe,  cond_fe,  dens_fe; // Fe
                 amrex::Real cp_slg, cond_slg, dens_slg; // Slag
                 amrex::Real sol_fe, mol_fe, sol_slg, mol_slg; // Phases
-                amrex::Real vfrac_fe;
+                amrex::Real vfrac_fe_mix, vfrac_fe;
 
-                //TODO: Here, we need to update cp et al., based on temperature
+                const auto lo = lbound(gbx);
+                const auto hi = ubound(gbx);    
+
+                auto const& prob_lo = geom[lev].ProbLoArray();
+                auto const& prob_hi = geom[lev].ProbLoArray();
+                auto const& dx = geom[lev].CellSizeArray();  
+
+                // TODO: This should not be computed for every time step.
+                // Just once when initializing and keep it somewhere.
+                vfrac_fe_mix = compute_vfrac (lev, i, j, k, prob_lo, prob_hi, dx);
+
                 // update rho ----------------------------------------------------
                 dens_fe         = compute_rho(Temp,2); //zero is temporary
                 dens_slg        = compute_rho(Temp,5);
-                vfrac_fe        = bound01((temp_arr(i,j,k)-dens_slg)/(dens_fe-dens_slg));
 
-                // dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
-                dens_arr(i,j,k)  = 1.0;
+                if (i == 8 & j == 8 & k == 8)
+                {
+                    amrex::Print() << "VFRAC = " << vfrac_fe << "\n";
+                }
+
+                // vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+                vfrac_fe = vfrac_fe_mix;
+                dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
+                // dens_arr(i,j,k)  = 1.0;
 
                 // update cp -----------------------------------------------------
                 cp_fe           = compute_cp(Temp, 2); //zero is temporary
@@ -653,61 +726,46 @@ void incflo::update_properties ()
         {
             auto const& dx = geom[lev].CellSizeArray();
             amrex::ParmParse pp("prob");
-            // Extract position and velocities
             amrex::Vector<amrex::Real> rads;
             amrex::Vector<amrex::Real> centx;
             amrex::Vector<amrex::Real> centy;
             amrex::Vector<amrex::Real> centz;
-
             int npellets = 0;
-            Real density_p = 1.;
-
             pp.get("npellets", npellets);
-            pp.get("density_p", density_p);
-
             pp.getarr("pellet_rads",  rads);    
             pp.getarr("pellet_centx", centx);
             pp.getarr("pellet_centy", centy);
             pp.getarr("pellet_centz", centz);
 
             auto& ld = *m_leveldata[lev];
-            for (int lev = 0; lev <= finest_level; lev++)
+            auto const& problo = geom[lev].ProbLoArray();
+            for (MFIter mfi(ld.velocity,TilingIfNotGPU()); mfi.isValid(); ++mfi)
             {
-                auto const& problo = geom[lev].ProbLoArray();
-                for (MFIter mfi(ld.velocity,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+                Array4<Real> const& vel = ld.velocity.array(mfi);
+                Array4<Real> temp_arr = ld.tracer.array(mfi);
+                Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+                amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                 {
-                    Array4<Real> const& vel = ld.velocity.array(mfi);
-                    Box const& bx = mfi.tilebox();
-                    amrex::ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                    amrex::Real Temp = temp_arr(i, j, k); // Need to bring actual Temp vals
+                    
+                    int inside_pellet = 0;
+                    for(int np = 0; np < npellets; np++)
                     {
-                        Real x = problo[0] + Real(i+0.5)*dx[0];
-                        Real y = problo[1] + Real(j+0.5)*dx[1];
-                        Real z = problo[2] + Real(k+0.5)*dx[2];
-
-                        int inside_pellet = 0;
-                        for(int np = 0; np < npellets; np++)
+                        // Update the inside location with Temperature
+                        Real Temp_melt = 1500.0;
+                        if (Temp < Temp_melt)
                         {
-
-                            Real dist2 = std::pow(x - centx[np], 2.0)+                
-                                        std::pow(y - centy[np], 2.0)+                
-                                        std::pow(z - centz[np], 2.0); 
-                            
-                            if(dist2 < std::pow(rads[np], 2.0))
-                            {              
-                                inside_pellet = 1;
-                                break;
-                            }
+                            inside_pellet = 1;
                         }
-                        if (inside_pellet)
-                        {   // no internal flow
-                            vel(i,j,k,0) = Real(0.0);
-                            vel(i,j,k,1) = Real(0.0);
-                            vel(i,j,k,2) = Real(0.0);
-                        }
-                    });
-                }
-            }
-        }
+                    }
+                    if (inside_pellet)
+                    {   // no internal flow
+                        vel(i,j,k,0) = Real(0.0);
+                        vel(i,j,k,1) = Real(0.0);
+                        vel(i,j,k,2) = Real(0.0);
+                    } // inside pellet
+                }); // i,j,k
+            } // mfi
+        } // lev
     }
 }
-

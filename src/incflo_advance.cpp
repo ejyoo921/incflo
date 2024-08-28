@@ -17,8 +17,6 @@ void incflo::Advance()
     // Set new and old time to correctly use in fillpatching
     for(int lev = 0; lev <= finest_level; lev++)
     {
-        // amrex::MultiFab::Copy(t_prop_o[lev], t_prop[lev], 
-        //                           0, 0, t_prop[lev].nComp(), 0);
         m_t_old[lev] = m_cur_time;
         m_t_new[lev] = m_cur_time + m_dt;
     }

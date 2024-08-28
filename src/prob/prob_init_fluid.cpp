@@ -283,7 +283,6 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     Real m_Tinit_fe = 0.0;
     Real m_Tinit_slg = 0.0;
 
-    // Real density_p = 0.;
     pp.get("npellets", npellets);
     pp.get("cp_fe", m_cp_fe);
     pp.get("cp_slg", m_cp_slg);
@@ -293,7 +292,6 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     pp.get("dens_slg", m_dens_slg);
     pp.get("Tinit_fe", m_Tinit_fe);
     pp.get("Tinit_slg", m_Tinit_slg);
-    // pp.get("density_p", density_p);
     pp.getarr("pellet_rads",  rads);    
     pp.getarr("pellet_centx", centx);
     pp.getarr("pellet_centy", centy);
@@ -326,7 +324,6 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
         }
         if (inside_pellet)
         {
-            // density(i,j,k) = density_p;            
             // no internal flow
             vel(i,j,k,0) = Real(0.0);
             vel(i,j,k,1) = Real(0.0);
