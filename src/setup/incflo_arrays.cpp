@@ -16,6 +16,7 @@ incflo::LevelData::LevelData (amrex::BoxArray const& ba,
       cp_steel    (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), 
       k_steel     (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact), 
       rho_steel   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
+      vfrac_mix   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       // -----------------------------------------------------------------------------
       density_eb  (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),
       density_o   (ba, dm, 1             , my_incflo->nghost_state(), MFInfo(), fact),

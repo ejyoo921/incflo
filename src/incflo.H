@@ -649,6 +649,7 @@ private:
         amrex::MultiFab cp_steel; // Specific heat
         amrex::MultiFab k_steel; // conductivity
         amrex::MultiFab rho_steel; // density
+        amrex::MultiFab vfrac_mix; // density
         // These are not sure how to use
         amrex::MultiFab t_prop; // properties with temperature
         amrex::MultiFab t_prop_o; // old time

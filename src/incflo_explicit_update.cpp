@@ -83,14 +83,14 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                         tra(i,j,k,n) = (cp_arr(i,j,k,n) * dens_arr(i,j,k,n)) * tra_o(i,j,k,n) + l_dt *
                         ( (cp_arr(i,j,k,n) * dens_arr(i,j,k,n)) * dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
 
-                        if (i == 8 & j == 8 & k == 8 )
-                        {
-                            amrex::Print() << "TEMP = " << tra_o(i,j,k,n) << "\n";
-                            amrex::Print() << "LAPS = " << laps_o(i,j,k,n) << "\n";
-                            amrex::Print() << "Specific HEAT = " << cp_arr(i,j,k,n) << "\n";
-                            amrex::Print() << "DENSITY = " << dens_arr(i,j,k,n) << "\n";
-                            amrex::Print() << "DTDT = " << dtdt_o(i,j,k,n) << "\n";
-                        }
+                        // if (i == 8 & j == 8 & k == 8 )
+                        // {
+                        //     amrex::Print() << "TEMP = " << tra_o(i,j,k,n) << "\n";
+                        //     amrex::Print() << "LAPS = " << laps_o(i,j,k,n) << "\n";
+                        //     amrex::Print() << "Specific HEAT = " << cp_arr(i,j,k,n) << "\n";
+                        //     amrex::Print() << "DENSITY = " << dens_arr(i,j,k,n) << "\n";
+                        //     amrex::Print() << "DTDT = " << dtdt_o(i,j,k,n) << "\n";
+                        // }
                         if (tra_f(i,j,k,n) != 0)
                         {
                             amrex::Print() <<  "tra_f is = " << tra_f(i,j,k,n) << "\n";

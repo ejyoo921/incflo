@@ -10,6 +10,7 @@
                             amrex::Array4<amrex::Real> const& cp,
                             amrex::Array4<amrex::Real> const& conductivity,
                             amrex::Array4<amrex::Real> const& rho_steel,
+                            amrex::Array4<amrex::Real> const& vfrac_mix,
                             amrex::Box const& domain,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo,

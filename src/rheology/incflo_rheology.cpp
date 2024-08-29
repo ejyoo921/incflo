@@ -204,19 +204,11 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
                     {
                         Box const& bx = mfi.growntilebox(nghost);
                         Array4<Real> tra_eta_arr = mf->array(mfi);
-                        // Array4<Real> tracer_eta_arr = ld.tracer_eta.array(mfi);  // for plots
-                        Array4<Real> cond_arr = ld.k_steel.array(mfi); 
-                        Array4<Real> temp_arr = ld.tracer.array(mfi);
-    
+                        Array4<Real> cond_arr = ld.k_steel.array(mfi);   
+                          
                         ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                         {   // EY: put everything on Bcoeff
                             tra_eta_arr(i,j,k,n) = cond_arr(i,j,k); 
-                            if (i == 8 & j == 8 & k == 8 & n == 0)
-                            {
-                                amrex::Print() << "TEMP IN RHEOLOGY = " << temp_arr(i,j,k,n) << "\n";
-                                amrex::Print() << "CONDUCTIVITY = " << tra_eta_arr(i,j,k,n) << "\n";
-                            }
-                            // tracer_eta_arr(i,j,k) = tra_eta_arr(i,j,k); // could be deleted
                         });
                     }
                 }

@@ -178,6 +178,7 @@ void incflo::prob_init_fluid (int lev)
                                   ld.cp_steel.array(mfi), //Specific heat
                                   ld.k_steel.array(mfi), //conductivity
                                   ld.rho_steel.array(mfi), //density
+                                  ld.vfrac_mix.array(mfi), //vfrac mix constant
                                   domain, dx, problo, probhi);            
         }
 #if 0
@@ -257,11 +258,12 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
                                   Array4<Real> const& tracer,
                                   Array4<Real> const& cp,
                                   Array4<Real> const& conductivity,
-                                  amrex::Array4<amrex::Real> const& rho_steel,
+                                  Array4<Real> const& rho_steel,
+                                  Array4<Real> const& vfrac_mix,
                                   Box const& /*domain*/,
                                   GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                   GpuArray<Real, AMREX_SPACEDIM> const& problo,
-                                  GpuArray<Real, AMREX_SPACEDIM> const& /*probhi*/)
+                                  GpuArray<Real, AMREX_SPACEDIM> const& probhi)
 {
     amrex::ParmParse pp("prob");
     // Extract position and velocities
@@ -280,8 +282,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     Real m_dens_fe = 7500.0;
     Real m_dens_slg = 2550.0;
     
-    Real m_Tinit_fe = 0.0;
-    Real m_Tinit_slg = 0.0;
+    Real m_Tinit_fe = 353.0 ;
+    Real m_Tinit_slg = 1813.0 ;
 
     pp.get("npellets", npellets);
     pp.get("cp_fe", m_cp_fe);
@@ -304,41 +306,92 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
         conductivity(i,j,k) = m_cond_slg; //W/m/K ; conductivity
         rho_steel(i,j,k) = m_dens_slg; // kg/m3; density
 
-        Real x = problo[0] + Real(i+0.5)*dx[0];
-        Real y = problo[1] + Real(j+0.5)*dx[1];
-        Real z = problo[2] + Real(k+0.5)*dx[2];
+        // Real x = problo[0] + Real(i+0.5)*dx[0];
+        // Real y = problo[1] + Real(j+0.5)*dx[1];
+        // Real z = problo[2] + Real(k+0.5)*dx[2];
 
         int inside_pellet = 0;
-        for(int np = 0; np < npellets; np++)
-        {
+        #ifdef _OPENMP
+        #pragma omp parallel for collapse(2) if (GPU::notInLaunchRegion)
+        #endif
 
-            Real dist2 = std::pow(x - centx[np], 2.0)+                
-                         std::pow(y - centy[np], 2.0)+                
-                         std::pow(z - centz[np], 2.0); 
-            
-            if(dist2 <= std::pow(rads[np], 2.0))
-            {              
-                inside_pellet = 1;
-                break;
+            Real vfrac_fe = 0.0;
+            for(int kk=0;kk<2;kk++)
+            {
+                for(int jj=0;jj<2;jj++)
+                {
+                    for(int ii=0;ii<2;ii++)
+                    {
+                        Real x = problo[0] + (i+ii) * dx[0];
+                        Real y = problo[1] + (j+jj) * dx[1];
+                        Real z = problo[2] + (k+kk) * dx[2];
+
+                        for(int np = 0; np < npellets; np++)
+                        {
+                            Real dist2 = std::pow(x - centx[np], 2.0)+                
+                                        std::pow(y - centy[np], 2.0)+                
+                                        std::pow(z - centz[np], 2.0); 
+
+                            if(dist2 < std::pow(rads[np], 2.0))
+                            {
+                                // calculate vfrac-steady
+                                vfrac_fe+=1.0;
+                                // //no internal flow
+                                vel(i,j,k,0) = Real(0.0);
+                                vel(i,j,k,1) = Real(0.0);
+                                vel(i,j,k,2) = Real(0.0);
+                                //Two viscosity
+                                viscosity(i,j,k) = m_mu*pow(10, m_n_0);
+                                // Initial Fe temperature
+                                tracer(i,j,k) = m_Tinit_fe; //K; 
+                                cp(i,j,k) = m_cp_fe; // Initial specific heat for Fe
+                                conductivity(i,j,k) = m_cond_fe;
+                                rho_steel(i,j,k) = m_dens_fe; // kg/m3; density
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-        }
-        if (inside_pellet)
-        {
-            // no internal flow
-            vel(i,j,k,0) = Real(0.0);
-            vel(i,j,k,1) = Real(0.0);
-            vel(i,j,k,2) = Real(0.0);
+            vfrac_fe = vfrac_fe/8.0;
 
-            //Two viscosity
-            viscosity(i,j,k) = m_mu*pow(10, m_n_0);
+            vfrac_mix(i,j,k) = m_dens_fe*vfrac_fe + m_dens_slg*(1.0-vfrac_fe);
+
+
+
+
+
+
+        // for(int np = 0; np < npellets; np++)
+        // {
+
+        //     Real dist2 = std::pow(x - centx[np], 2.0)+                
+        //                  std::pow(y - centy[np], 2.0)+                
+        //                  std::pow(z - centz[np], 2.0); 
             
-            // Initial Fe temperature
-            tracer(i,j,k) = m_Tinit_fe; //K; 
-            cp(i,j,k) = m_cp_fe; // Initial specific heat for Fe
-            conductivity(i,j,k) = m_cond_fe;
-            rho_steel(i,j,k) = m_dens_fe; // kg/m3; density
+        //     if(dist2 <= std::pow(rads[np], 2.0))
+        //     {              
+        //         inside_pellet = 1;
+        //         break;
+        //     }
+        // }
+        // if (inside_pellet)
+        // {
+        //     // no internal flow
+        //     vel(i,j,k,0) = Real(0.0);
+        //     vel(i,j,k,1) = Real(0.0);
+        //     vel(i,j,k,2) = Real(0.0);
 
-        }
+        //     //Two viscosity
+        //     viscosity(i,j,k) = m_mu*pow(10, m_n_0);
+            
+        //     // Initial Fe temperature
+        //     tracer(i,j,k) = m_Tinit_fe; //K; 
+        //     cp(i,j,k) = m_cp_fe; // Initial specific heat for Fe
+        //     conductivity(i,j,k) = m_cond_fe;
+        //     rho_steel(i,j,k) = m_dens_fe; // kg/m3; density
+
+        // }
     });
 }
 
