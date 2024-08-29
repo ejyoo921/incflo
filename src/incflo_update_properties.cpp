@@ -653,12 +653,13 @@ void incflo::update_properties ()
             Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
 
             Array4<Real> vfrac_mix_arr = ld.vfrac_mix.array(mfi); 
-            Array4<Real> temp_arr = ld.tracer.array(mfi);
+            // Array4<Real> temp_arr = ld.tracer.array(mfi);
             Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
             Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
             Array4<Real> cond_arr = ld.k_steel.array(mfi); 
             Array4<Real> eta_arr = ld.viscosity.array(mfi); 
             Array4<Real> const& vel = ld.velocity.array(mfi);
+            Array4<Real const> const& temp_arr   = ld.tracer_o.const_array(mfi);
 
             ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
@@ -701,13 +702,13 @@ void incflo::update_properties ()
                 cond_fe         = compute_k(Temp,0); //zero is temporary
                 cond_slg        = compute_k(Temp,5); //k is conductivity
                 cond_arr(i,j,k) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
-                cond_arr(i,j,k)  = 1.0;
+                cond_arr(i,j,k)  = 0.0;
 
                 // get iron properties
 	            mol_fe = bound01(compute_liqfrac(Temp,0));
                 sol_fe = bound01((1.0 - mol_fe));
 
-                if (i == 8 & j == 8 & k == 8)
+                if (i == 7 & j == 7 & k == 7)
                 {
                     amrex::Print() << "Temperature = " << Temp << "\n";
                     amrex::Print() << "VFRAC = " << vfrac_fe << "\n";
@@ -757,60 +758,4 @@ void incflo::update_properties ()
         } // mfi
     } // lev
 
-    // set zero velocity - inside pellet
-    // ParmParse pp("incflo");
-    // bool m_zero_vel = false;
-    // pp.queryAdd("zero_vel", m_zero_vel);
-
-    // if (m_zero_vel) // Make zero velocity 
-    // {
-    //     amrex::Print() << "Let's impose zero velocity" << "\n";
-    //     for (int lev = 0; lev <= finest_level; ++lev)
-    //     {
-    //         auto const& dx = geom[lev].CellSizeArray();
-    //         amrex::ParmParse pp("prob");
-    //         amrex::Vector<amrex::Real> rads;
-    //         amrex::Vector<amrex::Real> centx;
-    //         amrex::Vector<amrex::Real> centy;
-    //         amrex::Vector<amrex::Real> centz;
-    //         int npellets = 0;
-    //         pp.get("npellets", npellets);
-    //         pp.getarr("pellet_rads",  rads);    
-    //         pp.getarr("pellet_centx", centx);
-    //         pp.getarr("pellet_centy", centy);
-    //         pp.getarr("pellet_centz", centz);
-
-    //         auto& ld = *m_leveldata[lev];
-    //         auto const& problo = geom[lev].ProbLoArray();
-    //         for (MFIter mfi(ld.velocity,TilingIfNotGPU()); mfi.isValid(); ++mfi)
-    //         {
-    //             Array4<Real> const& vel = ld.velocity.array(mfi);
-    //             Array4<Real> temp_arr = ld.tracer.array(mfi);
-    //             Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
-    //             amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-    //             {
-    //                 amrex::Real Temp = temp_arr(i, j, k); // Need to bring actual Temp vals
-    
-    //                 int inside_pellet = 0;
-    //                 for(int np = 0; np < npellets; np++)
-    //                 {
-    //                     // Update the inside location with Temperature
-    //                     Real Temp_melt = 1500.0;
-    //                     if (Temp < Temp_melt)
-    //                     {   
-    //                         inside_pellet = 1;
-    //                         amrex::Print() << "TEMP = " << Temp << "\n";
-    //                         break;
-    //                     }
-    //                 }
-    //                 if (inside_pellet)
-    //                 {   // no internal flow
-    //                     vel(i,j,k,0) = Real(0.0);
-    //                     vel(i,j,k,1) = Real(0.0);
-    //                     vel(i,j,k,2) = Real(0.0);
-    //                 } // inside pellet
-    //             }); // i,j,k
-    //         } // mfi
-    //     } // lev
-    // }
 }

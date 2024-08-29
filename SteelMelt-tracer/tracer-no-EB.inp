@@ -2,7 +2,7 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   1         # Max number of time steps
+max_step                =   5         # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -51,7 +51,7 @@ amr.n_cell              =   16  16  16   # Grid cells at coarsest AMRlevel
 amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
-amr.regrid_int          =   2
+amr.regrid_int          =   0
 
 incflo.gradetaerr       = 10
 
@@ -60,13 +60,13 @@ incflo.gradetaerr       = 10
 #.......................................#
 geometry.prob_lo        = -1.  -1.  -1.   # Lo corner coordinates
 geometry.prob_hi        =  1.   1.   1.    # Hi corner coordinates
-geometry.is_periodic    =  0   1   0   # Periodicity x y z (0/1)
+geometry.is_periodic    =  1  1   1   # Periodicity x y z (0/1)
 
 # Boundary conditions
-xlo.type                =   "nsw"
-xhi.type                =   "nsw"
-zlo.type                =   "nsw"
-zhi.type                =   "nsw"
+# xlo.type                =   "nsw"
+# xhi.type                =   "nsw"
+# zlo.type                =   "nsw"
+# zhi.type                =   "nsw"
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            Pellet properties          #
@@ -114,7 +114,6 @@ scalar_diffusion.verbose =  1           # Scalar Diffusion
 tensor_diffusion.verbose =  1           # Tensor Diffusion
 
 # What are those?
-# tensor_diffusion.verbose     =   1           # Diffusion
 # tensor_diffusion.mg_verbose  =   1           # Diffusion
 
 # mac_proj.mg_rtol             = 1.e-12

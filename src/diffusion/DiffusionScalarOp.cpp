@@ -211,16 +211,18 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                     auto cp_steel  = m_incflo->get_cp_steel();
 
                     for (MFIter mfi(rho_cp[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-                        Box const& bx = mfi.tilebox();
+                        // Box const& bx = mfi.tilebox();
+                        Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
                         Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
                         Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
                         Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
-                        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                         {
                             rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
                         });
                     }     
-                    m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]); // This is alpha (scalar field)
+                    // m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]); // This is alpha (scalar field)
+                    m_reg_scal_solve_op->setACoeffs(lev, 1.0);
                 }
                 else {
                     m_reg_scal_solve_op->setACoeffs(lev, 1.0); 
@@ -268,7 +270,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                         if (fluid_model_s == "twoMu")
                         {
                             Vector<MultiFab> rho_cp;
-                            rho_cp.emplace_back(*tracer[lev], amrex::make_alias, 0, 1);
+                            // rho_cp.emplace_back(*tracer[lev], amrex::make_alias, comp, 1);
                             
                             amrex::Print() << "setting A coefficients" << "\n";  
                             
@@ -276,16 +278,18 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                             auto cp_steel = m_incflo->get_cp_steel();
 
                             for (MFIter mfi(rho_cp[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-                                Box const& bx = mfi.tilebox();
+                                // Box const& bx = mfi.tilebox();
+                                Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
                                 Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
                                 Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
                                 Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
-                                ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                                ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                                 {
                                     rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
                                 });
                             }     
-                            m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);              
+                            // m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);  
+                            m_reg_scal_solve_op->setACoeffs(lev, 1.0);
                         }
                         else
                         {
@@ -305,6 +309,20 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
 
             if ( !iconserv[comp] ) {
                 rhs.emplace_back(*tracer[lev], amrex::make_alias, comp, 1);
+                for (MFIter mfi(rhs[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+                    Box const& bx = mfi.tilebox();
+                    Array4<Real> const& rhs_a = rhs[lev].array(mfi);
+                    Array4<Real const> const& tra_a = tracer[lev]->const_array(mfi,comp);
+                    Array4<Real const> const& rho_a = density[lev]->const_array(mfi);
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                    {
+                        if (i == 7 & j == 7 & k == 7)
+                        {
+                            amrex::Print() << "Temperature!! = " << tra_a(i,j,k) << "\n";
+
+                        }
+                    });
+                }
             } else {
                 rhs.emplace_back(rhs_c[lev], amrex::make_alias, 0, 1);
 #ifdef _OPENMP
