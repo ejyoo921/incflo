@@ -2,7 +2,7 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   5         # Max number of time steps
+max_step                =   1         # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -53,20 +53,20 @@ amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
 amr.regrid_int          =   0
 
-incflo.gradetaerr       = 10
+incflo.gradetaerr       =   10
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
 geometry.prob_lo        = -1.  -1.  -1.   # Lo corner coordinates
 geometry.prob_hi        =  1.   1.   1.    # Hi corner coordinates
-geometry.is_periodic    =  1  1   1   # Periodicity x y z (0/1)
+geometry.is_periodic    =  0    1    0   # Periodicity x y z (0/1)
 
 # Boundary conditions
-# xlo.type                =   "nsw"
-# xhi.type                =   "nsw"
-# zlo.type                =   "nsw"
-# zhi.type                =   "nsw"
+xlo.type                =   "nsw"
+xhi.type                =   "nsw"
+zlo.type                =   "nsw"
+zhi.type                =   "nsw"
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            Pellet properties          #
@@ -94,7 +94,7 @@ prob.Tinit_slg          =   1813.0      # (1540.0+273.0) K
 incflo.probtype         =   201
 # incflo.test_tracer_conservation = true
 incflo.ic_u             =   0.0         #
-incflo.ic_v             =   1.0         # for now
+incflo.ic_v             =   0.0         # for now
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
 

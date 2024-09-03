@@ -653,13 +653,13 @@ void incflo::update_properties ()
             Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
 
             Array4<Real> vfrac_mix_arr = ld.vfrac_mix.array(mfi); 
-            // Array4<Real> temp_arr = ld.tracer.array(mfi);
+            Array4<Real> temp_arr = ld.tracer.array(mfi);
             Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
             Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
             Array4<Real> cond_arr = ld.k_steel.array(mfi); 
             Array4<Real> eta_arr = ld.viscosity.array(mfi); 
             Array4<Real> const& vel = ld.velocity.array(mfi);
-            Array4<Real const> const& temp_arr   = ld.tracer_o.const_array(mfi);
+            // Array4<Real const> const& temp_arr   = ld.tracer_o.const_array(mfi);
 
             ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
@@ -690,7 +690,7 @@ void incflo::update_properties ()
 
                 vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
                 dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
-                // dens_arr(i,j,k)  = 1.0;
+                dens_arr(i,j,k)  = 1.0;
 
                 // update cp -----------------------------------------------------
                 cp_fe           = compute_cp(Temp, 0); //zero is temporary
@@ -702,7 +702,7 @@ void incflo::update_properties ()
                 cond_fe         = compute_k(Temp,0); //zero is temporary
                 cond_slg        = compute_k(Temp,5); //k is conductivity
                 cond_arr(i,j,k) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
-                cond_arr(i,j,k)  = 0.0;
+                cond_arr(i,j,k)  = 1.0;
 
                 // get iron properties
 	            mol_fe = bound01(compute_liqfrac(Temp,0));

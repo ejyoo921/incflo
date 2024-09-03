@@ -202,25 +202,25 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                 pp.query("fluid_model", fluid_model_s);
                 if (fluid_model_s == "twoMu")
                 {
-                    Vector<MultiFab> rho_cp;
-                    rho_cp.emplace_back(*tracer[lev], amrex::make_alias, 0, 1);
+                    // Vector<MultiFab> rho_cp;
+                    // rho_cp.emplace_back(*tracer[lev], amrex::make_alias, 0, 1);
                     
-                    amrex::Print() << "setting A coefficients" << "\n";  
+                    // amrex::Print() << "setting A coefficients" << "\n";  
                     
-                    auto rho_steel = m_incflo->get_rho_steel();
-                    auto cp_steel  = m_incflo->get_cp_steel();
+                    // auto rho_steel = m_incflo->get_rho_steel();
+                    // auto cp_steel  = m_incflo->get_cp_steel();
 
-                    for (MFIter mfi(rho_cp[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-                        // Box const& bx = mfi.tilebox();
-                        Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
-                        Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
-                        Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
-                        Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
-                        ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                        {
-                            rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
-                        });
-                    }     
+                    // for (MFIter mfi(rho_cp[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+                    //     // Box const& bx = mfi.tilebox();
+                    //     Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+                    //     Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
+                    //     Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
+                    //     Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
+                    //     ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                    //     {
+                    //         rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
+                    //     });
+                    // }     
                     // m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]); // This is alpha (scalar field)
                     m_reg_scal_solve_op->setACoeffs(lev, 1.0);
                 }
@@ -270,7 +270,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                         if (fluid_model_s == "twoMu")
                         {
                             Vector<MultiFab> rho_cp;
-                            // rho_cp.emplace_back(*tracer[lev], amrex::make_alias, comp, 1);
+                            rho_cp.emplace_back(*tracer[lev], amrex::make_alias, comp, 1);
                             
                             amrex::Print() << "setting A coefficients" << "\n";  
                             
@@ -288,8 +288,8 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                                     rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
                                 });
                             }     
-                            // m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);  
-                            m_reg_scal_solve_op->setACoeffs(lev, 1.0);
+                            m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);  
+                            // m_reg_scal_solve_op->setACoeffs(lev, 1.0);
                         }
                         else
                         {
@@ -318,7 +318,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                     {
                         if (i == 7 & j == 7 & k == 7)
                         {
-                            amrex::Print() << "Temperature!! = " << tra_a(i,j,k) << "\n";
+                            amrex::Print() << "Temperature - in DSO = " << tra_a(i,j,k) << "\n";
 
                         }
                     });

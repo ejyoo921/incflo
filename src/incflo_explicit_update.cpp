@@ -83,9 +83,10 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                             tra(i,j,k,n) = (rho_arr(i,j,k,n)*cp_arr(i,j,k,n)) * tra_o(i,j,k,n) + l_dt *
                             (rho_arr(i,j,k,n)*(cp_arr(i,j,k,n)) * dtdt_o(i,j,k,n) + tra_f(i,j,k,n) + m_half * laps_o(i,j,k,n) );
 
-                            if (tra_f(i,j,k,n) != 0)
+                            if (i == 7 & j == 7 & k == 7)
                             {
-                                amrex::Print() <<  "tra_f is = " << tra_f(i,j,k,n) << "\n";
+                                amrex::Print() <<  "tra is = " << tra(i,j,k,n) << "\n";
+                                amrex::Print() <<  "tra_o is = " << tra_o(i,j,k,n) << "\n";
                             }
                         }
                     });
