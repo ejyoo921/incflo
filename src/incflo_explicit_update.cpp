@@ -85,7 +85,6 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
 
                             if (i == 7 & j == 7 & k == 7)
                             {
-                                amrex::Print() <<  "tra is = " << tra(i,j,k,n) << "\n";
                                 amrex::Print() <<  "tra_o is = " << tra_o(i,j,k,n) << "\n";
                             }
                         }

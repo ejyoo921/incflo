@@ -329,8 +329,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
                         for(int np = 0; np < npellets; np++)
                         {
                             Real dist2 = std::pow(x - centx[np], 2.0)+                
-                                        std::pow(y - centy[np], 2.0)+                
-                                        std::pow(z - centz[np], 2.0); 
+                                         std::pow(y - centy[np], 2.0)+                
+                                         std::pow(z - centz[np], 2.0); 
 
                             if(dist2 < std::pow(rads[np], 2.0))
                             {
@@ -354,44 +354,8 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
                 }
             }
             vfrac_fe = vfrac_fe/8.0;
-
             vfrac_mix(i,j,k) = m_dens_fe*vfrac_fe + m_dens_slg*(1.0-vfrac_fe);
 
-
-
-
-
-
-        // for(int np = 0; np < npellets; np++)
-        // {
-
-        //     Real dist2 = std::pow(x - centx[np], 2.0)+                
-        //                  std::pow(y - centy[np], 2.0)+                
-        //                  std::pow(z - centz[np], 2.0); 
-            
-        //     if(dist2 <= std::pow(rads[np], 2.0))
-        //     {              
-        //         inside_pellet = 1;
-        //         break;
-        //     }
-        // }
-        // if (inside_pellet)
-        // {
-        //     // no internal flow
-        //     vel(i,j,k,0) = Real(0.0);
-        //     vel(i,j,k,1) = Real(0.0);
-        //     vel(i,j,k,2) = Real(0.0);
-
-        //     //Two viscosity
-        //     viscosity(i,j,k) = m_mu*pow(10, m_n_0);
-            
-        //     // Initial Fe temperature
-        //     tracer(i,j,k) = m_Tinit_fe; //K; 
-        //     cp(i,j,k) = m_cp_fe; // Initial specific heat for Fe
-        //     conductivity(i,j,k) = m_cond_fe;
-        //     rho_steel(i,j,k) = m_dens_fe; // kg/m3; density
-
-        // }
     });
 }
 

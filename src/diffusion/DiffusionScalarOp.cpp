@@ -175,6 +175,13 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
         rhs_c[lev].define(tracer[lev]->boxArray(), tracer[lev]->DistributionMap(), 1, 0);
     }
 
+    //EY for rho*cp
+    Vector<MultiFab> rho_cp(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        rho_cp[lev].define(density[lev]->boxArray(), density[lev]->DistributionMap(), 1, 0);
+        rho_cp[lev].setVal(0.0);
+    }
+
     auto iconserv = m_incflo->get_tracer_iconserv();
 #ifdef AMREX_USE_EB
     if (m_eb_scal_solve_op)
@@ -191,41 +198,39 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
     else
 #endif
     {
-        m_reg_scal_solve_op->setScalars(1.0, dt); //EY: 1 = A, dt = B
-
+        m_reg_scal_solve_op->setScalars(1.0, dt); // EY: big A scalar constant 
         for (int lev = 0; lev <= finest_level; ++lev) {
             if ( iconserv[0] ) {
                 m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
             } else {
-                // EY: steelmelt
+                //EY
                 amrex::ParmParse pp("incflo");
-                pp.query("fluid_model", fluid_model_s);
-                if (fluid_model_s == "twoMu")
+                std::string m_fluid_model;
+                pp.query("fluid_model", m_fluid_model);
+                if (m_fluid_model == "twoMu")
                 {
-                    // Vector<MultiFab> rho_cp;
-                    // rho_cp.emplace_back(*tracer[lev], amrex::make_alias, 0, 1);
-                    
-                    // amrex::Print() << "setting A coefficients" << "\n";  
-                    
-                    // auto rho_steel = m_incflo->get_rho_steel();
-                    // auto cp_steel  = m_incflo->get_cp_steel();
+                    amrex::Print() << "SET A-COEFFICIENT (1)" << "\n";
+                    auto rho_steel = m_incflo->get_rho_steel();
+                    auto cp_steel  = m_incflo->get_cp_steel();
 
-                    // for (MFIter mfi(rho_cp[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-                    //     // Box const& bx = mfi.tilebox();
-                    //     Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
-                    //     Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
-                    //     Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
-                    //     Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
-                    //     ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    //     {
-                    //         rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
-                    //     });
-                    // }     
-                    // m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]); // This is alpha (scalar field)
-                    m_reg_scal_solve_op->setACoeffs(lev, 1.0);
+                    for (MFIter mfi(rho_cp[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
+                    {
+                        Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+                        Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
+                        Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
+                        Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
+
+                        ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        {
+                            rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
+                        });
+                    }
+                    // EY: alpha a scalar field 
+                    m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);
                 }
-                else {
-                    m_reg_scal_solve_op->setACoeffs(lev, 1.0); 
+                else
+                {
+                    m_reg_scal_solve_op->setACoeffs(lev, 1.0);
                 }
             }
         }
@@ -264,32 +269,30 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                     if ( iconserv[comp] ) {
                         m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
                     } else {
-                        // EY: steelmelt -- setting alpha 
+                        //EY
                         amrex::ParmParse pp("incflo");
-                        pp.query("fluid_model", fluid_model_s);
-                        if (fluid_model_s == "twoMu")
+                        std::string m_fluid_model;
+                        pp.query("fluid_model", m_fluid_model);
+                        if (m_fluid_model == "twoMu")
                         {
-                            Vector<MultiFab> rho_cp;
-                            rho_cp.emplace_back(*tracer[lev], amrex::make_alias, comp, 1);
-                            
-                            amrex::Print() << "setting A coefficients" << "\n";  
-                            
+                            amrex::Print() << "SET A-COEFFICIENT (2)" << "\n";
                             auto rho_steel = m_incflo->get_rho_steel();
-                            auto cp_steel = m_incflo->get_cp_steel();
+                            auto cp_steel  = m_incflo->get_cp_steel();
 
-                            for (MFIter mfi(rho_cp[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-                                // Box const& bx = mfi.tilebox();
+                            for (MFIter mfi(rho_cp[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
+                            {
                                 Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
                                 Array4<Real> const& rho_cp_a = rho_cp[lev].array(mfi);
                                 Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
                                 Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
+
                                 ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                                 {
                                     rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
                                 });
-                            }     
-                            m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);  
-                            // m_reg_scal_solve_op->setACoeffs(lev, 1.0);
+                            }
+                            // EY: alpha a scalar field 
+                            m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);
                         }
                         else
                         {
@@ -297,6 +300,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                         }
                     }
                 }
+
                 Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_scalar_eta_to_faces(lev, comp, *eta[lev]);
                 m_reg_scal_solve_op->setBCoeffs(lev, GetArrOfConstPtrs(b));
             }
@@ -309,20 +313,6 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
 
             if ( !iconserv[comp] ) {
                 rhs.emplace_back(*tracer[lev], amrex::make_alias, comp, 1);
-                for (MFIter mfi(rhs[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-                    Box const& bx = mfi.tilebox();
-                    Array4<Real> const& rhs_a = rhs[lev].array(mfi);
-                    Array4<Real const> const& tra_a = tracer[lev]->const_array(mfi,comp);
-                    Array4<Real const> const& rho_a = density[lev]->const_array(mfi);
-                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                    {
-                        if (i == 7 & j == 7 & k == 7)
-                        {
-                            amrex::Print() << "Temperature - in DSO = " << tra_a(i,j,k) << "\n";
-
-                        }
-                    });
-                }
             } else {
                 rhs.emplace_back(rhs_c[lev], amrex::make_alias, 0, 1);
 #ifdef _OPENMP
@@ -460,7 +450,7 @@ DiffusionScalarOp::diffuse_vel_components (Vector<MultiFab*> const& vel,
             m_reg_vel_solve_op->setDomainBC(m_incflo->get_diffuse_velocity_bc(Orientation::low ,comp),
                                             m_incflo->get_diffuse_velocity_bc(Orientation::high,comp));
 
-            m_reg_vel_solve_op->setScalars(1.0, dt); 
+            m_reg_vel_solve_op->setScalars(1.0, dt);
             for (int lev = 0; lev <= finest_level; ++lev) {
                 m_reg_vel_solve_op->setACoeffs(lev, *density[lev]);
             }
@@ -621,7 +611,7 @@ void DiffusionScalarOp::compute_laps (Vector<MultiFab*> const& a_laps,
 #endif
     {
         // We want to return div (mu grad)) phi
-        m_reg_scal_apply_op->setScalars(0.0, -1.0); // EY: why -1.0
+        m_reg_scal_apply_op->setScalars(0.0, -1.0);
 
         for (int comp = 0; comp < m_incflo->m_ntrac; ++comp) {
 

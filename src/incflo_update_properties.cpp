@@ -4,64 +4,6 @@ using namespace amrex;
 
 namespace 
 {
-    // AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    // amrex::Real compute_vfrac (int lev, int i, int j, int k, 
-    //                             amrex::GpuArray<double, 3> prob_lo, 
-    //                             amrex::GpuArray<double, 3> prob_hi, 
-    //                             amrex::GpuArray<double, 3> dx)
-    // {
-    //     amrex::ParmParse pp("prob");
-    //     // Extract position and velocities
-    //     int npellets = 0;
-    //     amrex::Vector<amrex::Real> rads;
-    //     amrex::Vector<amrex::Real> centx;
-    //     amrex::Vector<amrex::Real> centy;
-    //     amrex::Vector<amrex::Real> centz;
-
-    //     pp.get("npellets", npellets);
-    //     pp.getarr("pellet_rads",  rads);    
-    //     pp.getarr("pellet_centx", centx);
-    //     pp.getarr("pellet_centy", centy);
-    //     pp.getarr("pellet_centz", centz);
-
-    // #ifdef _OPENMP
-    // #pragma omp parallel for collapse(2) if (GPU::notInLaunchRegion)
-    // #endif
-
-    //     Real vfrac_fe = 0.0;
-
-    //     for(int kk=0;kk<2;kk++)
-    //     {
-    //         for(int jj=0;jj<2;jj++)
-    //         {
-    //             for(int ii=0;ii<2;ii++)
-    //             {
-    //                 Real x = prob_lo[0] + (i+ii) * dx[0];
-    //                 Real y = prob_lo[1] + (j+jj) * dx[1];
-    //                 Real z = prob_lo[2] + (k+kk) * dx[2];
-
-    //                 for(int np = 0; np < npellets; np++)
-    //                 {
-    //                     Real dist2 = std::pow(x - centx[np], 2.0)+                
-    //                                 std::pow(y - centy[np], 2.0)+                
-    //                                 std::pow(z - centz[np], 2.0); 
-
-    //                     if(dist2 < std::pow(rads[np], 2.0))
-    //                     {
-    //                         amrex::Print() << "vfrac add up?" << "\n";          
-    //                         vfrac_fe+=1.0;
-    //                         break;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     vfrac_fe=vfrac_fe/8.0;
-
-    //     return vfrac_fe;        
-    // }
-
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real bound01(const amrex::Real q0)
     {   //bounds a quantity between 0 and 1
@@ -679,30 +621,25 @@ void incflo::update_properties ()
                 auto const& prob_hi = geom[lev].ProbLoArray();
                 auto const& dx = geom[lev].CellSizeArray();  
 
-                // TODO: This should not be computed for every time step.
-                // Just once when initializing and keep it somewhere.
-                // vfrac_fe_mix = compute_vfrac (lev, i, j, k, prob_lo, prob_hi, dx);
-
                 // update rho ----------------------------------------------------
                 dens_fe         = compute_rho(Temp,0); //zero is temporary
                 dens_slg        = compute_rho(Temp,5);
 
-
                 vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
-                dens_arr(i,j,k)  = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
-                dens_arr(i,j,k)  = 1.0;
+                dens_arr(i,j,k) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
+                dens_arr(i,j,k) = 1.0;
 
                 // update cp -----------------------------------------------------
                 cp_fe           = compute_cp(Temp, 0); //zero is temporary
                 cp_slg          = compute_cp(Temp, 5);
                 cp_arr(i,j,k)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
-                cp_arr(i,j,k)  = 1.0;
+                cp_arr(i,j,k)   = 1.0;
 
                 // update conductivity -------------------------------------------
                 cond_fe         = compute_k(Temp,0); //zero is temporary
                 cond_slg        = compute_k(Temp,5); //k is conductivity
                 cond_arr(i,j,k) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
-                cond_arr(i,j,k)  = 1.0;
+                cond_arr(i,j,k) = 1.0;
 
                 // get iron properties
 	            mol_fe = bound01(compute_liqfrac(Temp,0));
@@ -739,7 +676,7 @@ void incflo::update_properties ()
                     for(int np = 0; np < npellets; np++)
                     {
                         // Update the inside location with Temperature
-                        Real Temp_melt = 1500.0;
+                        Real Temp_melt = 100.0;
                         if (Temp < Temp_melt)
                         {   
                             inside_pellet = 1;
