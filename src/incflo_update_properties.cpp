@@ -623,32 +623,33 @@ void incflo::update_properties ()
 
                 // update rho ----------------------------------------------------
                 dens_fe         = compute_rho(Temp,0); //zero is temporary
-                dens_slg        = compute_rho(Temp,5);
+                dens_slg        = compute_rho(Temp,1);
 
                 vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
                 dens_arr(i,j,k) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
-                dens_arr(i,j,k) = 1.0;
+                // dens_arr(i,j,k) = 1.0;
 
                 // update cp -----------------------------------------------------
                 cp_fe           = compute_cp(Temp, 0); //zero is temporary
-                cp_slg          = compute_cp(Temp, 5);
+                cp_slg          = compute_cp(Temp, 1);
                 cp_arr(i,j,k)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
-                cp_arr(i,j,k)   = 1.0;
+                // cp_arr(i,j,k)   = 1.0;
 
                 // update conductivity -------------------------------------------
                 cond_fe         = compute_k(Temp,0); //zero is temporary
-                cond_slg        = compute_k(Temp,5); //k is conductivity
+                cond_slg        = compute_k(Temp,1); //k is conductivity
                 cond_arr(i,j,k) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
-                cond_arr(i,j,k) = 1.0;
+                // cond_arr(i,j,k) = 1.0;
 
                 // get iron properties
 	            mol_fe = bound01(compute_liqfrac(Temp,0));
                 sol_fe = bound01((1.0 - mol_fe));
 
-                if (i == 7 & j == 7 & k == 7)
+                if (i == 8 & j == 8 & k == 8)
                 {
                     amrex::Print() << "Temperature = " << Temp << "\n";
-                    amrex::Print() << "VFRAC = " << vfrac_fe << "\n";
+                    amrex::Print() << "Vfrac MIX = " << vfrac_fe_mix << "\n";
+                    amrex::Print() << "Vfrac Bound 01 = " << vfrac_fe << "\n";
                     amrex::Print() << "Cp = " << cp_arr(i,j,k) << "\n";
                     amrex::Print() << "Conductivity = " << cond_arr(i,j,k) << "\n";
                     amrex::Print() << "Density = " << dens_arr(i,j,k) << "\n";

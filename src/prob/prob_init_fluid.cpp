@@ -355,7 +355,14 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
             }
             vfrac_fe = vfrac_fe/8.0;
             vfrac_mix(i,j,k) = m_dens_fe*vfrac_fe + m_dens_slg*(1.0-vfrac_fe);
-
+            if (i == 8 & j == 8 & k == 8)
+            {
+                amrex::Print() << "Vfrac INIT mix = " << vfrac_fe << "\n";   
+            }
+            if (i == 1 & j == 1 & k == 1)
+            {
+                amrex::Print() << "Vfrac INIT mix (OUT) = " << vfrac_fe << "\n";   
+            }
     });
 }
 

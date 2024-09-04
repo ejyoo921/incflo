@@ -275,7 +275,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                         pp.query("fluid_model", m_fluid_model);
                         if (m_fluid_model == "twoMu")
                         {
-                            amrex::Print() << "SET A-COEFFICIENT (2)" << "\n";
+                            amrex::Print() << "SET A-COEFFICIENT ()" << "\n";
                             auto rho_steel = m_incflo->get_rho_steel();
                             auto cp_steel  = m_incflo->get_cp_steel();
 
