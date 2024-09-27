@@ -74,3 +74,4 @@ test/chk*/
 **/paraview_data*
 **/32/
 **/data*
+**/*.o

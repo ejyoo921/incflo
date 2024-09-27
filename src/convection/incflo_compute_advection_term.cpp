@@ -142,7 +142,6 @@ incflo::compute_convective_term (Vector<MultiFab*> const& conv_u,
         compute_vel_forces(vel_forces, vel, density, tracer, tracer);
 
         if (m_godunov_include_diff_in_forcing) {
-
             for (int lev = 0; lev <= finest_level; ++lev) {
                 auto& ld = *m_leveldata[lev];
 #ifdef _OPENMP
@@ -675,6 +674,7 @@ incflo::compute_convective_term (Vector<MultiFab*> const& conv_u,
           for (MFIter mfi(*conv_r[lev],TilingIfNotGPU()); mfi.isValid(); ++mfi)
           {
             Box const& bx = mfi.tilebox();
+
 
 #ifdef AMREX_USE_EB
             EBCellFlagFab const& flagfab = ebfact->getMultiEBCellFlagFab()[mfi];

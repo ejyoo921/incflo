@@ -175,7 +175,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
         rhs_c[lev].define(tracer[lev]->boxArray(), tracer[lev]->DistributionMap(), 1, 0);
     }
 
-    //EY for rho*cp
+    //EY: prep for rho*cp
     Vector<MultiFab> rho_cp(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         rho_cp[lev].define(density[lev]->boxArray(), density[lev]->DistributionMap(), 1, 0);
@@ -197,8 +197,8 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
     }
     else
 #endif
-    {
-        m_reg_scal_solve_op->setScalars(1.0, dt); // EY: big A scalar constant 
+    {   // EY: big A,B scalar constant - this is dt/2 for CN 
+        m_reg_scal_solve_op->setScalars(1.0, dt); 
         for (int lev = 0; lev <= finest_level; ++lev) {
             if ( iconserv[0] ) {
                 m_reg_scal_solve_op->setACoeffs(lev, *density[lev]);
@@ -275,7 +275,6 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                         pp.query("fluid_model", m_fluid_model);
                         if (m_fluid_model == "twoMu")
                         {
-                            amrex::Print() << "SET A-COEFFICIENT ()" << "\n";
                             auto rho_steel = m_incflo->get_rho_steel();
                             auto cp_steel  = m_incflo->get_cp_steel();
 
@@ -291,7 +290,7 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                                     rho_cp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
                                 });
                             }
-                            // EY: alpha a scalar field 
+                            // EY: alpha here is a scalar field 
                             m_reg_scal_solve_op->setACoeffs(lev, rho_cp[lev]);
                         }
                         else
@@ -300,10 +299,23 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                         }
                     }
                 }
-
+                //TODO: EY: CHEKC THE EXACT VALUE HERE FOR LAPS_o
                 Array<MultiFab,AMREX_SPACEDIM> b = m_incflo->average_scalar_eta_to_faces(lev, comp, *eta[lev]);
                 m_reg_scal_solve_op->setBCoeffs(lev, GetArrOfConstPtrs(b));
-            }
+                amrex::Print() << "AVERAGE DOWN for ETA"<<"\n";
+                // EY: Checking face-centered values for tracer
+                // auto& ld = *m_leveldata[lev];
+                // bool first = true;
+                // // Array4<Real> eta_arr = *eta[lev];
+                // if(first)
+                // {
+                //     first = false;
+                //     amrex::PrintToFile("chk_values") << "[Average Down]    (i,j,k) = (" <<8<<","<<8<<","<<8<<")" << "\n";
+                //     amrex::PrintToFile("chk_values") << "[Average Down]    Temp    = " << b(8,8,8) << "\n";
+                //     amrex::PrintToFile("chk_values") << "[Average Down]    (i,j,k) = (" <<9<<","<<8<<","<<8<<")" << "\n";
+                //     amrex::PrintToFile("chk_values") << "[Average Down]    Temp    = " << b(9,8,8) << "\n";
+                // }
+            } //lev
         }
 
         Vector<MultiFab> phi;
@@ -630,6 +642,7 @@ void DiffusionScalarOp::compute_laps (Vector<MultiFab*> const& a_laps,
             }
 
             MLMG mlmg(*m_reg_scal_apply_op);
+            // mlmg.apply(output, input);
             mlmg.apply(GetVecOfPtrs(laps_comp), GetVecOfPtrs(scalar_comp));
         }
     }

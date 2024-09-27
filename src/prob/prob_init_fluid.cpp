@@ -23,7 +23,7 @@ void incflo::prob_init_fluid (int lev)
                  ld.velocity.setVal(m_ic_w, 2, 1););
 
     if (m_ntrac > 0) ld.tracer.setVal(0.0);
-
+    
     for (MFIter mfi(ld.density); mfi.isValid(); ++mfi)
     {
         const Box& vbx = mfi.validbox();
@@ -306,10 +306,6 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
         conductivity(i,j,k) = m_cond_slg; //W/m/K ; conductivity
         rho_steel(i,j,k) = m_dens_slg; // kg/m3; density
 
-        // Real x = problo[0] + Real(i+0.5)*dx[0];
-        // Real y = problo[1] + Real(j+0.5)*dx[1];
-        // Real z = problo[2] + Real(k+0.5)*dx[2];
-
         int inside_pellet = 0;
         #ifdef _OPENMP
         #pragma omp parallel for collapse(2) if (GPU::notInLaunchRegion)
@@ -348,22 +344,14 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
                                 conductivity(i,j,k) = m_cond_fe;
                                 rho_steel(i,j,k) = m_dens_fe; // kg/m3; density
                                 break;
-                            }
-                        }
-                    }
-                }
-            }
+                            } // inside pellet
+                        } // np
+                    } // ii
+                } // jj
+            }// kk
             vfrac_fe = vfrac_fe/8.0;
             vfrac_mix(i,j,k) = m_dens_fe*vfrac_fe + m_dens_slg*(1.0-vfrac_fe);
-            if (i == 8 & j == 8 & k == 8)
-            {
-                amrex::Print() << "Vfrac INIT mix = " << vfrac_fe << "\n";   
-            }
-            if (i == 1 & j == 1 & k == 1)
-            {
-                amrex::Print() << "Vfrac INIT mix (OUT) = " << vfrac_fe << "\n";   
-            }
-    });
+    }); // i,j,k
 }
 
 void incflo::init_taylor_green (Box const& vbx, Box const& /*gbx*/,

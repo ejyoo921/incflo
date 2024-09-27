@@ -194,12 +194,10 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
 {
     for (auto *mf : tra_eta) {
         for (int n = 0; n < m_ntrac; ++n) {
-            mf->setVal(m_mu_s[n], n, 1, nghost);
-            amrex::Print() << "[n]" << n << "\n";
-
             if (m_fluid_model == FluidModel::TwoMu){
                 for(int lev = 0; lev <= finest_level; ++lev){      
                     auto& ld = *m_leveldata[lev];
+                    bool first = true;
                     for (MFIter mfi(*mf,TilingIfNotGPU()); mfi.isValid(); ++mfi)
                     {
                         Box const& bx = mfi.growntilebox(nghost);
@@ -207,11 +205,21 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
                         Array4<Real> cond_arr = ld.k_steel.array(mfi);   
                           
                         ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
-                        {   // EY: put everything on Bcoeff
-                            tra_eta_arr(i,j,k,n) = cond_arr(i,j,k); 
+                        {   // EY: Conductivity = k_steel(...)
+                            tra_eta_arr(i,j,k,n) = cond_arr(i,j,k,n); 
                         });
+                        if (first)
+                        {
+                            first = false;
+                            amrex::PrintToFile("chk_values") <<  "[Rheology] conduct (888)  = " << tra_eta_arr(8,8,8,n) << "\n";
+                            amrex::PrintToFile("chk_values") <<  "[Rheology] conduct (988)  = " << tra_eta_arr(9,8,8,n) << "\n";
+                        }
                     }
                 }
+                // amrex::PrintToFile("chk_values") <<  "[Rheology] mu_s           = " << m_mu_s[n] << "\n";
+            } // EY
+            else {
+                mf->setVal(m_mu_s[n], n, 1, nghost);
             }
         }   
     }

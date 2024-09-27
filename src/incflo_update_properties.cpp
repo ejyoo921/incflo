@@ -583,6 +583,7 @@ void incflo::update_properties ()
 {
     BL_PROFILE("incflo::update_properties");
 
+    int l_ntrac = m_ntrac;
     // update thermal propeties
     for(int lev = 0; lev <= finest_level; ++lev) {
         // you need to deal with ghost cells
@@ -590,6 +591,7 @@ void incflo::update_properties ()
         fillpatch_tracer(lev, m_t_new[lev], m_leveldata[lev]->tracer, ng); 
         
         auto& ld = *m_leveldata[lev];
+        bool first = true;
         for (MFIter mfi(ld.tracer,TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
             Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
@@ -605,94 +607,125 @@ void incflo::update_properties ()
 
             ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
-                // incflo::update_thermal_properties_and_phases(i, j, k, t_prop_arr, prob_lo, prob_hi, dx);
                 // For SteelSlag case 
-                amrex::Real Temp = temp_arr(i,j,k); // Need to bring actual Temp vals
-                amrex::Real vfrac_fe_mix = vfrac_mix_arr(i,j,k);
-                amrex::Real vfrac_fe;
-                amrex::Real cp_fe,  cond_fe,  dens_fe; // Fe
-                amrex::Real cp_slg, cond_slg, dens_slg; // Slag
-                amrex::Real sol_fe, mol_fe, sol_slg, mol_slg; // Phases
-
-                const auto lo = lbound(gbx);
-                const auto hi = ubound(gbx);    
-
-                auto const& prob_lo = geom[lev].ProbLoArray();
-                auto const& prob_hi = geom[lev].ProbLoArray();
-                auto const& dx = geom[lev].CellSizeArray();  
-
-                // update rho ----------------------------------------------------
-                dens_fe         = compute_rho(Temp,0); //zero is temporary
-                dens_slg        = compute_rho(Temp,1);
-
-                vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
-                dens_arr(i,j,k) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
-                // dens_arr(i,j,k) = 1.0;
-
-                // update cp -----------------------------------------------------
-                cp_fe           = compute_cp(Temp, 0); //zero is temporary
-                cp_slg          = compute_cp(Temp, 1);
-                cp_arr(i,j,k)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
-                // cp_arr(i,j,k)   = 1.0;
-
-                // update conductivity -------------------------------------------
-                cond_fe         = compute_k(Temp,0); //zero is temporary
-                cond_slg        = compute_k(Temp,1); //k is conductivity
-                cond_arr(i,j,k) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
-                // cond_arr(i,j,k) = 1.0;
-
-                // get iron properties
-	            mol_fe = bound01(compute_liqfrac(Temp,0));
-                sol_fe = bound01((1.0 - mol_fe));
-
-                if (i == 8 & j == 8 & k == 8)
+                for (int n = 0; n < l_ntrac; ++n)
                 {
-                    amrex::Print() << "Temperature = " << Temp << "\n";
-                    amrex::Print() << "Vfrac MIX = " << vfrac_fe_mix << "\n";
-                    amrex::Print() << "Vfrac Bound 01 = " << vfrac_fe << "\n";
-                    amrex::Print() << "Cp = " << cp_arr(i,j,k) << "\n";
-                    amrex::Print() << "Conductivity = " << cond_arr(i,j,k) << "\n";
-                    amrex::Print() << "Density = " << dens_arr(i,j,k) << "\n";
+                    amrex::Real Temp = temp_arr(i,j,k,n); // Need to bring actual Temp vals
+                    amrex::Real vfrac_fe_mix = vfrac_mix_arr(i,j,k,n);
+                    amrex::Real vfrac_fe;
+                    amrex::Real cp_fe,  cond_fe,  dens_fe; // Fe
+                    amrex::Real cp_slg, cond_slg, dens_slg; // Slag
+                    amrex::Real sol_fe, mol_fe, sol_slg, mol_slg; // Phases
 
-                }
+                    const auto lo = lbound(gbx);
+                    const auto hi = ubound(gbx);    
 
-                // update phases -------------------------------------------------
-                // phi(i,j,k,NTHERMVARS+SOLFE_ID)   = vfrac_fe*sol_fe;             
-                // phi(i,j,k,NTHERMVARS+MOLFE_ID)   = vfrac_fe*mol_fe;             
-                // phi(i,j,k,NTHERMVARS+SOLSLG_ID)  = bound01((1.0-vfrac_fe))*sol_slg;             
-                // phi(i,j,k,NTHERMVARS+MOLSLG_ID)  = bound01((1.0-vfrac_fe))*mol_slg;  
+                    auto const& prob_lo = geom[lev].ProbLoArray();
+                    auto const& prob_hi = geom[lev].ProbLoArray();
+                    auto const& dx = geom[lev].CellSizeArray();  
 
-                // set zero velocity - inside pellet
-                ParmParse pp("incflo");
-                bool m_zero_vel = false;
-                pp.queryAdd("zero_vel", m_zero_vel);
+                    // update rho ----------------------------------------------------
+                    dens_fe         = compute_rho(Temp,0); //zero is temporary
+                    dens_slg        = compute_rho(Temp,1);
 
-                if (m_zero_vel) // Make zero velocity 
-                {
-                    int npellets = 0;
-                    amrex::ParmParse pp("prob");
-                    pp.get("npellets", npellets);
+                    vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+                    dens_arr(i,j,k,n) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
+                    // dens_arr(i,j,k,n) = 1.0;
 
-                    int inside_pellet = 0;
-                    for(int np = 0; np < npellets; np++)
+                    // update cp -----------------------------------------------------
+                    cp_fe           = compute_cp(Temp, 0); //zero is temporary
+                    cp_slg          = compute_cp(Temp, 1);
+                    cp_arr(i,j,k,n)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
+                    // cp_arr(i,j,k,n) = 1.0;
+
+                    // update conductivity -------------------------------------------
+                    cond_fe         = compute_k(Temp,0); //zero is temporary
+                    cond_slg        = compute_k(Temp,1); //k is conductivity
+                    // cond_fe         = 4.0; //zero is temporary
+                    // cond_slg        = 1.0; //k is conductivity
+                    cond_arr(i,j,k,n) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
+                    // cond_arr(i,j,k,n) = 10.0;
+
+                    // get iron properties
+                    mol_fe = bound01(compute_liqfrac(Temp,0));
+                    sol_fe = bound01((1.0 - mol_fe));
+
+                    // update phases -------------------------------------------------
+                    // phi(i,j,k,NTHERMVARS+SOLFE_ID)   = vfrac_fe*sol_fe;             
+                    // phi(i,j,k,NTHERMVARS+MOLFE_ID)   = vfrac_fe*mol_fe;             
+                    // phi(i,j,k,NTHERMVARS+SOLSLG_ID)  = bound01((1.0-vfrac_fe))*sol_slg;             
+                    // phi(i,j,k,NTHERMVARS+MOLSLG_ID)  = bound01((1.0-vfrac_fe))*mol_slg;  
+
+                    // set zero velocity - inside pellet
+                    ParmParse pp("incflo");
+                    bool m_zero_vel = false;
+                    pp.queryAdd("zero_vel", m_zero_vel);
+
+                    if (m_zero_vel) // Make zero velocity 
                     {
-                        // Update the inside location with Temperature
-                        Real Temp_melt = 100.0;
-                        if (Temp < Temp_melt)
-                        {   
-                            inside_pellet = 1;
-                            break;
+                        int npellets = 0;
+                        amrex::ParmParse pp("prob");
+                        pp.get("npellets", npellets);
+
+                        int inside_pellet = 0;
+                        for(int np = 0; np < npellets; np++)
+                        {
+                            // Update the inside location with Temperature
+                            Real Temp_melt = 100.0;
+                            if (Temp < Temp_melt)
+                            {   
+                                inside_pellet = 1;
+                                break;
+                            }
                         }
-                    }
-                    if (inside_pellet)
-                    {   // no internal flow
-                        vel(i,j,k,0) = Real(0.0);
-                        vel(i,j,k,1) = Real(0.0);
-                        vel(i,j,k,2) = Real(0.0);
-                        eta_arr(i,j,k) = m_mu*pow(10, m_n_0);
-                    } // inside pellet
-                } // if-zero-vel
+                        if (inside_pellet)
+                        {   // no internal flow
+                            vel(i,j,k,0) = Real(0.0);
+                            vel(i,j,k,1) = Real(0.0);
+                            vel(i,j,k,2) = Real(0.0);
+                            eta_arr(i,j,k,n) = m_mu*pow(10, m_n_0);
+                        } // inside pellet
+                    } // if-zero-vel
+                }
             }); // i,j,k
+            if(first)
+            {
+                first = false;
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<8<<","<<8<<","<<8<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(8,8,8) << "\n";
+                // //
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<7<<","<<8<<","<<8<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(7,8,8) << "\n";
+                // //
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<9<<","<<8<<","<<8<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(9,8,8) << "\n";
+                // //
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<8<<","<<7<<","<<8<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(8,7,8) << "\n";
+                // //
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<8<<","<<9<<","<<8<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(8,9,8) << "\n";
+                // //
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<8<<","<<8<<","<<7<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(8,8,7) << "\n";
+                // //
+                // amrex::PrintToFile("chk_values") << "[Update Property] (i,j,k) = (" <<8<<","<<8<<","<<9<<")" << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Temp    = " << temp_arr(8,8,9) << "\n";
+                //
+                // int i = 8; int j = 8; int k = 8;
+                // amrex::PrintToFile("chk_values") << "[Update Property] Vel_y   = " << vel(i,j,k) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] VfrcMX  = " << vfrac_mix_arr(i,j,k) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Cp      = " << cp_arr(i,j,k) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(i,j,k) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Densit  = " << dens_arr(i,j,k) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(7,8,8) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(9,8,8) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(8,7,8) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(8,9,8) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(8,8,7) << "\n";
+                // amrex::PrintToFile("chk_values") << "[Update Property] Conduc  = " << cond_arr(8,8,9) << "\n";
+                // amrex::PrintToFile("chk_values") <<  "---------------------------------------------- " <<"\n";
+            }
         } // mfi
     } // lev
 

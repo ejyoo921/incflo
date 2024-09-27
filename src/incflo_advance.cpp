@@ -44,7 +44,6 @@ void incflo::Advance()
 
 #ifdef AMREX_USE_EB
     if (m_eb_flow.enabled) {
-        amrex::Print() << "EB flow enabled" << "\n";  //EY
        for (int lev = 0; lev <= finest_level; ++lev) {
          set_eb_velocity(lev, m_t_old[lev], *get_velocity_eb()[lev], 1);
          set_eb_density(lev, m_t_old[lev], *get_density_eb()[lev], 1);
