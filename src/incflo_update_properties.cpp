@@ -486,14 +486,14 @@ namespace
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real compute_rho(const amrex::Real Temp,int phase)
-    {   // calculate rho based on phase and temp
+    {   // calculate rho based on phase(material) and temp
         Real rhocalc=1000.0;
         switch (phase) {
             case 0:
                 rhocalc = 7900.0;
             break;
 
-            case 1:
+            case 1: 
                 rhocalc = 7900.0;
             break;
 
@@ -519,6 +519,7 @@ namespace
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     amrex::Real compute_liqfrac(const amrex::Real Temp,int phase)
     { // calculate liqfrac based on phase and temp
+        // THIS IS TELLING ME LIQ VS SOLID 
         Real liqfraccalc=0.0;
         int material1 = phase;
         switch (material1) {
@@ -623,6 +624,9 @@ void incflo::update_properties ()
                     auto const& prob_lo = geom[lev].ProbLoArray();
                     auto const& prob_hi = geom[lev].ProbLoArray();
                     auto const& dx = geom[lev].CellSizeArray();  
+
+                    // Case numbers (materials)
+                    // #0 is temperoary
 
                     // update rho ----------------------------------------------------
                     dens_fe         = compute_rho(Temp,0); //zero is temporary

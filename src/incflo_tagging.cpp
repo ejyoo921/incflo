@@ -73,9 +73,9 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
     // EY: tagging for Steelmake - jump viscosity
     bool tag_eta = levc < etaerr_v.size();
     bool tag_gradeta = levc < gradetaerr_v.size();
-    if (tag_gradeta) {
-        fillpatch_viscosity(levc, time, m_leveldata[levc]->viscosity, 1);
-    }
+    // if (tag_gradeta) {
+    //     fillpatch_viscosity(levc, time, m_leveldata[levc]->viscosity, 1);
+    // }
 
     AMREX_D_TERM(const Real l_dx = geom[levc].CellSize(0);,
                  const Real l_dy = geom[levc].CellSize(1);,
@@ -170,6 +170,7 @@ void incflo::ErrorEst (int levc, TagBoxArray& tags, Real time, int /*ngrow*/)
         // EY: we may need one more tag here for Steelmaking (|| tag_)
         if (tag_eta || tag_gradeta) 
         {
+            // amrex::Print()<<"TAGGING"<<"\n";
             // //EY: 
             Array4<Real const> eta = m_leveldata[levc]->viscosity.const_array(mfi);
             Real etaerr = tag_eta ? etaerr_v[levc]: std::numeric_limits<Real>::max();

@@ -2,7 +2,7 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   2         # Max number of time steps
+max_step                =   40000       # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
@@ -15,20 +15,20 @@ incflo.initial_iterations = 0
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   -1           # Steps between plot files
+amr.plot_int            =   1000           # Steps between plot files
 amr.plt_eta             =   1           # plot file for eta
 amr.plt_tracer          =   1           # 
 amr.plt_cp_steel        =   1           # 
 amr.plt_k_steel         =   1           # conductivity/cp (or mu_s)
 amr.plt_rho_steel       =   1           # density
 
-# amr.check_int           =   1000        # Steps between checkpoint files
-amr.restart             =   ""          # Checkpoint to restart from 
+amr.check_int           =   10000        # Steps between checkpoint files
+# amr.restart             =   ""          # Checkpoint to restart from 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
-incflo.gravity          =  0. 0. 0.     # Gravitational force (3D)
+incflo.gravity          =  0.   0.  0.  # Gravitational force (3D)
 incflo.ro_0             =  1.0          # Turn off background state
 
 # incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
@@ -49,19 +49,19 @@ incflo.do_initial_pressure_proj = 1     # to enforce hydrostatic equilibrium
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   16  16  16   # Grid cells at coarsest AMRlevel
-amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
+amr.n_cell              =   64  64  64   # Grid cells at coarsest AMRlevel
+amr.max_grid_size       =   8   8   8 # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
-amr.max_level           =   0           # Max AMR level in hierarchy 
-amr.regrid_int          =   0
+amr.max_level           =   2           # Max AMR level in hierarchy 
+amr.regrid_int          =   2
 
-incflo.gradetaerr       =   10
+incflo.etaerr       =   10
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
-geometry.prob_lo        = -1.  -1.  -1. # Lo corner coordinates
-geometry.prob_hi        =  1.   1.   1. # Hi corner coordinates
+geometry.prob_lo        = -4.  -4.  -4. # Lo corner coordinates
+geometry.prob_hi        =  4.   4.   4. # Hi corner coordinates
 geometry.is_periodic    =  0    0    0  # Periodicity x y z (0/1)
 
 # Boundary conditions
@@ -81,20 +81,20 @@ prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
 
-# prob.cond_fe            =   4.5         # W/m/K (solid)
-# prob.cond_slg           =   1.1715      # W/m/K (liquid)
-prob.cond_fe            =   4.0         # W/m/K (solid)
-prob.cond_slg           =   4.0         # W/m/K (liquid)
+prob.cond_fe            =   4.5         # W/m/K (solid)
+prob.cond_slg           =   1.1715      # W/m/K (liquid)
+# prob.cond_fe            =   4.0         # W/m/K (solid)
+# prob.cond_slg           =   4.0         # W/m/K (liquid)
 
-# prob.dens_fe            =   7500.0      # kg/m3 (solid)
-# prob.dens_slg           =   2550.0      # kg/m3 (liquid)
-prob.dens_fe            =   1.0         # kg/m3 (solid)
-prob.dens_slg           =   1.0         # kg/m3 (liquid)
+prob.dens_fe            =   7500.0      # kg/m3 (solid)
+prob.dens_slg           =   2550.0      # kg/m3 (liquid)
+# prob.dens_fe            =   1.0         # kg/m3 (solid)
+# prob.dens_slg           =   1.0         # kg/m3 (liquid)
 
-# prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
-# prob.cp_slg             =   1004.0      # J/K/kg (liquid)
-prob.cp_fe              =   1.0         # J/K/kg (solid Fe)
-prob.cp_slg             =   1.0         # J/K/kg (liquid)
+prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
+prob.cp_slg             =   1004.0      # J/K/kg (liquid)
+# prob.cp_fe              =   1.0         # J/K/kg (solid Fe)
+# prob.cp_slg             =   1.0         # J/K/kg (liquid)
 
 # prob.Tinit_fe           =   80.0        # (80.0+273.0) K (solid)
 # prob.Tinit_slg          =   80.0      # (1540.0+273.0) K
