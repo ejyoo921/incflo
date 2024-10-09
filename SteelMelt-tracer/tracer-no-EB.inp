@@ -2,25 +2,28 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   40000       # Max number of time steps
+max_step                =   5      # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
 incflo.fixed_dt         =   1e-4        # Use this constant dt if > 0
-incflo.cfl              =   0.45        # CFL factor
-# incflo.init_shrink      = 1.0           # EY: What is this for?
-incflo.initial_iterations = 0
+incflo.cfl              =   0.01        # CFL factor
+incflo.init_shrink      = 0.01           # EY: What is this for?
+# let me try with a differnt inital time step multiplied by this number
+# based on cfl
+#find incflo.change_max -> set that with different number if necessary
+incflo.initial_iterations = 3
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   1000           # Steps between plot files
-amr.plt_eta             =   1           # plot file for eta
-amr.plt_tracer          =   1           # 
+amr.plot_int            =   1           # Steps between plot files
+amr.plt_eta             =   1           # plot file for eta not real viscosity for inside pellet
+amr.plt_tracer          =   1           # Temperature
 amr.plt_cp_steel        =   1           # 
 amr.plt_k_steel         =   1           # conductivity/cp (or mu_s)
-amr.plt_rho_steel       =   1           # density
+amr.plt_rho_steel       =   1           # density Fe
 
 amr.check_int           =   10000        # Steps between checkpoint files
 # amr.restart             =   ""          # Checkpoint to restart from 
@@ -33,66 +36,64 @@ incflo.ro_0             =  1.0          # Turn off background state
 
 # incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
 incflo.fluid_model      =   "twoMu"     # Rheological model
-incflo.mu               =   0.1         # Dynamic viscosity coefficient(g/cm*s)
-incflo.n                =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.mu               =   100.0         # Dynamic viscosity coefficient(g/cm*s) <- liquid Fe viscosity (should be real)
+incflo.n                =   0           # For twoMu, this is eta mu*pow(10, incflo.n)
 
 incflo.zero_vel              =   true   # imposing zero inside pellet vel.     
 incflo.constant_density      =   true   # This density is not depending on Temp
 incflo.advect_tracer         =   true   #
 incflo.trac_is_conservative  =      0   # conservative?
-# incflo.godunov_include_diff_in_forcing = false 
 
-incflo.mu_s             =   1.          # EY: This should not affect
+incflo.mu_s             =   1.          # EY: This should not affect (replaced by k)
 
 incflo.do_initial_pressure_proj = 1     # to enforce hydrostatic equilibrium
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   64  64  64   # Grid cells at coarsest AMRlevel
+amr.n_cell              =   32  32  32  # Grid cells at coarsest AMRlevel
 amr.max_grid_size       =   8   8   8 # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
-amr.max_level           =   2           # Max AMR level in hierarchy 
+amr.max_level           =   0           # Max AMR level in hierarchy 
 amr.regrid_int          =   2
-
 incflo.etaerr       =   10
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
-geometry.prob_lo        = -4.  -4.  -4. # Lo corner coordinates
-geometry.prob_hi        =  4.   4.   4. # Hi corner coordinates
-geometry.is_periodic    =  0    0    0  # Periodicity x y z (0/1)
+geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates
+geometry.prob_hi        =  0.1   0.1   0.1 # Hi corner coordinates
+geometry.is_periodic    =  1    0    0   # Periodicity x y z (0/1)
 
 # Boundary conditions
-xlo.type                =   "mi"
-xhi.type                =   "mi"
-ylo.type                =   "mi"
-yhi.type                =   "mi"
-zlo.type                =   "mi"
-zhi.type                =   "mi"
+# xlo.type                =   "nsw"
+# xhi.type                =   "nsw"
+ylo.type                =   "nsw"
+yhi.type                =   "nsw"
+zlo.type                =   "nsw"
+zhi.type                =   "nsw"
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            Pellet properties          #
 #.......................................#
 prob.npellets           =   1
-prob.pellet_rads        =   0.2
+prob.pellet_rads        =   0.005
 prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
 
-prob.cond_fe            =   4.5         # W/m/K (solid)
-prob.cond_slg           =   1.1715      # W/m/K (liquid)
+# prob.cond_fe            =   4.5         # W/m/K (solid)
+# prob.cond_slg           =   1.1715      # W/m/K (liquid)
 # prob.cond_fe            =   4.0         # W/m/K (solid)
 # prob.cond_slg           =   4.0         # W/m/K (liquid)
 
-prob.dens_fe            =   7500.0      # kg/m3 (solid)
-prob.dens_slg           =   2550.0      # kg/m3 (liquid)
-# prob.dens_fe            =   1.0         # kg/m3 (solid)
-# prob.dens_slg           =   1.0         # kg/m3 (liquid)
+# prob.dens_fe            =   7500.0      # kg/m3 (solid)
+# prob.dens_slg           =   2550.0      # kg/m3 (liquid)
+# prob.dens_fe            =   2000.0         # kg/m3 (solid)
+# prob.dens_slg           =   2000.0         # kg/m3 (liquid)
 
-prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
-prob.cp_slg             =   1004.0      # J/K/kg (liquid)
+# prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
+# prob.cp_slg             =   1004.0      # J/K/kg (liquid)
 # prob.cp_fe              =   1.0         # J/K/kg (solid Fe)
 # prob.cp_slg             =   1.0         # J/K/kg (liquid)
 
@@ -106,8 +107,8 @@ prob.Tinit_slg          =   1500.0      # (1540.0+273.0) K
 #.......................................#
 incflo.probtype         =   201
 # incflo.test_tracer_conservation = true
-incflo.ic_u             =   0.0         #
-incflo.ic_v             =   1.0         # for now
+incflo.ic_u             =   0.01        #
+incflo.ic_v             =   0.0         # for now
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
 

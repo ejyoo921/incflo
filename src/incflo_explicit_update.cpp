@@ -84,46 +84,10 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                             + l_dt *(rho_arr(i,j,k,n)*(cp_arr(i,j,k,n)) * dtdt_o(i,j,k,n) 
                                     + m_half * laps_o(i,j,k,n) + tra_f(i,j,k,n) );
 
-                            // if (i == 7 & j == 8 & k == 8)
-                            // {
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                            // }
                             if (i == 9 & j == 8 & k == 8)
                             {
                                 amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
                                 amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                            }
-                            // if (i == 8 & j == 7 & k == 8)
-                            // {
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                            // }
-                            // if (i == 8 & j == 9 & k == 8)
-                            // {
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                            // }
-                            // if (i == 8 & j == 8 & k == 7)
-                            // {
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                            // }
-                            // if (i == 8 & j == 8 & k == 9)
-                            // {
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
-                            //     amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                            // }
-                            if (i == 8 & j == 8 & k == 8)
-                            {
-                                amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
-                                amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
-                                // amrex::PrintToFile("chk_values") <<  "[Explicit Update] dtdt_o  = " << dtdt_o(i,j,k,n) << "\n";
-                                // amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_f   = " << tra_f(i,j,k,n) << "\n";
-                                amrex::PrintToFile("chk_values") <<  "[Explicit Update] laps_o  = " << laps_o(i,j,k,n) << "\n";
-                                // amrex::PrintToFile("chk_values") <<  "[Explicit Update] dt      = " << l_dt << "\n";
-                                // amrex::PrintToFile("chk_values") <<  "[Explicit Update] rho     = " << rho_arr(i,j,k,n) << "\n";
-                                // amrex::PrintToFile("chk_values") <<  "[Explicit Update] cp      = " << cp_arr(i,j,k,n) << "\n";
                             }
                         }
                     });

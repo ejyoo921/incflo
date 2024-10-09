@@ -13,6 +13,15 @@ void incflo::Advance()
     int initialisation = ( m_dt < 0 );
     bool explicit_diffusion = (m_diff_type == DiffusionType::Explicit);
     ComputeDt(initialisation, explicit_diffusion);
+    // update properties here as an initial time
+    // TODO: fix this to update properties here
+    // We only need initial Temp. && materials (phases)
+    if (m_fluid_model == FluidModel::TwoMu & initialisation == 1)
+    {
+        amrex::Print() << "INITIALIZATION =" << initialisation << "\n";
+        amrex::Print() << "[Initial time] Update thermal properties" << "\n";
+        update_properties();
+    }
 
     // Set new and old time to correctly use in fillpatching
     for(int lev = 0; lev <= finest_level; lev++)

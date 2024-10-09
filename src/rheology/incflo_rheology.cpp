@@ -216,7 +216,6 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
                         }
                     }
                 }
-                // amrex::PrintToFile("chk_values") <<  "[Rheology] mu_s           = " << m_mu_s[n] << "\n";
             } // EY
             else {
                 mf->setVal(m_mu_s[n], n, 1, nghost);
