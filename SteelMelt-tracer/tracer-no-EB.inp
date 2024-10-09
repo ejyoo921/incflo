@@ -89,8 +89,8 @@ prob.pellet_centz       =   0.
 
 # prob.dens_fe            =   7500.0      # kg/m3 (solid)
 # prob.dens_slg           =   2550.0      # kg/m3 (liquid)
-# prob.dens_fe            =   2000.0         # kg/m3 (solid)
-# prob.dens_slg           =   2000.0         # kg/m3 (liquid)
+prob.dens_fe            =   2000.0         # kg/m3 (solid)
+prob.dens_slg           =   2000.0         # kg/m3 (liquid)
 
 # prob.cp_fe              =   740.0       # J/K/kg (solid Fe)
 # prob.cp_slg             =   1004.0      # J/K/kg (liquid)
