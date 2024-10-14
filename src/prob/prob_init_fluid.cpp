@@ -275,15 +275,15 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
     Real m_Tinit_slg = 1813.0 ;
 
     pp.get("npellets", npellets);
-    pp.get("dens_fe", m_dens_fe);
-    pp.get("dens_slg", m_dens_slg);
-    pp.get("Tinit_fe", m_Tinit_fe);
-    pp.get("Tinit_slg", m_Tinit_slg);
     pp.getarr("pellet_rads",  rads);    
     pp.getarr("pellet_centx", centx);
     pp.getarr("pellet_centy", centy);
     pp.getarr("pellet_centz", centz);
 
+    pp.get("dens_fe", m_dens_fe);
+    pp.get("dens_slg", m_dens_slg);
+    pp.get("Tinit_fe", m_Tinit_fe);
+    pp.get("Tinit_slg", m_Tinit_slg);
 
     amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
