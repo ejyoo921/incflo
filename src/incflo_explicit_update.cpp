@@ -81,7 +81,7 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                         for (int n = 0; n < l_ntrac; ++n)
                         {   // EY: laps_o already has (-1)
                             tra(i,j,k,n) = (rho_arr(i,j,k,n)*cp_arr(i,j,k,n)) * tra_o(i,j,k,n) 
-                            + l_dt *(rho_arr(i,j,k,n)*(cp_arr(i,j,k,n)) * dtdt_o(i,j,k,n) 
+                            + l_dt *(rho_arr(i,j,k,n)*cp_arr(i,j,k,n) * dtdt_o(i,j,k,n) 
                                     + m_half * laps_o(i,j,k,n) + tra_f(i,j,k,n) );
 
                             if (i == 9 & j == 8 & k == 8)
@@ -112,6 +112,29 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
 
                     }
                 });
+
+                if (m_fluid_model == FluidModel::TwoMu)
+                {
+                    Array4<Real> cp_arr  = ld.cp_steel.array(mfi); 
+                    Array4<Real> rho_arr = ld.rho_steel.array(mfi); 
+
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                    {
+                        for (int n = 0; n < l_ntrac; ++n)
+                        {   // EY: laps_o already has (-1)
+                            tra(i,j,k,n) = (rho_arr(i,j,k,n)*cp_arr(i,j,k,n)) * tra_o(i,j,k,n) 
+                            + l_dt *(rho_arr(i,j,k,n)*cp_arr(i,j,k,n) * dtdt_o(i,j,k,n) + tra_f(i,j,k,n) );
+
+                            if (i == 9 & j == 8 & k == 8)
+                            {
+                                amrex::PrintToFile("chk_values") <<  "[Explicit Update] (i,j,k) = (" <<i<<","<<j<<","<<k<<")" << "\n";
+                                amrex::PrintToFile("chk_values") <<  "[Explicit Update] tra_o   = " << tra_o(i,j,k,n) << "\n";
+                            }
+                        }
+                    });
+
+                    
+                }
             }
         } // mfi
     } // lev

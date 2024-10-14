@@ -2,14 +2,14 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   5      # Max number of time steps
+max_step                =   10      # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-4        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-3        # Use this constant dt if > 0
 incflo.cfl              =   0.01        # CFL factor
-incflo.init_shrink      = 0.01           # EY: What is this for?
+incflo.init_shrink      =   0.01        # EY: What is this for?
 # let me try with a differnt inital time step multiplied by this number
 # based on cfl
 #find incflo.change_max -> set that with different number if necessary
@@ -31,22 +31,22 @@ amr.check_int           =   10000        # Steps between checkpoint files
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
 #.......................................#
-incflo.gravity          =  0.   0.  0.  # Gravitational force (3D)
-incflo.ro_0             =  1.0          # Turn off background state
+incflo.gravity              =  0.   0.  0.  # Gravitational force (3D)
+incflo.ro_0                 =  1.0          # Turn off background state
 
-# incflo.fluid_model      =  "newtonian"  # Fluid model (rheology)
-incflo.fluid_model      =   "twoMu"     # Rheological model
-incflo.mu               =   100.0         # Dynamic viscosity coefficient(g/cm*s) <- liquid Fe viscosity (should be real)
-incflo.n                =   0           # For twoMu, this is eta mu*pow(10, incflo.n)
+# incflo.fluid_model      =  "newtonian"    # Fluid model (rheology)
+incflo.fluid_model          =   "twoMu"     # Rheological model
+incflo.mu                   =   1.0         # Dynamic viscosity coefficient(g/cm*s) <- liquid Fe viscosity (should be real)
+incflo.n                    =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
 
-incflo.zero_vel              =   true   # imposing zero inside pellet vel.     
-incflo.constant_density      =   true   # This density is not depending on Temp
-incflo.advect_tracer         =   true   #
-incflo.trac_is_conservative  =      0   # conservative?
+incflo.zero_vel             =   true        # imposing zero inside pellet vel.     
+incflo.constant_density     =   true        # This density is not depending on Temp
+incflo.advect_tracer        =   true        #
+incflo.trac_is_conservative =      0        # conservative?
 
-incflo.mu_s             =   1.          # EY: This should not affect (replaced by k)
+incflo.mu_s                 =   1.          # EY: This should not affect (replaced by k)
 
-incflo.do_initial_pressure_proj = 1     # to enforce hydrostatic equilibrium
+incflo.do_initial_pressure_proj = 1         # to enforce hydrostatic equilibrium
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
@@ -56,7 +56,7 @@ amr.max_grid_size       =   8   8   8 # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
 amr.regrid_int          =   2
-incflo.etaerr       =   10
+incflo.etaerr           =   10
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -77,7 +77,7 @@ zhi.type                =   "nsw"
 #            Pellet properties          #
 #.......................................#
 prob.npellets           =   1
-prob.pellet_rads        =   0.005
+prob.pellet_rads        =   0.001
 prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
@@ -107,7 +107,7 @@ prob.Tinit_slg          =   1500.0      # (1540.0+273.0) K
 #.......................................#
 incflo.probtype         =   201
 # incflo.test_tracer_conservation = true
-incflo.ic_u             =   0.01        #
+incflo.ic_u             =   0.001        #
 incflo.ic_v             =   0.0         # for now
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
@@ -116,7 +116,7 @@ incflo.ic_p             =   0.0         #
 #                NUMERICS               #
 #.......................................#
 incflo.advection_type        = "Godunov"
-incflo.diffusion_type        = 1             # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
+incflo.diffusion_type        = 2             # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
