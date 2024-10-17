@@ -2,18 +2,18 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   5      # Max number of time steps
+max_step                =   10      # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-3        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-5        # Use this constant dt if > 0
 incflo.cfl              =   0.01        # CFL factor
 incflo.init_shrink      =   0.01        # EY: What is this for?
 # let me try with a differnt inital time step multiplied by this number
 # based on cfl
 #find incflo.change_max -> set that with different number if necessary
-incflo.initial_iterations = 3
+incflo.initial_iterations = 0
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
@@ -25,7 +25,7 @@ amr.plt_cp_steel        =   1           #
 amr.plt_k_steel         =   1           # conductivity/cp (or mu_s)
 amr.plt_rho_steel       =   1           # density Fe
 
-amr.check_int           =   10000        # Steps between checkpoint files
+amr.check_int           =   -1          # Steps between checkpoint files
 # amr.restart             =   ""          # Checkpoint to restart from 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
@@ -36,7 +36,8 @@ incflo.ro_0                 =  1.0          # Turn off background state
 
 # incflo.fluid_model      =  "newtonian"    # Fluid model (rheology)
 incflo.fluid_model          =   "twoMu"     # Rheological model
-incflo.mu                   =   1.0         # Dynamic viscosity coefficient(g/cm*s) <- liquid Fe viscosity (should be real)
+# liquid Fe viscosity (should be real)
+incflo.mu                   =   1e-3        # Dynamic viscosity coefficient(kg/m*s)
 incflo.n                    =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
 
 incflo.zero_vel             =   true        # imposing zero inside pellet vel.     
@@ -51,8 +52,8 @@ incflo.do_initial_pressure_proj = 1         # to enforce hydrostatic equilibrium
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   32  32  32  # Grid cells at coarsest AMRlevel
-amr.max_grid_size       =   8   8   8 # Max grid size at AMR levels
+amr.n_cell              =   64  64  64  # Grid cells at coarsest AMRlevel
+amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
 amr.regrid_int          =   2
@@ -61,7 +62,7 @@ incflo.etaerr           =   10
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
-geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates
+geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates (m)
 geometry.prob_hi        =  0.1   0.1   0.1 # Hi corner coordinates
 geometry.is_periodic    =  1    0    0   # Periodicity x y z (0/1)
 
@@ -77,7 +78,7 @@ zhi.type                =   "nsw"
 #            Pellet properties          #
 #.......................................#
 prob.npellets           =   1
-prob.pellet_rads        =   0.001
+prob.pellet_rads        =   0.01
 prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
@@ -99,7 +100,7 @@ prob.Tinit_slg          =   1500.0      # (1540.0+273.0) K
 #.......................................#
 incflo.probtype         =   201
 # incflo.test_tracer_conservation = true
-incflo.ic_u             =   0.001        #
+incflo.ic_u             =   1e-3        # (m/s)
 incflo.ic_v             =   0.0         # for now
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
@@ -108,7 +109,7 @@ incflo.ic_p             =   0.0         #
 #                NUMERICS               #
 #.......................................#
 incflo.advection_type        = "Godunov"
-incflo.diffusion_type        = 2             # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
+incflo.diffusion_type        = 1        # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #

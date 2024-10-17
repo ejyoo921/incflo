@@ -13,8 +13,8 @@ void incflo::Advance()
     int initialisation = ( m_dt < 0 );
     bool explicit_diffusion = (m_diff_type == DiffusionType::Explicit);
     ComputeDt(initialisation, explicit_diffusion);
+    
     // update properties here as an initial time
-    // TODO: fix this to update properties here
     // We only need initial Temp. && materials (phases)
     if (m_fluid_model == FluidModel::TwoMu & initialisation == 1)
     {

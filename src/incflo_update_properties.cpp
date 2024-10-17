@@ -664,33 +664,12 @@ void incflo::update_properties ()
 
                     if (m_zero_vel) // Make zero velocity 
                     {
-                        // int npellets = 0;
-                        // amrex::ParmParse pp("prob");
-                        // pp.get("npellets", npellets);
-
-                        // int inside_pellet = 0;
-                        // for(int np = 0; np < npellets; np++)
-                        // {
-                        //     // Update the inside location with Temperature
-                        //     Real Temp_melt = 100.0;
-                        //     if (Temp < Temp_melt)
-                        //     {   
-                        //         inside_pellet = 1;
-                        //         break;
-                        //     }
-                        // }
-                        // if (inside_pellet)
                         if (sol_fe > 0.99)
                         {   // no internal flow
                             vel(i,j,k,0) = Real(0.0);
                             vel(i,j,k,1) = Real(0.0);
                             vel(i,j,k,2) = Real(0.0);
                             eta_arr(i,j,k,n) = m_mu*pow(10, m_n_0);
-
-                            // Solid property
-                            // dens_arr(i,j,k,n) = compute_rho(Temp,0); 
-                            // cp_arr(i,j,k,n) = compute_cp(Temp, 0); 
-                            // cond_arr(i,j,k,n) = compute_k(Temp,0);
                         } // inside pellet
                     } // if-zero-vel
                 }
