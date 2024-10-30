@@ -2,14 +2,14 @@
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   10      # Max number of time steps
+max_step                =   3      # Max number of time steps
 
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#s
 #         TIME STEP COMPUTATION         #
 #.......................................#
 incflo.fixed_dt         =   1e-5        # Use this constant dt if > 0
-incflo.cfl              =   0.01        # CFL factor
-incflo.init_shrink      =   0.01        # EY: What is this for?
+incflo.cfl              =   1        # CFL factor
+incflo.init_shrink      =   1        # EY: What is this for?
 # let me try with a differnt inital time step multiplied by this number
 # based on cfl
 #find incflo.change_max -> set that with different number if necessary
@@ -37,7 +37,7 @@ incflo.ro_0                 =  1.0          # Turn off background state
 # incflo.fluid_model      =  "newtonian"    # Fluid model (rheology)
 incflo.fluid_model          =   "twoMu"     # Rheological model
 # liquid Fe viscosity (should be real)
-incflo.mu                   =   1e-3        # Dynamic viscosity coefficient(kg/m*s)
+incflo.mu                   =   1e-2        # Dynamic viscosity coefficient(kg/m*s)
 incflo.n                    =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
 
 incflo.zero_vel             =   true        # imposing zero inside pellet vel.     
@@ -53,11 +53,12 @@ incflo.do_initial_pressure_proj = 1         # to enforce hydrostatic equilibrium
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
 amr.n_cell              =   64  64  64  # Grid cells at coarsest AMRlevel
-amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
-amr.blocking_factor     =   8           # Blocking factor for grids
+# amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
+amr.blocking_factor     =   64           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
 amr.regrid_int          =   2
 incflo.etaerr           =   10
+
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
@@ -111,16 +112,19 @@ incflo.ic_p             =   0.0         #
 incflo.advection_type        = "Godunov"
 incflo.diffusion_type        = 1        # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
 
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#s
 #              VERBOSITY                #
 #.......................................#
 incflo.verbose           =  2           # incflo itself
 mac_proj.verbose         =  0           # MAC Projector
 nodal_proj.verbose       =  0           # Nodal Projector
-scalar_diffusion.verbose =  1           # Scalar Diffusion
-tensor_diffusion.verbose =  1           # Tensor Diffusion
+scalar_diffusion.verbose =  3           # Scalar Diffusion
+tensor_diffusion.verbose =  5           # Tensor Diffusion
 
 # What are those?
-# tensor_diffusion.mg_verbose  =   1           # Diffusion
+tensor_diffusion.mg_verbose  =  3           # Diffusion
+#max_coarsening_level = 0  # No. of GMG coarsening level before calling hypre
+# tensor_diffusion.mg_max_coarsening_level = 0
+# tensor_diffusion.bottom_solver = "hypre"
 
 # mac_proj.mg_rtol             = 1.e-12

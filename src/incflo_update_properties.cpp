@@ -492,6 +492,7 @@ namespace
         switch (phase) {
             case 0:
                 rhocalc = 7900.0;
+                // rhocalc = 2000.0;
             break;
 
             case 1: 
@@ -645,6 +646,7 @@ void incflo::update_properties ()
                     cond_fe         = compute_k(Temp,0); 
                     cond_slg        = compute_k(Temp,0); //k is conductivity
                     cond_arr(i,j,k,n) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
+                    // cond_arr(i,j,k,n) = 1e-20;
 
                     // get iron properties 
                     // When do we ust this?

@@ -92,6 +92,7 @@ void incflo::update_velocity (StepType step_type, Vector<MultiFab>& vel_eta, Vec
             }
             else if (m_diff_type == DiffusionType::Crank_Nicolson)
             {
+                amrex::Print() << "update velocity w/ diffuse_type = CN" << "\n";
 
                 Array4<Real const> const& divtau_o = ld.divtau_o.const_array(mfi);
                 if (m_advect_momentum) {
