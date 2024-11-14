@@ -1,17 +1,17 @@
 # This input file is based on benchmark.rayleigh_taylor (no eb 3d)
 # Have These traps
-amrex.fpe_trap_invalid = 1
-amrex.fpe_trap_zero = 1
-amrex.fpe_trap_overflow = 1
+amrex.fpe_trap_invalid   = 1
+amrex.fpe_trap_zero      = 1
+amrex.fpe_trap_overflow  = 1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   10      # Max number of time steps
+max_step                =   100      # Max number of time steps
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   2e-4        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-2        # Use this constant dt if > 0
 incflo.cfl              =   0.1        # CFL factor
 incflo.init_shrink      =   1        # EY: What is this for?
 # tensor_diffusion.mg_verbose  =  3           # Diffusion
@@ -88,24 +88,21 @@ prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
 
-# prob.dens_fe            =   7500.0      # kg/m3 (solid)
-# prob.dens_slg           =   2550.0      # kg/m3 (liquid)
-
-# prob.Tinit_fe           =   80.0        # (80.0+273.0) K (solid)
-# prob.Tinit_slg          =   80.0      # (1540.0+273.0) K
-
-prob.dens_fe            =   7900.0         # kg/m3 (solid)
-prob.dens_slg           =   7900.0         # kg/m3 (liquid)
-
-prob.Tinit_fe           =   80.0        # (80.0+273.0) K (solid)
-prob.Tinit_slg          =   1500.0      # (1540.0+273.0) K
+prob.Tinit_liq          =   1500.0      # (1540.0+273.0) K
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
 #.......................................#
-incflo.probtype         =   201
+incflo.probtype         =   200
+
+# Value for Gaussian function (initial Temp)
+prob.sigX               =   0.01;
+prob.sigY               =   0.01;
+prob.sigZ               =   0.01;
+prob.cc                 =    0.05;
+
 # incflo.test_tracer_conservation = true
-incflo.ic_u             =   1e-3        # (m/s)
+incflo.ic_u             =   0.0        # (m/s)
 incflo.ic_v             =   0.0         # for now
 incflo.ic_w             =   0.0         #
 incflo.ic_p             =   0.0         #
@@ -124,8 +121,3 @@ mac_proj.verbose         =  0           # MAC Projector
 nodal_proj.verbose       =  0           # Nodal Projector
 scalar_diffusion.verbose =  1           # Scalar Diffusion
 tensor_diffusion.verbose =  1           # Tensor Diffusion
-
-# What are those?
-# tensor_diffusion.mg_verbose  =   1           # Diffusion
-
-# mac_proj.mg_rtol             = 1.e-12

@@ -634,6 +634,10 @@ void incflo::update_properties ()
                     dens_slg        = compute_rho(Temp,0);
 
                     vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+                    if (std::abs(dens_fe-dens_slg) < 1e-6)
+                    {
+                        vfrac_fe        = 1.0;
+                    }
                     dens_arr(i,j,k,n) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
 
                     // update cp -----------------------------------------------------
@@ -642,8 +646,8 @@ void incflo::update_properties ()
                     cp_arr(i,j,k,n)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
 
                     // update conductivity -------------------------------------------
-                    cond_fe         = compute_k(Temp,0); 
-                    cond_slg        = compute_k(Temp,0); //k is conductivity
+                    cond_fe         = compute_k(Temp, 0); 
+                    cond_slg        = compute_k(Temp, 0); //k is conductivity
                     cond_arr(i,j,k,n) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
 
                     // get iron properties 

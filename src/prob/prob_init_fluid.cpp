@@ -169,6 +169,10 @@ void incflo::prob_init_fluid (int lev)
                                   domain, dx, problo, probhi);
         }
         //EY: New problem type for steel-making
+        else if (200 == m_probtype)
+        {
+            init_steel_gauss(gbx, ld.tracer.array(mfi), dx, problo);
+        }
         else if (201 == m_probtype)
         {
             init_steel_melt(vbx, gbx,
@@ -248,7 +252,46 @@ void incflo::init_rotating_flow (Box const& vbx, Box const& /*gbx*/,
     });
 }
 
-//EY: steel-making 
+//EY: steel-making-----------
+void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
+                                GpuArray<Real, AMREX_SPACEDIM> const& dx,
+                                GpuArray<Real, AMREX_SPACEDIM> const& problo)
+{   
+    
+    Real m_Tinit_liq = 1500;
+    Real m_sigX = 1.0;
+    Real m_sigY = 1.0;
+    Real m_sigZ = 1.0;
+    Real m_cc = -1.0;
+
+    amrex::ParmParse pp("prob");
+    pp.get("Tinit_liq", m_Tinit_liq);
+    pp.get("sigX", m_sigX);
+    pp.get("sigY", m_sigY);
+    pp.get("sigZ", m_sigZ);
+    pp.get("cc", m_cc);
+
+    amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+    {
+            for(int kk=0;kk<2;kk++)
+            {
+                for(int jj=0;jj<2;jj++)
+                {
+                    for(int ii=0;ii<2;ii++)
+                    {
+                        Real x = problo[0] + (i+ii) * dx[0];
+                        Real y = problo[1] + (j+jj) * dx[1];
+                        Real z = problo[2] + (k+kk) * dx[2];
+
+                        tracer(i,j,k) = m_Tinit_liq 
+                                        * (1 - m_cc*exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2) + pow(z/m_sigZ,2))));
+                    } //ii
+                } // jj
+            } // kk
+        
+    }); // i,j,k
+}
+
 void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
                                   Array4<Real> const& vel,
                                   Array4<Real> const& viscosity,
@@ -334,7 +377,7 @@ void incflo::init_steel_melt(Box const& vbx, Box const& gbx,
             vfrac_mix(i,j,k) = m_dens_fe*vfrac_fe + m_dens_slg*(1.0-vfrac_fe);
     }); // i,j,k
 }
-
+//EY: steel-making finished -----------
 void incflo::init_taylor_green (Box const& vbx, Box const& /*gbx*/,
                                 Array4<Real> const& vel,
                                 Array4<Real> const& /*density*/,

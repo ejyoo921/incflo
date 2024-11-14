@@ -3,6 +3,10 @@
 
 // This header is include by incflo.H.  These functions are members of incflo class.
     // //EY: for steel-making                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> dx);
+    void init_steel_gauss (amrex::Box const& gbx,  amrex::Array4<amrex::Real> const& tracer,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo);
+
     void init_steel_melt (amrex::Box const& vbx, amrex::Box const& gbx,
                             amrex::Array4<amrex::Real> const& vel,
                             amrex::Array4<amrex::Real> const& viscosity,
