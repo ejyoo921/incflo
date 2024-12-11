@@ -262,7 +262,7 @@ void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
     Real m_sigX = 1.0;
     Real m_sigY = 1.0;
     Real m_sigZ = 1.0;
-    Real m_cc = -1.0;
+    Real m_cc = 1.0;
 
     amrex::ParmParse pp("prob");
     pp.get("Tinit_liq", m_Tinit_liq);

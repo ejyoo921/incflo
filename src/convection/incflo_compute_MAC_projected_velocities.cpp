@@ -34,7 +34,7 @@ incflo::compute_MAC_projected_velocities (
                     Box const& bx = mfi.tilebox();
                     Array4<Real> const& vel_f          = vel_forces[lev]->array(mfi);
                     Array4<Real const> const& rho      = density[lev]->array(mfi);
-                    Array4<Real const> const& divtau   = ld.divtau_o.const_array(mfi);
+                    Array4<Real const> const& a   = ld.divtau_o.const_array(mfi);
                     if (m_advect_momentum) {
                         ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                         {

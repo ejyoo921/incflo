@@ -175,7 +175,6 @@ void incflo::compute_viscosity_at_level (int /*lev*/,
                             if (inside_pellet)
                             {
                                 // amrex::Print() << "INSIDE = "<< inside_pellet << "\n";
-                                //non_newtonian_viscosity(1.)
                                 eta_arr(i,j,k) = non_newtonian_viscosity(1.);
                             }
                         }

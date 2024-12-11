@@ -220,6 +220,7 @@ void DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
                                         Vector<MultiFab const*> const& a_density,
                                         Vector<MultiFab const*> const& a_eta)
 {
+    amrex::Print() << "COMPUTE DIVTAU TENSOR OP HERE FOR WHAT?" << "\n";
     BL_PROFILE("DiffusionTensorOp::compute_divtau");
 
     int finest_level = m_incflo->finestLevel();
@@ -296,6 +297,7 @@ void DiffusionTensorOp::compute_divtau (Vector<MultiFab*> const& a_divtau,
 
     bool advect_momentum = m_incflo->AdvectMomentum();
     if (!advect_momentum) {
+        amrex::Print() << "ADVECT MOMENUM ??? " << advect_momentum << "\n";
 #ifdef _OPENMP
 #pragma omp parallel if (Gpu::notInLaunchRegion())
 #endif

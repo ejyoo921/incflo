@@ -1,37 +1,37 @@
 # This input file is based on benchmark.rayleigh_taylor (no eb 3d)
-# Have These traps
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#                 TRAPS                 #
+#.......................................#
 amrex.fpe_trap_invalid   = 1
 amrex.fpe_trap_zero      = 1
 amrex.fpe_trap_overflow  = 1
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   100      # Max number of time steps
+# max_step                =   200      # Max number of time steps
+stop_time  				=	10
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-2        # Use this constant dt if > 0
-incflo.cfl              =   0.1        # CFL factor
-incflo.init_shrink      =   1        # EY: What is this for?
-# tensor_diffusion.mg_verbose  =  3           # Diffusion
-# let me try with a differnt inital time step multiplied by this number
-# based on cfl
-#find incflo.change_max -> set that with different number if necessary
-incflo.initial_iterations = 0
+incflo.fixed_dt         =   1e-5        # Use this constant dt if > 0
+incflo.cfl              =   0.1         # CFL factor
+incflo.init_shrink      =   1           # EY: What is this for?
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   1           # Steps between plot files
+amr.plot_int            =   10000          # Steps between plot files
 amr.plt_eta             =   1           # plot file for eta not real viscosity for inside pellet
 amr.plt_tracer          =   1           # Temperature
 amr.plt_cp_steel        =   1           # 
 amr.plt_k_steel         =   1           # conductivity/cp (or mu_s)
 amr.plt_rho_steel       =   1           # density Fe
 
-amr.check_int           =   -1          # Steps between checkpoint files
-# amr.restart             =   ""          # Checkpoint to restart from 
+amr.check_int           =  -1          # Steps between checkpoint files
+# amr.restart             =   ""         # Checkpoint to restart from 
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #               PHYSICS                 #
@@ -39,11 +39,10 @@ amr.check_int           =   -1          # Steps between checkpoint files
 incflo.gravity              =  0.   0.  0.  # Gravitational force (3D)
 incflo.ro_0                 =  1.0          # Turn off background state
 
-# incflo.fluid_model      =  "newtonian"    # Fluid model (rheology)
 incflo.fluid_model          =   "twoMu"     # Rheological model
 # liquid Fe viscosity (should be real)
-incflo.mu                   =   1e-3        # Dynamic viscosity coefficient(kg/m*s)
-incflo.n                    =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.mu                   =   1.0         # Dynamic viscosity coefficient(kg/m*s)
+incflo.n                    =   0           # For twoMu, this is eta mu*pow(10, incflo.n)
 
 incflo.zero_vel             =   true        # imposing zero inside pellet vel.     
 incflo.constant_density     =   true        # This density is not depending on Temp
@@ -52,12 +51,10 @@ incflo.trac_is_conservative =      0        # conservative?
 
 incflo.mu_s                 =   1.          # EY: This should not affect (replaced by k)
 
-incflo.do_initial_pressure_proj = 1         # to enforce hydrostatic equilibrium
-
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   64  64  64  # Grid cells at coarsest AMRlevel
+amr.n_cell              =   64	64	64  # Grid cells at coarsest AMRlevel
 amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
@@ -69,15 +66,15 @@ incflo.etaerr           =   10
 #.......................................#
 geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates (m)
 geometry.prob_hi        =  0.1   0.1   0.1 # Hi corner coordinates
-geometry.is_periodic    =  1    0    0   # Periodicity x y z (0/1)
+geometry.is_periodic    =  1    1	 1  # Periodicity x y z (0/1)
 
 # Boundary conditions
 # xlo.type                =   "nsw"
 # xhi.type                =   "nsw"
-ylo.type                =   "nsw"
-yhi.type                =   "nsw"
-zlo.type                =   "nsw"
-zhi.type                =   "nsw"
+# ylo.type                =   "nsw"
+# yhi.type                =   "nsw"
+# zlo.type                =   "nsw"
+# zhi.type                =   "nsw"
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            Pellet properties          #
@@ -88,7 +85,6 @@ prob.pellet_centx       =   0.
 prob.pellet_centy       =   0.
 prob.pellet_centz       =   0.
 
-prob.Tinit_liq          =   1500.0      # (1540.0+273.0) K
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #           INITIAL CONDITIONS          #
@@ -96,16 +92,17 @@ prob.Tinit_liq          =   1500.0      # (1540.0+273.0) K
 incflo.probtype         =   200
 
 # Value for Gaussian function (initial Temp)
+# Liquid Fe (or slag or bath) temperature
+prob.Tinit_liq          =   1500.0      # (1540.0+273.0) K
 prob.sigX               =   0.01;
 prob.sigY               =   0.01;
 prob.sigZ               =   0.01;
-prob.cc                 =    0.05;
+prob.cc                 =   0.05;      # x 100 = % of the temp. difference
 
-# incflo.test_tracer_conservation = true
 incflo.ic_u             =   0.0        # (m/s)
-incflo.ic_v             =   0.0         # for now
-incflo.ic_w             =   0.0         #
-incflo.ic_p             =   0.0         #
+incflo.ic_v             =   0.0        # for now
+incflo.ic_w             =   0.0        #
+incflo.ic_p             =   0.0        #
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #                NUMERICS               #
@@ -121,3 +118,14 @@ mac_proj.verbose         =  0           # MAC Projector
 nodal_proj.verbose       =  0           # Nodal Projector
 scalar_diffusion.verbose =  1           # Scalar Diffusion
 tensor_diffusion.verbose =  1           # Tensor Diffusion
+
+#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
+#                EXTRA                  #
+#.......................................#
+# incflo.test_tracer_conservation = true
+# incflo.do_initial_pressure_proj = 1   # to enforce hydrostatic equilibrium
+# let me try with a differnt inital time step multiplied by this number
+# based on cfl
+#find incflo.change_max -> set that with different number if necessary
+# tensor_diffusion.mg_verbose  =  3       # Diffusion
+# incflo.initial_iterations = 0

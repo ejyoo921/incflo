@@ -605,7 +605,6 @@ void incflo::update_properties ()
             Array4<Real> cond_arr = ld.k_steel.array(mfi); 
             Array4<Real> eta_arr = ld.viscosity.array(mfi); 
             Array4<Real> const& vel = ld.velocity.array(mfi);
-            // Array4<Real const> const& temp_arr   = ld.tracer_o.const_array(mfi);
 
             ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
@@ -633,11 +632,15 @@ void incflo::update_properties ()
                     dens_fe         = compute_rho(Temp,0); 
                     dens_slg        = compute_rho(Temp,0);
 
-                    vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
                     if (std::abs(dens_fe-dens_slg) < 1e-6)
                     {
-                        vfrac_fe        = 1.0;
+                        vfrac_fe        = 1.0; // one material case
                     }
+                    else
+                    {
+                        vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+                    }
+
                     dens_arr(i,j,k,n) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
 
                     // update cp -----------------------------------------------------
@@ -652,7 +655,7 @@ void incflo::update_properties ()
 
                     // get iron properties 
                     // When do we ust this?
-                    mol_fe = bound01(compute_liqfrac(Temp,0)); //liquid part
+                    mol_fe = bound01(compute_liqfrac(Temp,0)); // liquid 
                     sol_fe = bound01((1.0 - mol_fe));          // solid
 
                     // update phases -------------------------------------------------
