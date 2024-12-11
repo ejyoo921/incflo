@@ -76,3 +76,4 @@ test/chk*/
 **/data*
 **/*.0
 **/*.xlsx
+**/fig**
