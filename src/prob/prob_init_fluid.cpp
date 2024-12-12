@@ -182,6 +182,10 @@ void incflo::prob_init_fluid (int lev)
                                   ld.vfrac_mix.array(mfi), //vfrac mix constant
                                   domain, dx, problo, probhi);            
         }
+        else if (202 == m_probtype)
+        {
+            init_steel_sine(gbx, ld.tracer.array(mfi), dx, problo);
+        }
 #if 0
         else if (500 == m_probtype)
         {
@@ -253,6 +257,31 @@ void incflo::init_rotating_flow (Box const& vbx, Box const& /*gbx*/,
 }
 
 //EY: steel-making-----------
+void incflo::init_steel_sine(Box const& gbx, Array4<Real> const& tracer,
+                                GpuArray<Real, AMREX_SPACEDIM> const& dx,
+                                GpuArray<Real, AMREX_SPACEDIM> const& problo)
+{
+    // amrex::Print() << "Sine function 2D case" << "\n";
+    constexpr Real twopi = Real(2.0)*Real(3.1415926535897932);
+    amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+    {
+            for(int kk=0;kk<2;kk++)
+            {
+                for(int jj=0;jj<2;jj++)
+                {
+                    for(int ii=0;ii<2;ii++)
+                    {
+                        Real x = problo[0] + (i+ii) * dx[0];
+                        Real y = problo[1] + (j+jj) * dx[1];
+                        Real z = problo[2] + (k+kk) * dx[2];
+
+                        tracer(i,j,k) = sin((twopi/problo[0])*x) + sin((twopi/problo[1])*y) + sin((twopi/problo[2])*z);
+                    } //ii
+                } // jj
+            } // kk
+        
+    }); // i,j,k
+}
 void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
                                 GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                 GpuArray<Real, AMREX_SPACEDIM> const& problo)

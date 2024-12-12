@@ -2,7 +2,11 @@
 #define INCFLO_PROB_USR_I_H_
 
 // This header is include by incflo.H.  These functions are members of incflo class.
-    // //EY: for steel-making                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> dx);
+    // //EY: for steel-making                            
+    void init_steel_sine (amrex::Box const& gbx,  amrex::Array4<amrex::Real> const& tracer,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
+                            amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo);
+                            
     void init_steel_gauss (amrex::Box const& gbx,  amrex::Array4<amrex::Real> const& tracer,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo);

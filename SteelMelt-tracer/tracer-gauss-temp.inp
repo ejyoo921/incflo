@@ -16,7 +16,7 @@ stop_time  				=	10
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   1e-5        # Use this constant dt if > 0
+incflo.fixed_dt         =   1e-2        # Use this constant dt if > 0
 incflo.cfl              =   0.1         # CFL factor
 incflo.init_shrink      =   1           # EY: What is this for?
 
@@ -42,7 +42,7 @@ incflo.ro_0                 =  1.0          # Turn off background state
 incflo.fluid_model          =   "twoMu"     # Rheological model
 # liquid Fe viscosity (should be real)
 incflo.mu                   =   1.0         # Dynamic viscosity coefficient(kg/m*s)
-incflo.n                    =   0           # For twoMu, this is eta mu*pow(10, incflo.n)
+incflo.n                    =   3           # For twoMu, this is eta mu*pow(10, incflo.n)
 
 incflo.zero_vel             =   true        # imposing zero inside pellet vel.     
 incflo.constant_density     =   true        # This density is not depending on Temp
@@ -54,7 +54,7 @@ incflo.mu_s                 =   1.          # EY: This should not affect (replac
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #        ADAPTIVE MESH REFINEMENT       #
 #.......................................#
-amr.n_cell              =   64	64	64  # Grid cells at coarsest AMRlevel
+amr.n_cell              =   32	32	32  # Grid cells at coarsest AMRlevel
 amr.max_grid_size       =   8   8   8   # Max grid size at AMR levels
 amr.blocking_factor     =   8           # Blocking factor for grids
 amr.max_level           =   0           # Max AMR level in hierarchy 
@@ -66,13 +66,13 @@ incflo.etaerr           =   10
 #.......................................#
 geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates (m)
 geometry.prob_hi        =  0.1   0.1   0.1 # Hi corner coordinates
-geometry.is_periodic    =  1    1	 1  # Periodicity x y z (0/1)
+geometry.is_periodic    =  0	0	 1  # Periodicity x y z (0/1)
 
 # Boundary conditions
-# xlo.type                =   "nsw"
-# xhi.type                =   "nsw"
-# ylo.type                =   "nsw"
-# yhi.type                =   "nsw"
+xlo.type                =   "nsw"
+xhi.type                =   "nsw"
+ylo.type                =   "nsw"
+yhi.type                =   "nsw"
 # zlo.type                =   "nsw"
 # zhi.type                =   "nsw"
 
