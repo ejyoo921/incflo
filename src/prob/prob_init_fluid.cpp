@@ -312,10 +312,10 @@ void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
                         Real y = problo[1] + (j+jj) * dx[1];
                         Real z = problo[2] + (k+kk) * dx[2];
 
-                        tracer(i,j,k) = m_Tinit_liq * (exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2))));
+                        // tracer(i,j,k) = m_Tinit_liq * (exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2))));
 
-                        // tracer(i,j,k) = m_Tinit_liq 
-                        //                 * (1 - m_cc*exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2) + pow(z/m_sigZ,2))));
+                        tracer(i,j,k) = m_Tinit_liq 
+                                        * (1 - m_cc*exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2) + pow(z/m_sigZ,2))));
                     } //ii
                 } // jj
             } // kk

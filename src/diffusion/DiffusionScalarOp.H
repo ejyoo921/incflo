@@ -18,7 +18,9 @@ public:
     void diffuse_scalar (amrex::Vector<amrex::MultiFab*> const& tracer,
                          amrex::Vector<amrex::MultiFab*> const& density,
                          amrex::Vector<amrex::MultiFab const*> const& eta,
-                         amrex::Real dt);
+                         amrex::Real dt,
+                         amrex::Vector<amrex::MultiFab*> const& rho_steel,
+                         amrex::Vector<amrex::MultiFab*> const& cp_steel);
 
     void diffuse_vel_components (
                          amrex::Vector<amrex::MultiFab*> const& vel,
@@ -66,9 +68,6 @@ private:
 
     int m_num_pre_smooth = 2;
     int m_num_post_smooth = 2;
-
-    //EY 
-    std::string fluid_model_s = "newtonian";
 
 #ifdef AMREX_USE_FLOAT
     amrex::Real m_mg_rtol = amrex::Real(1.0e-4);

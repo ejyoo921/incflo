@@ -51,7 +51,7 @@ void incflo::update_tracer (StepType step_type, Vector<MultiFab>& tra_eta, Vecto
                 fillphysbc_tracer(lev, new_time, m_leveldata[lev]->tracer, ng_diffusion);
 
             Real dt_diff = (m_diff_type == DiffusionType::Implicit) ? m_dt : Real(0.5)*m_dt;
-            diffuse_scalar(get_tracer_new(), get_density_new(), GetVecOfConstPtrs(tra_eta), dt_diff);
+            diffuse_scalar(get_tracer_new(), get_density_new(), GetVecOfConstPtrs(tra_eta), dt_diff, get_rho_steel(), get_cp_steel());
         }
         else
         {

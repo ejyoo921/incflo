@@ -67,9 +67,11 @@ void
 incflo::diffuse_scalar(Vector<MultiFab      *> const& scalar,
                        Vector<MultiFab      *> const& density,
                        Vector<MultiFab const*> const& eta,
-                       Real dt_diff)
+                       Real dt_diff,
+                       Vector<MultiFab      *> const& rho_steel,
+                       Vector<MultiFab      *> const& cp_steel)
 {
-    get_diffusion_scalar_op()->diffuse_scalar(scalar, density, eta, dt_diff);
+    get_diffusion_scalar_op()->diffuse_scalar(scalar, density, eta, dt_diff, rho_steel, cp_steel);
 }
 
 

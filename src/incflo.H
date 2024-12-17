@@ -225,7 +225,9 @@ public:
     void diffuse_scalar (amrex::Vector<amrex::MultiFab      *> const& scalar,
                          amrex::Vector<amrex::MultiFab      *> const& density,
                          amrex::Vector<amrex::MultiFab const*> const& eta,
-                         amrex::Real dt_diff);
+                         amrex::Real dt_diff,
+                         amrex::Vector<amrex::MultiFab      *> const& rho_steel,
+                         amrex::Vector<amrex::MultiFab      *> const& cp_steel);
 
     void fixup_eta_on_domain_faces (int lev,
                                     amrex::Array<amrex::MultiFab,AMREX_SPACEDIM>& fc,
@@ -793,7 +795,7 @@ private:
     amrex::Vector<amrex::MultiFab*> get_tracer_eb () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_old () noexcept;
     amrex::Vector<amrex::MultiFab*> get_density_new () noexcept;
-    //EY: eta viscosity----------------------------------------
+    //EY: steel case ----------------------------------------
     amrex::Vector<amrex::MultiFab*> get_tracer_eta () noexcept;
     amrex::Vector<amrex::MultiFab*> get_viscosity () noexcept;
     amrex::Vector<amrex::MultiFab*> get_cp_steel () noexcept;

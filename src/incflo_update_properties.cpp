@@ -593,95 +593,172 @@ void incflo::update_properties ()
         fillpatch_tracer(lev, m_t_new[lev], m_leveldata[lev]->tracer, ng); 
         
         auto& ld = *m_leveldata[lev];
-        bool first = true; // in case you want to output txt.
-        for (MFIter mfi(ld.tracer,TilingIfNotGPU()); mfi.isValid(); ++mfi)
-        {
-            Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+        bool first = true; // in case you want to output txt. 
 
-            Array4<Real> vfrac_mix_arr = ld.vfrac_mix.array(mfi); 
+
+        for (MFIter mfi(ld.rho_steel, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        {
+            amrex::Real vfrac_fe;
+            Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+            
+            Array4<Real> dens_arr = ld.rho_steel.array(mfi);
             Array4<Real> temp_arr = ld.tracer.array(mfi);
-            Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
-            Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
-            Array4<Real> cond_arr = ld.k_steel.array(mfi); 
-            Array4<Real> eta_arr = ld.viscosity.array(mfi); 
-            Array4<Real> const& vel = ld.velocity.array(mfi);
+            Array4<Real> vfrac_mix_arr = ld.vfrac_mix.array(mfi); 
 
             ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
             {
-                // For SteelSlag case 
                 for (int n = 0; n < l_ntrac; ++n)
                 {
-                    amrex::Real Temp = temp_arr(i,j,k,n); // Need to bring actual Temp vals
                     amrex::Real vfrac_fe_mix = vfrac_mix_arr(i,j,k,n);
-                    amrex::Real vfrac_fe;
-                    amrex::Real cp_fe,  cond_fe,  dens_fe; // Fe
-                    amrex::Real cp_slg, cond_slg, dens_slg; // Slag
-                    amrex::Real sol_fe, mol_fe, sol_slg, mol_slg; // Phases
-
-                    const auto lo = lbound(gbx);
-                    const auto hi = ubound(gbx);    
-
-                    auto const& prob_lo = geom[lev].ProbLoArray();
-                    auto const& prob_hi = geom[lev].ProbLoArray();
-                    auto const& dx = geom[lev].CellSizeArray();  
-
-                    // Case numbers (materials)
-                    // #0 is Fe
+                    amrex::Real Temp = temp_arr(i,j,k,n); // Need to bring actual Temp vals
 
                     // update rho ----------------------------------------------------
-                    dens_fe         = compute_rho(Temp,0); 
-                    dens_slg        = compute_rho(Temp,0);
+                    amrex::Real dens_fe         = compute_rho(Temp, 0); 
+                    amrex::Real dens_slg        = compute_rho(Temp, 0);
 
                     if (std::abs(dens_fe-dens_slg) < 1e-6)
                     {
-                        vfrac_fe        = 1.0; // one material case
+                        amrex::Real vfrac_fe        = 1.0; // one material case
                     }
                     else
                     {
-                        vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+                        amrex::Real vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
                     }
 
                     dens_arr(i,j,k,n) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
-
-                    // update cp -----------------------------------------------------
-                    cp_fe           = compute_cp(Temp, 0); 
-                    cp_slg          = compute_cp(Temp, 0);
-                    cp_arr(i,j,k,n)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
-
-                    // update conductivity -------------------------------------------
-                    cond_fe         = compute_k(Temp, 0); 
-                    cond_slg        = compute_k(Temp, 0); //k is conductivity
-                    cond_arr(i,j,k,n) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
-
-                    // get iron properties 
-                    // When do we ust this?
-                    mol_fe = bound01(compute_liqfrac(Temp,0)); // liquid 
-                    sol_fe = bound01((1.0 - mol_fe));          // solid
-
-                    // update phases -------------------------------------------------
-                    // phi(i,j,k,NTHERMVARS+SOLFE_ID)   = vfrac_fe*sol_fe;             
-                    // phi(i,j,k,NTHERMVARS+MOLFE_ID)   = vfrac_fe*mol_fe;             
-                    // phi(i,j,k,NTHERMVARS+SOLSLG_ID)  = bound01((1.0-vfrac_fe))*sol_slg;             
-                    // phi(i,j,k,NTHERMVARS+MOLSLG_ID)  = bound01((1.0-vfrac_fe))*mol_slg;  
-
-                    // set zero velocity: Solid Fe
-                    ParmParse pp("incflo");
-                    bool m_zero_vel = false;
-                    pp.queryAdd("zero_vel", m_zero_vel);
-
-                    if (m_zero_vel) // Make zero velocity 
-                    {
-                        if (sol_fe > 0.99)
-                        {   // no internal flow
-                            vel(i,j,k,0) = Real(0.0);
-                            vel(i,j,k,1) = Real(0.0);
-                            vel(i,j,k,2) = Real(0.0);
-                            eta_arr(i,j,k,n) = m_mu*pow(10, m_n_0);
-                        } // inside pellet
-                    } // if-zero-vel
                 }
-            }); // i,j,k
-        } // mfi
+            }); //i,j,k
+        } //mfi for rho_steel
+
+        for (MFIter mfi(ld.rho_steel, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        {
+            amrex::Real vfrac_fe;
+            Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+            
+            Array4<Real> dens_arr = ld.rho_steel.array(mfi);
+            Array4<Real> temp_arr = ld.tracer.array(mfi);
+            Array4<Real> vfrac_mix_arr = ld.vfrac_mix.array(mfi); 
+
+            ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+            {
+                for (int n = 0; n < l_ntrac; ++n)
+                {
+                    amrex::Real vfrac_fe_mix = vfrac_mix_arr(i,j,k,n);
+                    amrex::Real Temp = temp_arr(i,j,k,n); // Need to bring actual Temp vals
+
+                    // update rho ----------------------------------------------------
+                    amrex::Real dens_fe         = compute_rho(Temp, 0); 
+                    amrex::Real dens_slg        = compute_rho(Temp, 0);
+
+                    if (std::abs(dens_fe-dens_slg) < 1e-6)
+                    {
+                        amrex::Real vfrac_fe        = 1.0; // one material case
+                    }
+                    else
+                    {
+                        amrex::Real vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+                    }
+
+                    dens_arr(i,j,k,n) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
+                }
+            }); //i,j,k
+        } //mfi for cp_steel
+
+
+
+
+
+
+        // for (MFIter mfi(ld.tracer,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        // {
+        //     Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+
+        //     Array4<Real> vfrac_mix_arr = ld.vfrac_mix.array(mfi); 
+        //     Array4<Real> temp_arr = ld.tracer.array(mfi);
+
+        //     Array4<Real> dens_arr = ld.rho_steel.array(mfi); 
+        //     Array4<Real> cp_arr   = ld.cp_steel.array(mfi); 
+
+        //     Array4<Real> cond_arr = ld.k_steel.array(mfi); 
+        //     Array4<Real> eta_arr = ld.viscosity.array(mfi); 
+        //     Array4<Real> const& vel = ld.velocity.array(mfi);
+
+        //     ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+        //     {
+        //         // For SteelSlag case 
+        //         for (int n = 0; n < l_ntrac; ++n)
+        //         {
+        //             amrex::Real Temp = temp_arr(i,j,k,n); // Need to bring actual Temp vals
+        //             amrex::Real vfrac_fe_mix = vfrac_mix_arr(i,j,k,n);
+        //             amrex::Real vfrac_fe;
+        //             amrex::Real sol_fe, mol_fe, sol_slg, mol_slg; // Phases
+
+        //             const auto lo = lbound(gbx);
+        //             const auto hi = ubound(gbx);    
+
+        //             auto const& prob_lo = geom[lev].ProbLoArray();
+        //             auto const& prob_hi = geom[lev].ProbLoArray();
+        //             auto const& dx = geom[lev].CellSizeArray();  
+
+        //             // Case numbers (materials)
+        //             // #0 is Fe
+
+        //             // update rho ----------------------------------------------------
+        //             // dens_fe         = compute_rho(Temp,0); 
+        //             // dens_slg        = compute_rho(Temp,0);
+
+        //             // if (std::abs(dens_fe-dens_slg) < 1e-6)
+        //             // {
+        //             //     vfrac_fe        = 1.0; // one material case
+        //             // }
+        //             // else
+        //             // {
+        //             //     vfrac_fe        = bound01((vfrac_fe_mix-dens_slg)/(dens_fe-dens_slg));
+        //             // }
+
+        //             // dens_arr(i,j,k,n) = dens_slg*(1.0-vfrac_fe) + dens_fe*vfrac_fe;
+
+        //             // update cp -----------------------------------------------------
+        //             cp_fe           = compute_cp(Temp, 0); 
+        //             cp_slg          = compute_cp(Temp, 0);
+
+        //             cp_arr(i,j,k,n)   = cp_slg*(1.0-vfrac_fe) + cp_fe*vfrac_fe;
+
+        //             // update conductivity -------------------------------------------
+        //             cond_fe         = compute_k(Temp, 0); 
+        //             cond_slg        = compute_k(Temp, 0); //k is conductivity
+
+        //             cond_arr(i,j,k,n) = cond_slg*(1.0-vfrac_fe) + cond_fe*vfrac_fe;
+
+        //             // get iron properties  -------------------------------------------
+        //             // When do we ust this?
+        //             mol_fe = bound01(compute_liqfrac(Temp,0)); // liquid 
+        //             sol_fe = bound01((1.0 - mol_fe));          // solid
+
+        //             // update phases -------------------------------------------------
+        //             // phi(i,j,k,NTHERMVARS+SOLFE_ID)   = vfrac_fe*sol_fe;             
+        //             // phi(i,j,k,NTHERMVARS+MOLFE_ID)   = vfrac_fe*mol_fe;             
+        //             // phi(i,j,k,NTHERMVARS+SOLSLG_ID)  = bound01((1.0-vfrac_fe))*sol_slg;             
+        //             // phi(i,j,k,NTHERMVARS+MOLSLG_ID)  = bound01((1.0-vfrac_fe))*mol_slg;  
+
+        //             // set zero velocity: Solid Fe
+        //             ParmParse pp("incflo");
+        //             bool m_zero_vel = false;
+        //             pp.queryAdd("zero_vel", m_zero_vel);
+
+        //             if (m_zero_vel) // Make zero velocity 
+        //             {
+        //                 if (sol_fe > 0.99)
+        //                 {   // no internal flow
+        //                     vel(i,j,k,0) = Real(0.0);
+        //                     vel(i,j,k,1) = Real(0.0);
+        //                     vel(i,j,k,2) = Real(0.0);
+        //                     eta_arr(i,j,k,n) = m_mu*pow(10, m_n_0);
+        //                 } // inside pellet
+        //             } // if-zero-vel
+        //         }
+        //     }); // i,j,k
+        // } // mfi
     } // lev
 
 }

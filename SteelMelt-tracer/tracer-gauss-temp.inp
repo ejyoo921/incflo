@@ -10,8 +10,8 @@ amrex.fpe_trap_overflow  = 1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-# max_step                =   200      # Max number of time steps
-stop_time  				=	10
+max_step                =   2      # Max number of time steps
+# stop_time  				=	10
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
