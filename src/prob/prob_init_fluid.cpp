@@ -171,7 +171,7 @@ void incflo::prob_init_fluid (int lev)
         //EY: New problem type for steel-making
         else if (200 == m_probtype)
         {
-            init_steel_gauss(gbx, ld.tracer.array(mfi), dx, problo);
+            init_steel_gauss(gbx, ld.velocity.array(mfi), ld.tracer.array(mfi), dx, problo);
         }
         else if (201 == m_probtype)
         {
@@ -279,10 +279,10 @@ void incflo::init_steel_sine(Box const& gbx, Array4<Real> const& tracer,
                     } //ii
                 } // jj
             } // kk
-        
     }); // i,j,k
 }
-void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
+void incflo::init_steel_gauss(Box const& gbx, 
+                                Array4<Real> const& vel, Array4<Real> const& tracer, 
                                 GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                 GpuArray<Real, AMREX_SPACEDIM> const& problo)
 {   
@@ -299,7 +299,7 @@ void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
     pp.get("sigY", m_sigY);
     pp.get("sigZ", m_sigZ);
     pp.get("cc", m_cc);
-
+    constexpr Real twopi = Real(2.0)*Real(3.1415926535897932);
     amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
             for(int kk=0;kk<2;kk++)
@@ -312,10 +312,17 @@ void incflo::init_steel_gauss(Box const& gbx, Array4<Real> const& tracer,
                         Real y = problo[1] + (j+jj) * dx[1];
                         Real z = problo[2] + (k+kk) * dx[2];
 
+                        vel(i,j,k) = 0.01*(tanh(y)+1);
+                        tracer(i,j,k) = 100*(tanh(y) + 1);
+
                         // tracer(i,j,k) = m_Tinit_liq * (exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2))));
 
-                        tracer(i,j,k) = m_Tinit_liq 
-                                        * (1 - m_cc*exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2) + pow(z/m_sigZ,2))));
+                        // tracer(i,j,k) = m_Tinit_liq 
+                                        // * (1 - m_cc*exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2) + pow(z/m_sigZ,2))));
+                        // tracer(i,j,k) = 1000;
+                        // tracer(i,j,k) = 10*sin(twopi*x/0.2);
+
+
                     } //ii
                 } // jj
             } // kk

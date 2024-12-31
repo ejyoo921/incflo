@@ -67,7 +67,7 @@ void incflo::tracer_explicit_update (Vector<MultiFab> const& tra_forces)
                         for (int n = 0; n < l_ntrac; ++n)
                         {   // EY: laps_o already has (-1)
                             tra(i,j,k,n) = (rho_arr(i,j,k,n)*cp_arr(i,j,k,n)) * tra_o(i,j,k,n) 
-                            + l_dt *(-rho_arr(i,j,k,n)*cp_arr(i,j,k,n) * dtdt_o(i,j,k,n) 
+                            + l_dt *(rho_arr(i,j,k,n)*cp_arr(i,j,k,n) * dtdt_o(i,j,k,n) 
                                     + m_half * laps_o(i,j,k,n) + tra_f(i,j,k,n) );
                         } 
                     }); 

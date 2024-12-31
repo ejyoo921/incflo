@@ -315,9 +315,17 @@ void incflo::InitialIterations ()
     copy_from_new_to_old_velocity();
     copy_from_new_to_old_density();
     copy_from_new_to_old_tracer();
+
     //EY
     copy_from_new_to_old_t_prop();
-
+    // update properties here as an initial time
+    if (m_fluid_model == FluidModel::TwoMu)
+    {
+        amrex::Print() << "[Initial time] Update thermal properties" << "\n";
+        update_properties();
+    }
+    //EY----------------------------------------------------------------------
+    
     int initialisation = 1;
     bool explicit_diffusion = (m_diff_type == DiffusionType::Explicit);
     ComputeDt(initialisation, explicit_diffusion);

@@ -196,7 +196,7 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
             if (m_fluid_model == FluidModel::TwoMu){
                 for(int lev = 0; lev <= finest_level; ++lev){      
                     auto& ld = *m_leveldata[lev];
-                    bool first = true;
+                    // bool first = true;
                     for (MFIter mfi(*mf,TilingIfNotGPU()); mfi.isValid(); ++mfi)
                     {
                         Box const& bx = mfi.growntilebox(nghost);
@@ -207,12 +207,12 @@ void incflo::compute_tracer_diff_coeff (Vector<MultiFab*> const& tra_eta, int ng
                         {   // EY: Conductivity = k_steel(...)
                             tra_eta_arr(i,j,k,n) = cond_arr(i,j,k,n); 
                         });
-                        if (first)
-                        {
-                            first = false;
-                            amrex::PrintToFile("chk_values") <<  "[Rheology] conduct (888)  = " << tra_eta_arr(8,8,8,n) << "\n";
-                            amrex::PrintToFile("chk_values") <<  "[Rheology] conduct (988)  = " << tra_eta_arr(9,8,8,n) << "\n";
-                        }
+                        // if (first)
+                        // {
+                        //     first = false;
+                        //     amrex::PrintToFile("chk_values") <<  "[Rheology] conduct (888)  = " << tra_eta_arr(8,8,8,n) << "\n";
+                        //     amrex::PrintToFile("chk_values") <<  "[Rheology] conduct (988)  = " << tra_eta_arr(9,8,8,n) << "\n";
+                        // }
                     }
                 }
             } // EY

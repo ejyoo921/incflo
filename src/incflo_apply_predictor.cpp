@@ -181,6 +181,16 @@ void incflo::ApplyPredictor (bool incremental_projection)
     // *************************************************************************************
     update_density(StepType::Predictor);
 
+    // EY : additional GetVecOfPtrs
+    Vector<MultiFab> rho_steel;
+
+    // *************************************************************************************
+    // Allocate space for the forcing terms
+    // *************************************************************************************
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        rho_steel.emplace_back(grids[lev], dmap[lev], m_ntrac, 1, MFInfo(), Factory(lev));
+    }
+
     // **********************************************************************************************
     // Update tracer
     // **********************************************************************************************

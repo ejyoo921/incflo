@@ -213,17 +213,23 @@ DiffusionScalarOp::diffuse_scalar (Vector<MultiFab*> const& tracer,
                 if (m_fluid_model == "twoMu")
                 {
                     amrex::Print() << "TwoMu in Diffusion ScalarOp" << "\n";
-
+                    
                     for (MFIter mfi(rhoCp[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
                     {
-                        Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+                        // Box const& gbx = mfi.growntilebox(); //bigger box (with ghosts)
+                        Box const& bx = mfi.tilebox();
+
                         Array4<Real> const& rhoCp_a = rhoCp[lev].array(mfi);
                         Array4<Real const> const& rho_steel_arr = rho_steel[lev]->const_array(mfi);
                         Array4<Real const> const& cp_steel_arr = cp_steel[lev]->const_array(mfi);
 
-                        ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+                        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
                         {
                             rhoCp_a(i,j,k) = rho_steel_arr(i,j,k) * cp_steel_arr(i,j,k);
+                            if (i == 8)
+                            {
+                                amrex::PrintToFile("chk_values") <<  "[DiffScalarOp] rho_steel  = " << rho_steel_arr(i,j,k) << "\n";
+                            }
                         }); //i,j,k
 
                     } // mfi

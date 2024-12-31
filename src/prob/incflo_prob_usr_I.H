@@ -7,7 +7,9 @@
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo);
                             
-    void init_steel_gauss (amrex::Box const& gbx,  amrex::Array4<amrex::Real> const& tracer,
+    void init_steel_gauss (amrex::Box const& gbx,  
+                            amrex::Array4<amrex::Real> const& vel,
+                            amrex::Array4<amrex::Real> const& tracer,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& dx,
                             amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> const& problo);
 
