@@ -10,20 +10,20 @@ amrex.fpe_trap_overflow  = 1
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            SIMULATION STOP            #
 #.......................................#
-max_step                =   100000         # Max number of time steps
+max_step                =   1000         # Max number of time steps
 # stop_time  				=	1
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #         TIME STEP COMPUTATION         #
 #.......................................#
-incflo.fixed_dt         =   0.001     # Use this constant dt if > 0
+incflo.fixed_dt         =   0.0001     # Use this constant dt if > 0
 incflo.cfl              =   0.1         # CFL factor
 incflo.init_shrink      =   1           # EY: What is this for?
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #            INPUT AND OUTPUT           #
 #.......................................#
-amr.plot_int            =   100         # Steps between plot files
+amr.plot_int            =   10         # Steps between plot files
 amr.plt_eta             =   1           # plot file for eta not real viscosity for inside pellet
 amr.plt_tracer          =   1           # Temperature
 amr.plt_cp_steel        =   1           # 
@@ -64,22 +64,37 @@ incflo.etaerr           =   10
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              GEOMETRY                 #
 #.......................................#
-geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates (m)
-geometry.prob_hi        =  0.1   0.1   0.1 # Hi corner coordinates
-geometry.is_periodic    =  0	0	1  # Periodicity x y z (0/1)
+# geometry.prob_lo        = -0.1  -0.1  -0.1 # Lo corner coordinates (m)
+# geometry.prob_hi        =  0.1   0.1   0.1 # Hi corner coordinates
+
+geometry.prob_lo        = -0.1  -0.1  0 # Lo corner coordinates (m)
+geometry.prob_hi        =  .1   .1   1 # Hi corner coordinates
+geometry.is_periodic    =  0	0	0  # Periodicity x y z (0/1)
 
 # Boundary conditions
-xlo.type                =   "sw"
-xhi.type                =   "sw"
-# xlo.tracer = 990.0;
-# xhi.tracer = 1010.0;
+xlo.type                =   "mi"        #  mass inflow
+xlo.tracer              =   0.0         #  inflow value of tracer
+xlo.velocity            =   0.0  0. 0.    #  inflow value of tracer
+xhi.type                =   "po"        #  pressure outflow
+xhi.pressure            =   0.0
+# xlo.type                =   "sw"
+# xhi.type                =   "sw"
+# xlo.velocity = 0.001
+# xhi.velocity = 0.1
+# # xlo.pressure = 1.0
+# # xhi.pressure = 1.0
+# # xlo.density = 1.0
+# # xhi.density = 1.0
+
+# # xlo.tracer = 990.0;
+# # xhi.tracer = 1010.0;
 
 ylo.type                =   "sw"
 yhi.type                =   "sw"
-# ylo.tracer = 90.03320054
-# yhi.tracer = 109.966799462
-# ylo.velocity = 0.0001
-yhi.velocity = 0.01
+ylo.tracer = 90.03320054
+yhi.tracer = 109.966799462
+ylo.velocity = 0.0
+yhi.velocity = 0.0
 # zlo.type                =   "nsw"
 # zhi.type                =   "nsw"
 
@@ -106,8 +121,8 @@ prob.sigY               =   0.01;
 prob.sigZ               =   0.01;
 prob.cc                 =   0.05;      # x 100 = % of the temp. difference
 
-incflo.ic_u             =   0.001        # (m/s)
-# incflo.ic_v             =   0.0        # for now
+# incflo.ic_u             =   1        # (m/s)
+# incflo.ic_v             =   0.001        # for now
 # incflo.ic_w             =   0.0        #
 # incflo.ic_p             =   0.0        #
 
@@ -117,6 +132,7 @@ incflo.ic_u             =   0.001        # (m/s)
 incflo.advection_type        = "Godunov"
 incflo.diffusion_type        = 1        # 0 = Explicit, 1 = Crank-Nicolson, 2 = Implicit
 
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #              VERBOSITY                #
 #.......................................#
@@ -124,13 +140,14 @@ incflo.verbose           =  2           # incflo itself
 mac_proj.verbose         =  0           # MAC Projector
 nodal_proj.verbose       =  0           # Nodal Projector
 scalar_diffusion.verbose =  1           # Scalar Diffusion
-tensor_diffusion.verbose =  1           # Tensor Diffusion
+tensor_diffusion.verbose =  0           # Tensor Diffusion
 
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨#
 #                EXTRA                  #
 #.......................................#
 # incflo.test_tracer_conservation = true
-# incflo.do_initial_pressure_proj = 1   # to enforce hydrostatic equilibrium
+# don't do initial projection
+# incflo.do_initial_pressure_proj = 0   # to enforce hydrostatic equilibrium
 # let me try with a differnt inital time step multiplied by this number
 # based on cfl
 #find incflo.change_max -> set that with different number if necessary

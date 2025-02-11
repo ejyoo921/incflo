@@ -171,7 +171,7 @@ void incflo::prob_init_fluid (int lev)
         //EY: New problem type for steel-making
         else if (200 == m_probtype)
         {
-            init_steel_gauss(gbx, ld.velocity.array(mfi), ld.tracer.array(mfi), dx, problo);
+            init_steel_gauss(gbx, vbx, domain, ld.velocity.array(mfi), ld.tracer.array(mfi), dx, problo);
         }
         else if (201 == m_probtype)
         {
@@ -281,7 +281,7 @@ void incflo::init_steel_sine(Box const& gbx, Array4<Real> const& tracer,
             } // kk
     }); // i,j,k
 }
-void incflo::init_steel_gauss(Box const& gbx, 
+void incflo::init_steel_gauss(Box const& gbx, Box const& vbx, Box const& domain,
                                 Array4<Real> const& vel, Array4<Real> const& tracer, 
                                 GpuArray<Real, AMREX_SPACEDIM> const& dx,
                                 GpuArray<Real, AMREX_SPACEDIM> const& problo)
@@ -299,7 +299,18 @@ void incflo::init_steel_gauss(Box const& gbx,
     pp.get("sigY", m_sigY);
     pp.get("sigZ", m_sigZ);
     pp.get("cc", m_cc);
-    constexpr Real twopi = Real(2.0)*Real(3.1415926535897932);
+    static constexpr Real twopi = Real(2.0) * Real(3.1415926535897932);
+
+    // ParallelFor(vbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+    // {
+    //     Real x = Real(i+0.05) * dx[0];
+    //     Real y = Real(j+0.05) * dx[1];
+    //     vel(i,j,k,0) = std::tanh(Real(10.0)*(problo[1]-amrex::Math::abs(y)));
+    //     // vel(i,j,k,1) = Real(0.05)*std::sin(twopi*x);
+    //     vel(i,j,k,1) = Real(0.0);
+    // });
+
+    int half_num_cells = domain.length(AMREX_SPACEDIM-1) / 2;
     amrex::ParallelFor(gbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) noexcept
     {
             for(int kk=0;kk<2;kk++)
@@ -312,7 +323,13 @@ void incflo::init_steel_gauss(Box const& gbx,
                         Real y = problo[1] + (j+jj) * dx[1];
                         Real z = problo[2] + (k+kk) * dx[2];
 
-                        vel(i,j,k) = 0.01*(tanh(y)+1);
+                        
+                        Real midpt_y = Real(0.00); 
+
+                        // vel(i,j,k,0) = Real(0.001)*std::tanh(Real(30.0)*(midpt_y*Real(0.5) - amrex::Math::abs(y-midpt_y)));
+                        vel(i,j,k,0) = amrex::Math::abs(std::tanh(Real(50.0)*(problo[0]))) - amrex::Math::abs(std::tanh(Real(50.0)*(y)));
+                        // vel(i,j,k,1) = Real(0.0);
+
                         tracer(i,j,k) = 100*(tanh(y) + 1);
 
                         // tracer(i,j,k) = m_Tinit_liq * (exp(-0.5 * (pow(x/m_sigX,2) + pow(y/m_sigY,2))));

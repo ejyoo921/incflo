@@ -58,6 +58,7 @@ std::unique_ptr<iMultiFab>
 incflo::make_BC_MF(int lev, amrex::Gpu::DeviceVector<amrex::BCRec> const& bcs,
                    std::string const& field)
 {
+    amrex::Print() << "make BC MF step" << "\n";
     auto ncomp = static_cast<int>(bcs.size());
 
     // The advection routines expect that the BC type is stored in the first ghost

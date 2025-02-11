@@ -105,9 +105,9 @@ void incflo::init_bcs ()
             eb_geom = amrex::toLower(eb_geom);
             if (eb_geom == "null" || eb_geom == "all_regular")
 #endif
-            {
-                Abort("For now, mixed BCs must be separated by an EB");
-            }
+            // {
+            //     Abort("For now, mixed BCs must be separated by an EB");
+            // }
             Warning("Using BC type mixed requires that the Dirichlet and Neumann regions are separated by EB.");
 
             m_bc_type[ori] = BC::mixed;

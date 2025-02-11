@@ -108,6 +108,7 @@ incflo::get_diffusion_scalar_op ()
 Vector<Array<LinOpBCType,AMREX_SPACEDIM> >
 incflo::get_diffuse_tensor_bc (Orientation::Side side) const noexcept
 {
+    amrex::Print() << "get Diffuse Tensor BC step" << "\n";
     Vector<Array<LinOpBCType,AMREX_SPACEDIM>> r(AMREX_SPACEDIM);
     for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
         if (Geom(0).isPeriodic(dir)) {

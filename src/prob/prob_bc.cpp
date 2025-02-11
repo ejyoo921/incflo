@@ -11,7 +11,7 @@ void incflo::prob_set_BC_MF (Orientation const& ori, Box const& bx,
                              int inflow_val, int outflow_val,
                              std::string const& field)
 {
-    if (1100 == m_probtype || 1101 == m_probtype || 1102 == m_probtype)
+    if (1100 == m_probtype || 1101 == m_probtype || 1102 == m_probtype || 200 == m_probtype)
     {
         int direction = 0;
         if (1101 == m_probtype) {
