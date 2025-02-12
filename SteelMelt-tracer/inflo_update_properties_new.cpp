@@ -99,7 +99,7 @@ namespace sm_userfuncs
       return liqfrac_1a;
     }
 
-    
+
       AMREX_GPU_DEVICE AMREX_INLINE
 
     Real visc_0(const Real Temp1)
@@ -974,43 +974,43 @@ namespace sm_userfuncs
         amrex::Real cp_fe,cond_fe,dens_fe;
         amrex::Real cp_slg,cond_slg,dens_slg;
         amrex::Real sol_fe,mol_fe,sol_slg,mol_slg;
-	amrex::Real Tinit_liq,Tinit_solid;
+	    amrex::Real Tinit_liq,Tinit_solid;
 
-	int  solidmat,liquidmat;
+	    int  solidmat,liquidmat;
 
-	//  Set inital temps and materials, this is temporary code.
+	    //  Set inital temps and materials, this is temporary code.
 
         solidmat = 2;
-	liquidmat = 5;
+        liquidmat = 5;
 
-	Tinit_liq = 1500.0;
+        Tinit_liq = 1500.0;
 
-	Tinit_solid = 30.0;
+        Tinit_solid = 30.0;
 
 	
 
-	// get solid  properties
-	mol_fe = bound01(get_liqfrac(Temp,2));
+        // get solid  properties
+        mol_fe = bound01(get_liqfrac(Temp,2));
 		
         sol_fe = bound01((1.0 - mol_fe));
 				
 	
-	cp_fe  = get_cp(Temp,solidmat);
-	dens_fe = get_rho(Temp,solidmat);
-	cond_fe   = get_k(Temp,solidmat);
+        cp_fe  = get_cp(Temp,solidmat);
+        dens_fe = get_rho(Temp,solidmat);
+        cond_fe   = get_k(Temp,solidmat);
        
         
         // get slag properties
-	mol_slg = bound01(get_liqfrac(Temp,liquidmat));
-			       
-	sol_slg = bound01(1.0 - mol_slg);
+        mol_slg = bound01(get_liqfrac(Temp,liquidmat));
+                    
+        sol_slg = bound01(1.0 - mol_slg);
 
 	
 	
-	cp_slg  = get_cp(Temp,liquidmat);
-	dens_slg = get_rho(Temp,liquidmat);
-	cond_slg   = get_k(Temp,liquidmat);
-        
+        cp_slg  = get_cp(Temp,liquidmat);
+        dens_slg = get_rho(Temp,liquidmat);
+        cond_slg   = get_k(Temp,liquidmat);
+            
         amrex::Real vfrac_fe=bound01((phi(i,j,k,NTHERMVARS+MIXMASS_ID)-dens_slg)
 				     /(dens_fe-dens_slg));
         phi(i,j,k,DENS_ID)   = dens_slg*(1.0-vfrac_fe)+dens_fe*vfrac_fe;

@@ -53,7 +53,7 @@ namespace
      
         if (Temp <= TL)
         { 
-            cp_1a = cp_1 + c * exp(-0.5*pow(((Temp-T1)/omega),2));
+            cp_0a = cp_1 + c * exp(-0.5*pow(((Temp-T1)/omega),2));
         }
         else
         { if (Temp <= TH)
@@ -66,7 +66,7 @@ namespace
             }
         }
 
-        return 1000.0*cp_1a;
+        return 1000.0*cp_0a;
         }
     
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -944,8 +944,13 @@ void incflo::update_properties ()
 
                     // get iron properties  -------------------------------------------
                     // When do we ust this?
-                    mol_fe = bound01(compute_liqfrac(Temp,0)); // liquid 
+                    mol_fe = bound01(compute_liqfrac(Temp, 2)); // liquid 
                     sol_fe = bound01((1.0 - mol_fe));          // solid
+
+                    // TODO: How to obtain the linquidmat status?
+                    // get slag properties
+                    // mol_slg = bound01(get_liqfrac(Temp, liquidmat));
+                    // sol_slg = bound01(1.0 - mol_slg);
 
                     // update phases -------------------------------------------------
                     // phi(i,j,k,NTHERMVARS+SOLFE_ID)   = vfrac_fe*sol_fe;             
@@ -966,8 +971,8 @@ void incflo::update_properties ()
                             vel(i,j,k,0) = Real(0.0);
                             vel(i,j,k,1) = Real(0.0);
                             vel(i,j,k,2) = Real(0.0);
-                            // eta_arr(i,j,k,n) = m_mu*pow(10, m_n_0);
-                            // eta_arr(i,j,k,n) = get_visc(Temp,0);
+                            eta_arr(i,j,k,n) = m_mu*pow(10, m_n_0);
+                            eta_arr(i,j,k,n) = get_visc(Temp,0);
                         } // inside pellet
                     } // if-zero-vel
                 }
